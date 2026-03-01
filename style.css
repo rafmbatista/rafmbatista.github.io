@@ -369,7 +369,7 @@ footer {
 /* Subtle search bar for research page */
 #search-research {
   display: block;
-  margin: 2rem 0 0 auto;
+  margin: 2rem auto 0 0;
   width: 200px;
   padding: 0.3rem 0.6rem;
   font-family: 'Source Sans 3', sans-serif;
