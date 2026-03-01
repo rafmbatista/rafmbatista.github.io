@@ -1,0 +1,394 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,300&family=DM+Serif+Display:ital@0;1&display=swap');
+
+:root {
+  --bg: #f7f6f3;
+  --text: #1c1c1c;
+  --muted: #888;
+  --subtle: #bbb;
+  --accent: #2a5c8b;
+  --accent-hover: #1e4570;
+  --border: #e4e2dd;
+  --max-width: 680px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 17px; }
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+  font-weight: 300;
+  line-height: 1.75;
+  padding: 0 1.5rem;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Layout */
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 3rem 0 6rem;
+}
+
+/* Header */
+header {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 2.8rem 0 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.site-name {
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 500;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--text);
+}
+
+nav { display: flex; gap: 0.2rem; }
+
+nav a {
+  font-size: 0.82rem;
+  font-weight: 400;
+  text-decoration: none;
+  color: var(--muted);
+  padding: 0.3rem 0.65rem;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+nav a:hover { color: var(--text); background: rgba(0,0,0,0.05); }
+nav a.active { color: var(--text); font-weight: 500; }
+
+/* Typography */
+h1 {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 2rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 1.8rem;
+  margin-top: 2.8rem;
+}
+
+h2 {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--subtle);
+  margin-top: 3rem;
+  margin-bottom: 1.1rem;
+}
+
+p { margin-bottom: 1.1rem; }
+p:last-child { margin-bottom: 0; }
+
+a { color: var(--accent); text-decoration: none; transition: color 0.15s; }
+a:hover { color: var(--accent-hover); text-decoration: underline; text-underline-offset: 2px; }
+
+/* Bio */
+.bio { margin-top: 2.5rem; }
+.bio p { color: #2e2e2e; line-height: 1.8; }
+
+/* Link list */
+.link-list { list-style: none; display: flex; flex-wrap: wrap; }
+.link-list li { font-size: 0.88rem; font-weight: 400; }
+.link-list li::after { content: '·'; margin: 0 0.6rem; color: var(--subtle); }
+.link-list li:last-child::after { content: ''; }
+
+/* Selected papers on home */
+.paper-preview { list-style: none; margin-top: 0.5rem; }
+.paper-preview li {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.paper-preview li:first-child { border-top: 1px solid var(--border); }
+.paper-preview .venue {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+  font-style: italic;
+}
+
+/* Research page papers */
+.paper {
+  padding: 1.8rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.paper:first-of-type { border-top: 1px solid var(--border); }
+
+.paper-title {
+  font-size: 0.97rem;
+  font-weight: 500;
+  line-height: 1.45;
+  margin-bottom: 0.3rem;
+  letter-spacing: -0.01em;
+}
+
+.paper-meta {
+  font-size: 0.80rem;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.paper-abstract {
+  font-size: 0.88rem;
+  color: #444;
+  line-height: 1.7;
+  margin-bottom: 0.75rem;
+  font-weight: 300;
+}
+
+.paper-links { display: flex; gap: 0.8rem; }
+.paper-links a {
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+  border: 1px solid #c2d4e8;
+  padding: 0.2rem 0.55rem;
+  border-radius: 3px;
+  transition: background 0.15s, color 0.15s;
+}
+.paper-links a:hover { background: var(--accent); color: #fff; text-decoration: none; }
+
+/* Work in progress */
+.wip-list { list-style: none; }
+.wip-list li {
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #444;
+}
+.wip-list li .coauthor {
+  font-style: normal;
+  font-size: 0.8rem;
+  color: var(--muted);
+  display: block;
+  margin-top: 0.1rem;
+}
+
+/* Writing page */
+.post-list { list-style: none; }
+.post-list li {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+.post-list li:first-child { border-top: 1px solid var(--border); }
+.post-list a { font-size: 0.95rem; color: var(--text); font-weight: 400; }
+.post-list a:hover { color: var(--accent); text-decoration: none; }
+.post-date { font-size: 0.78rem; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+
+.post-tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 0.1rem 0.45rem;
+  border-radius: 3px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.empty-state {
+  font-size: 0.88rem;
+  color: var(--muted);
+  font-style: italic;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.page-intro {
+  font-size: 0.92rem;
+  color: #555;
+  line-height: 1.75;
+  font-weight: 300;
+}
+
+/* Footer */
+footer {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 1.8rem 0 3rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.78rem;
+  color: var(--subtle);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 520px) {
+  html { font-size: 16px; }
+  h1 { font-size: 1.6rem; }
+  header { flex-direction: column; align-items: flex-start; gap: 0.8rem; }
+  nav { gap: 0; margin-left: -0.65rem; }
+  .post-list li { flex-direction: column; gap: 0.2rem; }
+  footer { flex-direction: column; }
+}
+
+/* Search input on notes page */
+#search {
+  width: 100%;
+  margin: 1.5rem 0 1rem;
+  padding: 0.55rem 0.75rem;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 300;
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+#search:focus {
+  border-color: var(--accent);
+}
+
+#search::placeholder {
+  color: var(--subtle);
+}
+
+/* Individual note entries */
+.note {
+  padding: 1.4rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.note:first-of-type {
+  border-top: 1px solid var(--border);
+}
+
+.note-meta {
+  display: flex;
+  gap: 0.8rem;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+}
+
+.note-number {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+.note-date {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.note p {
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: #2e2e2e;
+}
+
+/* Note index (the number strip at the top) */
+.note-index {
+  margin: 1.5rem 0 0.5rem;
+  line-height: 2;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.88rem;
+}
+
+.note-index .index-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 400;
+}
+
+.note-index .index-link:hover {
+  text-decoration: underline;
+}
+
+.index-sep {
+  color: var(--subtle);
+  margin: 0 0.2rem;
+}
+
+/* Notes page spacing overrides */
+.note {
+  padding: 2.2rem 0;
+}
+
+.note-meta {
+  margin-bottom: 0.9rem;
+}
+
+.note-number {
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+}
+
+.note-date {
+  font-size: 0.82rem;
+}
+
+.note p {
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.note-index {
+  margin: 1.8rem 0 0.8rem;
+  line-height: 2.2;
+}
+
+#search {
+  margin: 1rem 0 0.5rem;
+}
+
+/* Subtle search bar for research page */
+#search-research {
+  display: block;
+  margin: 2rem 0 0 auto;
+  width: 200px;
+  padding: 0.3rem 0.6rem;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  outline: none;
+  transition: border-color 0.15s, width 0.2s;
+}
+
+#search-research:focus {
+  border-bottom-color: var(--accent);
+  width: 260px;
+}
+
+#search-research::placeholder {
+  color: var(--subtle);
+}

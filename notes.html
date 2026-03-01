@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes — Rafael M. Batista</title>
+    <link href="/style.css" rel="stylesheet" type="text/css" media="all">
+  </head>
+  <body>
+
+    <header>
+      <a class="site-name" href="/">Rafael M. Batista</a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/research.html">Research</a>
+        <a href="/writing.html">Writing</a>
+        <a href="/notes.html" class="active">Notes</a>
+        <a href="/files/cv.pdf">CV</a>
+      </nav>
+    </header>
+
+    <div class="container">
+
+      <p class="page-intro">
+        This is a "commonplace notebook" of sorts, where I collect passages, observations, and ideas
+        I want to hold on to. Inspired by <a href="https://bookshop.org/p/books/where-good-ideas-come-from-the-natural-history-of-innovation-steven-johnson/da79a39b6d263b3d?ean=9781594485381&next=t" target="_blank" rel="noopener">Steven Johnson</a>, <a href="https://bookshop.org/p/books/bird-by-bird-some-instructions-on-writing-and-life-anne-lamott/7937cf657650025e?ean=9780385480017&next=t" target="_blank" rel="noopener">Anne Lamott</a>, and 
+        <a href="https://web.archive.org/save/https://jsomers.net/blog/more-people-should-write" target="_blank" rel="noopener">James Somers</a>.
+      </p>
+
+      <!-- SEARCH BAR -->
+      <input
+        type="text"
+        id="search"
+        placeholder="Search notes..."
+        autocomplete="off"
+      >
+
+      <!-- NUMBER INDEX
+           Add each new number here when you add a note below.
+           Format: <a href="#4" class="index-link" data-n="4">4</a> <span class="index-sep">-</span>
+           No trailing separator on the last entry. -->
+      <div class="note-index" id="note-index">
+        <a href="#1" class="index-link" data-n="1">1</a> <span class="index-sep">-</span>
+        <a href="#2" class="index-link" data-n="2">2</a> <span class="index-sep">-</span>
+        <a href="#3" class="index-link" data-n="3">3</a>
+      </div>
+
+      <!-- ============================================================
+        HOW TO ADD A NOTE
+
+        1. Add its number to the index above:
+              <a href="#4" class="index-link" data-n="4">4</a> <span class="index-sep">-</span>
+           (no trailing separator on the last one)
+
+        2. Copy a note block and paste at the BOTTOM before the closing
+           comment, incrementing the id to match.
+
+        3. Save and re-upload notes.html to Neocities.
+      ============================================================ -->
+
+      <div class="note" id="1">
+        <div class="note-meta">
+          <span class="note-number">#1</span>
+          <span class="note-date">January 2026</span>
+        </div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed auctor tortor non libero suscipit, nec vehicula velit consequat. Integer nec est at lacus venenatis malesuada sed nec tortor. Sed aliquam urna non nunc luctus, eget cursus purus consequat. Vivamus a purus nec purus finibus ultricies. Suspendisse potenti. Sed euismod purus ut lectus pulvinar, sit amet accumsan turpis tincidunt. Vivamus auctor tempor mauris, eu convallis leo dignissim nec. Sed scelerisque justo a felis ullamcorper, at fermentum lorem mattis. Etiam ultricies ligula et metus commodo, eget placerat est tempus. Cras tempus ex eu velit consectetur, id mattis sapien pharetra. Sed lobortis, libero quis sollicitudin congue, odio sapien consequat lacus, sed volutpat nibh nisl sit amet ex. Maecenas sollicitudin velit at nisi scelerisque, non venenatis libero tempor. Sed in vehicula ligula. Sed vulputate libero nec tristique lobortis.</p>
+      </div>
+
+      <div class="note" id="2">
+        <div class="note-meta">
+          <span class="note-number">#2</span>
+          <span class="note-date">February 2026</span>
+        </div>
+        <p>Curabitur maximus libero id magna bibendum fringilla. Curabitur ultricies dictum justo. Nam efficitur lobortis sapien a tristique. Vivamus vestibulum, sem nec dignissim scelerisque, purus nunc volutpat ligula, vitae aliquam libero orci nec augue. Nullam semper pulvinar turpis eget finibus. Suspendisse potenti. Nunc posuere arcu eget mauris venenatis, id pharetra sapien dapibus. Etiam at dictum urna. Integer gravida, odio sit amet mattis scelerisque, ipsum arcu ullamcorper sem, in vehicula sapien elit in tellus. Cras nec justo eu mauris volutpat dignissim. Curabitur malesuada purus sed tortor sollicitudin, in ullamcorper risus suscipit.</p>
+      </div>
+
+      <div class="note" id="3">
+        <div class="note-meta">
+          <span class="note-number">#3</span>
+          <span class="note-date">March 2026</span>
+        </div>
+        <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aliquam erat volutpat. Donec tincidunt, quam sed pellentesque fermentum, lorem dolor consequat lectus, at pulvinar arcu ipsum in ligula. Mauris pretium ipsum id sapien posuere vehicula. Vivamus consectetur, turpis vitae pellentesque molestie, libero odio venenatis mauris, id vestibulum nisl nulla sit amet enim.</p>
+      </div>
+
+      <!-- END OF NOTES -->
+
+      <p class="empty-state" id="no-results" style="display:none;">No notes match your search.</p>
+
+    </div>
+
+    <footer>
+      <span>&copy; 2026 Rafael M. Batista</span>
+    </footer>
+
+    <script>
+    (function () {
+      var notes      = Array.from(document.querySelectorAll('.note'));
+      var indexLinks = Array.from(document.querySelectorAll('.index-link'));
+      var indexSeps  = Array.from(document.querySelectorAll('.index-sep'));
+      var search     = document.getElementById('search');
+      var noResults  = document.getElementById('no-results');
+
+      function resetIndexVisibility() {
+        indexLinks.forEach(function (l) { l.style.display = ''; });
+        indexSeps.forEach(function (s) { s.style.display = ''; });
+      }
+
+      function showByHash() {
+        var hash   = window.location.hash.replace('#', '');
+        var target = hash ? document.getElementById(hash) : notes[0];
+        notes.forEach(function (n) {
+          n.style.display = (n === target) ? '' : 'none';
+        });
+        search.value = '';
+        noResults.style.display = 'none';
+        resetIndexVisibility();
+      }
+
+      indexLinks.forEach(function (link) {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          var n      = this.getAttribute('data-n');
+          var target = document.getElementById(n);
+          if (!target) return;
+          notes.forEach(function (note) {
+            note.style.display = (note === target) ? '' : 'none';
+          });
+          history.pushState(null, '', '#' + n);
+          search.value = '';
+          noResults.style.display = 'none';
+          resetIndexVisibility();
+          window.scrollTo(0, 0);
+        });
+      });
+
+      window.addEventListener('popstate', showByHash);
+
+      search.addEventListener('input', function () {
+        var query = this.value.toLowerCase().trim();
+
+        if (!query) {
+          showByHash();
+          return;
+        }
+
+        history.replaceState(null, '', window.location.pathname);
+
+        var visible = 0;
+        notes.forEach(function (note) {
+          var match = note.textContent.toLowerCase().includes(query);
+          note.style.display = match ? '' : 'none';
+          if (match) visible++;
+          var link = document.querySelector('.index-link[data-n="' + note.id + '"]');
+          if (link) link.style.display = match ? '' : 'none';
+        });
+
+        indexSeps.forEach(function (s) { s.style.display = 'none'; });
+        var visibleLinks = indexLinks.filter(function (l) { return l.style.display !== 'none'; });
+        visibleLinks.forEach(function (link, i) {
+          if (i < visibleLinks.length - 1) {
+            var next = link.nextSibling;
+            while (next) {
+              if (next.classList && next.classList.contains('index-sep')) {
+                next.style.display = '';
+                break;
+              }
+              next = next.nextSibling;
+            }
+          }
+        });
+
+        noResults.style.display = (visible === 0) ? 'block' : 'none';
+      });
+
+      showByHash();
+    })();
+    </script>
+
+  </body>
+</html>
