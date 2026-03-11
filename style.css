@@ -146,25 +146,42 @@ a:hover { color: var(--accent-hover); text-decoration: underline; text-underline
 }
 
 .paper-abstract {
+  display: none;
   font-size: 0.88rem;
   color: #444;
   line-height: 1.7;
+  margin-top: 0.75rem;
   margin-bottom: 0.75rem;
   font-weight: 300;
 }
+.paper.abstract-open .paper-abstract { display: block; }
 
-.paper-links { display: flex; gap: 0.8rem; }
-.paper-links a {
+.paper-links { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+.paper-links a,
+.paper-links button.abstract-toggle {
   font-size: 0.76rem;
   font-weight: 500;
-  color: var(--accent);
   letter-spacing: 0.02em;
-  border: 1px solid #c2d4e8;
   padding: 0.2rem 0.55rem;
   border-radius: 3px;
   transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+  background: none;
+  text-decoration: none;
+  display: inline-block;
+}
+.paper-links a {
+  color: var(--accent);
+  border: 1px solid #c2d4e8;
 }
 .paper-links a:hover { background: var(--accent); color: #fff; text-decoration: none; }
+.paper-links button.abstract-toggle {
+  color: var(--muted);
+  border: 1px solid var(--border);
+  font-family: inherit;
+  line-height: inherit;
+}
+.paper-links button.abstract-toggle:hover { color: var(--text); border-color: #bbb; background: none; }
 
 /* Work in progress */
 .wip-list { list-style: none; }
