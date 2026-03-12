@@ -101,7 +101,7 @@ a:hover { color: var(--accent-hover); text-decoration: underline; text-underline
 
 /* Bio */
 .bio { margin-top: 2.5rem; }
-.bio p { color: #2e2e2e; line-height: 1.8; }
+.bio p { color: #555; line-height: 1.8; }
 
 /* Link list */
 .link-list { list-style: none; display: flex; flex-wrap: wrap; }
