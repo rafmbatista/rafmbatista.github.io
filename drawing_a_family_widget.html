@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Draw Your Family</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #f0ebe3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Georgia, serif;
+      padding: 24px;
+    }
+
+    #app {
+      background: #fff;
+      border: 1.5px solid #1a1a1a;
+      border-radius: 4px;
+      box-shadow: 4px 4px 0 #1a1a1a;
+      max-width: 660px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* Header */
+    #header {
+      padding: 20px 24px 16px;
+      border-bottom: 1.5px solid #1a1a1a;
+      background: #fdfaf5;
+    }
+    #header .label {
+      font-family: monospace;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: #999;
+      text-transform: uppercase;
+    }
+    #header h1 {
+      margin-top: 6px;
+      font-size: 18px;
+      font-weight: normal;
+      color: #1a1a1a;
+      line-height: 1.4;
+    }
+
+    /* Canvas */
+    #canvas-wrap {
+      border-bottom: 1.5px solid #1a1a1a;
+      line-height: 0;
+    }
+    #canvas {
+      display: block;
+      width: 100%;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    /* Toolbar */
+    #toolbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 16px;
+      border-bottom: 1.5px solid #1a1a1a;
+      background: #fdfaf5;
+      flex-wrap: wrap;
+    }
+    .tool-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tool-btn {
+      width: 34px;
+      height: 34px;
+      border: 1.5px solid #ccc;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.1s;
+    }
+    .tool-btn.active {
+      border-color: #1a1a1a;
+      background: #f0ebe3;
+      box-shadow: 1px 1px 0 #1a1a1a;
+    }
+    .swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #ddd;
+      transition: transform 0.1s;
+    }
+    .swatch.active {
+      border-color: #1a1a1a;
+      transform: scale(1.2);
+    }
+    #color-input {
+      width: 28px;
+      height: 28px;
+      border: 1.5px solid #ccc;
+      border-radius: 50%;
+      cursor: pointer;
+      padding: 1px;
+      background: none;
+    }
+
+    /* Footer */
+    #footer {
+      padding: 14px 20px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+    }
+    #status-msg {
+      font-family: monospace;
+      font-size: 12px;
+      color: #888;
+    }
+    #submit-btn {
+      padding: 10px 22px;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      cursor: not-allowed;
+      opacity: 0.45;
+      transition: opacity 0.2s;
+    }
+    #submit-btn.ready {
+      cursor: pointer;
+      opacity: 1;
+    }
+
+    /* Success screen */
+    #success {
+      display: none;
+      padding: 48px 40px;
+      text-align: center;
+    }
+    #success .icon { font-size: 32px; margin-bottom: 12px; }
+    #success h2 { font-size: 22px; font-weight: normal; margin-bottom: 8px; }
+    #success p { color: #888; font-family: monospace; font-size: 13px; margin-bottom: 24px; }
+    #reset-btn {
+      padding: 10px 20px;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: monospace;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Drawing UI -->
+  <div id="drawing-ui">
+    <div id="header">
+      <div class="label">Thought experiment</div>
+      <h1 id="prompt-text">Draw your family</h1>
+    </div>
+
+    <div id="canvas-wrap">
+      <canvas id="canvas" width="600" height="400"></canvas>
+    </div>
+
+    <div id="toolbar">
+      <!-- Tools -->
+      <div class="tool-group">
+        <button class="tool-btn active" id="btn-pen"   title="Pen">✏️</button>
+        <button class="tool-btn"        id="btn-eraser" title="Eraser">⬜</button>
+        <button class="tool-btn"        id="btn-clear"  title="Clear all">🗑️</button>
+      </div>
+
+      <!-- Brush sizes -->
+      <div class="tool-group" id="size-group">
+        <button class="tool-btn active" data-size="3"  title="Small">·</button>
+        <button class="tool-btn"        data-size="6"  title="Medium">–</button>
+        <button class="tool-btn"        data-size="11" title="Large">━</button>
+      </div>
+
+      <!-- Color swatches -->
+      <div class="tool-group" id="swatch-group">
+        <div class="swatch active" data-color="#1a1a1a" style="background:#1a1a1a;"></div>
+        <div class="swatch" data-color="#e63946" style="background:#e63946;"></div>
+        <div class="swatch" data-color="#2a9d8f" style="background:#2a9d8f;"></div>
+        <div class="swatch" data-color="#e9c46a" style="background:#e9c46a;"></div>
+        <div class="swatch" data-color="#457b9d" style="background:#457b9d;"></div>
+        <div class="swatch" data-color="#f4a261" style="background:#f4a261;"></div>
+        <!-- Full color picker -->
+        <input type="color" id="color-input" value="#1a1a1a" title="Custom color" />
+      </div>
+    </div>
+
+    <div id="footer">
+      <span id="status-msg"></span>
+      <button id="submit-btn">Submit drawing →</button>
+    </div>
+  </div>
+
+  <!-- Success screen (hidden until submission) -->
+  <div id="success">
+    <div class="icon">✦</div>
+    <h2>Drawing received!</h2>
+    <p>Thanks for your submission.</p>
+    <button id="reset-btn">Draw another</button>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     Firebase SDK  (loaded from Google's CDN)
+     ═══════════════════════════════════════════════ -->
+<script type="module">
+  import { initializeApp }       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore,
+           addDoc, collection,
+           serverTimestamp }     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB00QTkDuV5aBY8waXjHCXtLn0EPfWKj2M",
+    authDomain: "draw-a-family.firebaseapp.com",
+    projectId: "draw-a-family",
+    storageBucket: "draw-a-family.firebasestorage.app",
+    messagingSenderId: "848653438644",
+    appId: "1:848653438644:web:0597c989d2f476733591e1"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  const PROMPT = "Draw your family";
+  document.getElementById("prompt-text").textContent = PROMPT;
+
+
+  // ── Canvas setup ──────────────────────────────────────────────────────────
+  const canvas  = document.getElementById("canvas");
+  const ctx     = canvas.getContext("2d");
+
+  // Fill background (important — otherwise toDataURL gives a transparent PNG)
+  ctx.fillStyle = "#fdfaf5";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  let tool      = "pen";
+  let color     = "#1a1a1a";
+  let brushSize = 3;
+  let isDrawing = false;
+  let lastX     = 0;
+  let lastY     = 0;
+  let hasStrokes = false;
+
+  // Scale mouse/touch coords to canvas resolution
+  function getPos(e) {
+    const rect   = canvas.getBoundingClientRect();
+    const scaleX = canvas.width  / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const src    = e.touches ? e.touches[0] : e;
+    return {
+      x: (src.clientX - rect.left) * scaleX,
+      y: (src.clientY - rect.top)  * scaleY,
+    };
+  }
+
+  function startDraw(e) {
+    e.preventDefault();
+    isDrawing = true;
+    const { x, y } = getPos(e);
+    lastX = x; lastY = y;
+    // Paint a dot on click/tap
+    ctx.beginPath();
+    ctx.arc(x, y, (tool === "eraser" ? 14 : brushSize), 0, Math.PI * 2);
+    ctx.fillStyle = tool === "eraser" ? "#fdfaf5" : color;
+    ctx.fill();
+    markDirty();
+  }
+
+  function draw(e) {
+    e.preventDefault();
+    if (!isDrawing) return;
+    const { x, y } = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.strokeStyle = tool === "eraser" ? "#fdfaf5" : color;
+    ctx.lineWidth   = tool === "eraser" ? 28 : brushSize * 2;
+    ctx.lineCap     = "round";
+    ctx.lineJoin    = "round";
+    ctx.stroke();
+    lastX = x; lastY = y;
+    markDirty();
+  }
+
+  function stopDraw() { isDrawing = false; }
+
+  canvas.addEventListener("mousedown",  startDraw);
+  canvas.addEventListener("mousemove",  draw);
+  canvas.addEventListener("mouseup",    stopDraw);
+  canvas.addEventListener("mouseleave", stopDraw);
+  canvas.addEventListener("touchstart", startDraw, { passive: false });
+  canvas.addEventListener("touchmove",  draw,      { passive: false });
+  canvas.addEventListener("touchend",   stopDraw);
+
+
+  // ── Tool buttons ──────────────────────────────────────────────────────────
+  document.getElementById("btn-pen").addEventListener("click", () => setTool("pen"));
+  document.getElementById("btn-eraser").addEventListener("click", () => setTool("eraser"));
+  document.getElementById("btn-clear").addEventListener("click", () => {
+    ctx.fillStyle = "#fdfaf5";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    hasStrokes = false;
+    updateSubmitBtn();
+  });
+
+  function setTool(t) {
+    tool = t;
+    canvas.style.cursor = t === "eraser" ? "cell" : "crosshair";
+    document.getElementById("btn-pen").classList.toggle("active",    t === "pen");
+    document.getElementById("btn-eraser").classList.toggle("active", t === "eraser");
+  }
+
+  // ── Brush size buttons ────────────────────────────────────────────────────
+  document.querySelectorAll("#size-group .tool-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      brushSize = parseInt(btn.dataset.size);
+      document.querySelectorAll("#size-group .tool-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+    });
+  });
+
+  // ── Color swatches ────────────────────────────────────────────────────────
+  document.querySelectorAll("#swatch-group .swatch").forEach(sw => {
+    sw.addEventListener("click", () => {
+      color = sw.dataset.color;
+      setTool("pen");
+      document.querySelectorAll(".swatch").forEach(s => s.classList.remove("active"));
+      sw.classList.add("active");
+      document.getElementById("color-input").value = color;
+    });
+  });
+
+  // Full color picker input
+  document.getElementById("color-input").addEventListener("input", (e) => {
+    color = e.target.value;
+    setTool("pen");
+    document.querySelectorAll(".swatch").forEach(s => s.classList.remove("active"));
+  });
+
+
+  // ── Submit ────────────────────────────────────────────────────────────────
+  function markDirty() {
+    if (!hasStrokes) { hasStrokes = true; updateSubmitBtn(); }
+  }
+
+  function updateSubmitBtn() {
+    const btn = document.getElementById("submit-btn");
+    btn.classList.toggle("ready", hasStrokes);
+  }
+
+  document.getElementById("submit-btn").addEventListener("click", async () => {
+    if (!hasStrokes) return;
+
+    const btn = document.getElementById("submit-btn");
+    const msg = document.getElementById("status-msg");
+    btn.textContent = "Submitting…";
+    btn.classList.remove("ready");
+    msg.textContent = "";
+
+    try {
+      const imageData = canvas.toDataURL("image/png");
+
+      await addDoc(collection(db, "drawings"), {
+        prompt:      PROMPT,
+        image:       imageData,
+        submittedAt: serverTimestamp()
+      });
+
+      document.getElementById("drawing-ui").style.display = "none";
+      document.getElementById("success").style.display    = "block";
+
+    } catch (err) {
+      console.error("Submission failed:", err);
+      msg.textContent = "Submission failed — check console.";
+      btn.textContent = "Submit drawing →";
+      btn.classList.add("ready");
+    }
+  });
+
+
+  // ── Reset ("Draw another") ────────────────────────────────────────────────
+  document.getElementById("reset-btn").addEventListener("click", () => {
+    ctx.fillStyle = "#fdfaf5";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    hasStrokes = false;
+    updateSubmitBtn();
+    document.getElementById("submit-btn").textContent = "Submit drawing →";
+    document.getElementById("drawing-ui").style.display = "block";
+    document.getElementById("success").style.display    = "none";
+  });
+
+</script>
+</body>
+</html>
