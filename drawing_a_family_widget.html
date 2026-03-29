@@ -119,9 +119,15 @@
     #footer {
       padding: 14px 20px;
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       align-items: center;
       gap: 12px;
+    }
+    #disclosure {
+      font-family: monospace;
+      font-size: 11px;
+      color: #aaa;
+      line-height: 1.5;
     }
     #status-msg {
       font-family: monospace;
@@ -210,8 +216,11 @@
     </div>
 
     <div id="footer">
-      <span id="status-msg"></span>
-      <button id="submit-btn">Submit drawing →</button>
+      <span id="disclosure">Anonymous. By submitting I'm assuming<br>you're okay with me viewing and sharing it.</span>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span id="status-msg"></span>
+        <button id="submit-btn">Submit drawing →</button>
+      </div>
     </div>
   </div>
 
