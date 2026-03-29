@@ -59,6 +59,11 @@
       touch-action: none;
       cursor: crosshair;
     }
+    #upload-preview {
+      display: none;
+      width: 100%;
+      height: auto;
+    }
 
     /* Toolbar */
     #toolbar {
@@ -115,6 +120,27 @@
       background: none;
     }
 
+    /* Draw-instead bar (shown in upload mode, replaces toolbar) */
+    #draw-instead-wrap {
+      display: none;
+      align-items: center;
+      padding: 10px 16px;
+      border-bottom: 1.5px solid #1a1a1a;
+      background: #fdfaf5;
+    }
+    #draw-instead-btn {
+      background: none;
+      border: none;
+      font-family: monospace;
+      font-size: 12px;
+      color: #888;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    #draw-instead-btn:hover { color: #1a1a1a; }
+
     /* Footer */
     #footer {
       padding: 14px 20px;
@@ -151,6 +177,19 @@
       cursor: pointer;
       opacity: 1;
     }
+    #upload-btn {
+      background: none;
+      border: none;
+      font-family: monospace;
+      font-size: 11px;
+      color: #aaa;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-align: right;
+    }
+    #upload-btn:hover { color: #555; }
 
     /* Success screen */
     #success {
@@ -185,6 +224,7 @@
 
     <div id="canvas-wrap">
       <canvas id="canvas" width="600" height="400"></canvas>
+      <img id="upload-preview" alt="Your uploaded drawing">
     </div>
 
     <div id="toolbar">
@@ -215,11 +255,20 @@
       </div>
     </div>
 
+    <!-- Shown only in upload mode, replacing the toolbar -->
+    <div id="draw-instead-wrap">
+      <button id="draw-instead-btn">← draw instead</button>
+    </div>
+
     <div id="footer">
       <span id="disclosure">Anonymous. By submitting I'm assuming<br>you're okay with me viewing and sharing it.</span>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <span id="status-msg"></span>
-        <button id="submit-btn">Submit drawing →</button>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span id="status-msg"></span>
+          <button id="submit-btn">Submit drawing →</button>
+        </div>
+        <input type="file" id="upload-input" accept="image/*" capture="environment" style="display:none">
+        <button id="upload-btn">Or upload a photo of your drawing</button>
       </div>
     </div>
   </div>
@@ -273,7 +322,8 @@
   let isDrawing = false;
   let lastX     = 0;
   let lastY     = 0;
-  let hasStrokes = false;
+  let hasStrokes       = false;
+  let uploadedImageData = null;   // set when user uploads; null when drawing
 
   // Scale mouse/touch coords to canvas resolution
   function getPos(e) {
@@ -372,18 +422,60 @@
   });
 
 
+  // ── Upload flow ───────────────────────────────────────────────────────────
+  const uploadInput   = document.getElementById("upload-input");
+  const uploadPreview = document.getElementById("upload-preview");
+  const toolbar       = document.getElementById("toolbar");
+  const drawInsteadWrap = document.getElementById("draw-instead-wrap");
+
+  document.getElementById("upload-btn").addEventListener("click", () => {
+    uploadInput.value = "";   // allow re-selecting the same file
+    uploadInput.click();
+  });
+
+  uploadInput.addEventListener("change", () => {
+    const file = uploadInput.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      uploadedImageData = e.target.result;   // base64 data URL
+      uploadPreview.src = uploadedImageData;
+      // Switch to upload mode
+      canvas.style.display        = "none";
+      uploadPreview.style.display = "block";
+      toolbar.style.display       = "none";
+      drawInsteadWrap.style.display = "flex";
+      // Enable submit
+      document.getElementById("submit-btn").classList.add("ready");
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById("draw-instead-btn").addEventListener("click", () => {
+    // Return to draw mode — clear the upload
+    uploadedImageData             = null;
+    uploadPreview.style.display   = "none";
+    uploadPreview.src             = "";
+    canvas.style.display          = "block";
+    toolbar.style.display         = "flex";
+    drawInsteadWrap.style.display = "none";
+    updateSubmitBtn();   // re-evaluate based on hasStrokes
+  });
+
+
   // ── Submit ────────────────────────────────────────────────────────────────
   function markDirty() {
     if (!hasStrokes) { hasStrokes = true; updateSubmitBtn(); }
   }
 
   function updateSubmitBtn() {
-    const btn = document.getElementById("submit-btn");
-    btn.classList.toggle("ready", hasStrokes);
+    const ready = hasStrokes || uploadedImageData !== null;
+    document.getElementById("submit-btn").classList.toggle("ready", ready);
   }
 
   document.getElementById("submit-btn").addEventListener("click", async () => {
-    if (!hasStrokes) return;
+    if (!hasStrokes && uploadedImageData === null) return;
 
     const btn = document.getElementById("submit-btn");
     const msg = document.getElementById("status-msg");
@@ -392,7 +484,9 @@
     msg.textContent = "";
 
     try {
-      const imageData = canvas.toDataURL("image/png");
+      const imageData = uploadedImageData !== null
+        ? uploadedImageData
+        : canvas.toDataURL("image/png");
 
       await addDoc(collection(db, "drawings"), {
         prompt:      PROMPT,
@@ -407,16 +501,25 @@
       console.error("Submission failed:", err);
       msg.textContent = "Submission failed — check console.";
       btn.textContent = "Submit drawing →";
-      btn.classList.add("ready");
+      updateSubmitBtn();
     }
   });
 
 
   // ── Reset ("Draw another") ────────────────────────────────────────────────
   document.getElementById("reset-btn").addEventListener("click", () => {
+    // Clear canvas
     ctx.fillStyle = "#fdfaf5";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     hasStrokes = false;
+    // Clear upload state
+    uploadedImageData             = null;
+    uploadPreview.style.display   = "none";
+    uploadPreview.src             = "";
+    // Restore draw mode
+    canvas.style.display          = "block";
+    toolbar.style.display         = "flex";
+    drawInsteadWrap.style.display = "none";
     updateSubmitBtn();
     document.getElementById("submit-btn").textContent = "Submit drawing →";
     document.getElementById("drawing-ui").style.display = "block";
