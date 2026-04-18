@@ -68,139 +68,6 @@
   }
   .shot img { display: block; width: 100%; height: auto; }
 
-  /* Paper demo (live 3-tab) ------------------------------------ */
-  .paper-demo {
-    margin: 32px 0 14px;
-    border: 1px solid var(--line); border-radius: 4px; background: var(--paper);
-    overflow: hidden;
-    box-shadow: 0 2px 6px rgba(22,24,26,0.05), 0 16px 32px rgba(22,24,26,0.08);
-  }
-  .paper-demo .chrome {
-    height: 32px; background: var(--paper-2); border-bottom: 1px solid var(--line);
-    display: flex; align-items: center; padding: 0 14px; gap: 8px;
-  }
-  .paper-demo .chrome .dots { display: flex; gap: 6px; }
-  .paper-demo .chrome .dots span { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
-  .paper-demo .chrome .title { flex: 1; text-align: center; font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); }
-  .paper-demo .tab-bar {
-    display: flex; gap: 4px; align-items: center;
-    padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--paper-2);
-  }
-  .paper-demo .segmented {
-    display: inline-flex; border: 1px solid var(--line); border-radius: 999px;
-    overflow: hidden; background: var(--paper);
-  }
-  .paper-demo .tab {
-    background: transparent; border: none;
-    padding: 6px 16px; font-family: var(--font-sans); font-size: 13px; font-weight: 500;
-    color: var(--ink-2); cursor: pointer; text-transform: capitalize;
-  }
-  .paper-demo .tab.active { background: var(--ink); color: var(--paper); }
-  .paper-demo .hint {
-    font-family: var(--font-mono); font-size: 10px; color: var(--ink-3);
-    letter-spacing: 0.08em; text-transform: uppercase; margin-left: 14px;
-  }
-  .paper-demo .pane { padding: 28px 40px; min-height: 420px; }
-
-  /* Paper — Draft */
-  .pane-draft .meta { font-family: var(--font-mono); font-size: 10px; color: var(--ink-3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
-  .pane-draft h1 { font-family: var(--font-serif); font-size: 28px; font-weight: 400; line-height: 1.15; margin: 0 0 10px; letter-spacing: -0.005em; }
-  .pane-draft .byline { font-size: 13px; color: var(--ink-2); margin-bottom: 24px; }
-  .pane-draft h2 { font-family: var(--font-serif); font-size: 18px; font-weight: 400; margin: 24px 0 8px; }
-  .pane-draft p { font-family: var(--font-sans); font-size: 15px; line-height: 1.7; margin: 0 0 12px; color: var(--ink); }
-  .pane-draft em { font-style: italic; }
-  .pane-draft .pill-data {
-    font-family: var(--font-mono); font-size: 12px; padding: 1px 6px; border-radius: 3px;
-    border: 1px solid var(--pencil); background: var(--pencil-soft); color: var(--pencil);
-  }
-  .pane-draft .pill-live {
-    font-family: var(--font-mono); font-size: 12px; padding: 1px 6px; border-radius: 3px;
-    border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent-deep);
-  }
-  .pane-draft .pill-material {
-    font-family: var(--font-mono); font-size: 12px; padding: 1px 6px; border-radius: 3px;
-    border: 1px solid var(--qual); background: #EFE2F2; color: var(--qual);
-  }
-  .pane-draft .cite {
-    font-family: var(--font-mono); font-size: 13px; color: var(--ink-2);
-    text-decoration: underline; text-decoration-style: dotted;
-    text-decoration-color: var(--ink-3); text-underline-offset: 2px;
-  }
-
-  /* Paper — Publication */
-  .pane-pub {
-    background: #FFFCF6;
-    font-family: 'Iowan Old Style', Georgia, serif;
-  }
-  .pane-pub .masthead {
-    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
-    color: var(--ink-2); border-bottom: 2px solid var(--ink); padding-bottom: 8px; margin-bottom: 20px;
-    display: flex; justify-content: space-between; align-items: baseline;
-  }
-  .pane-pub .masthead .crossmark {
-    font-family: var(--font-mono); font-size: 9px; color: var(--ink-3);
-    padding: 2px 6px; border: 1px solid var(--ink-3); letter-spacing: 0.05em;
-  }
-  .pane-pub h1 { font-family: 'Iowan Old Style', Georgia, serif; font-size: 22px; font-weight: 400; line-height: 1.18; margin: 0 0 12px; letter-spacing: -0.005em; }
-  .pane-pub .byline { font-size: 13px; }
-  .pane-pub .aff { font-size: 11px; color: var(--ink-3); margin-top: 4px; line-height: 1.5; }
-  .pane-pub .signif {
-    margin: 20px 0; padding: 14px 16px;
-    background: var(--accent-soft); border: 1px solid var(--line);
-    border-left: 3px solid var(--accent);
-  }
-  .pane-pub .signif .lbl {
-    font-family: var(--font-sans); font-size: 10px; font-weight: 600;
-    letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px;
-  }
-  .pane-pub .signif p { font-size: 13px; line-height: 1.55; margin: 0; }
-  .pane-pub .twocol {
-    column-count: 2; column-gap: 22px; font-size: 12px; line-height: 1.55;
-    text-align: justify; hyphens: auto;
-  }
-  .pane-pub .twocol h2 {
-    font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-    margin: 0 0 8px; font-family: var(--font-sans);
-  }
-  .pane-pub .twocol p { margin: 0 0 10px; }
-  .pane-pub .trace {
-    color: var(--pencil); text-decoration: underline; text-decoration-style: dotted;
-    text-underline-offset: 2px;
-  }
-  .pane-pub .trace-accent {
-    color: var(--accent); text-decoration: underline; text-decoration-style: dotted;
-    text-underline-offset: 2px;
-  }
-
-  /* Paper — Interactive */
-  .pane-int .banner {
-    padding: 8px 12px; background: var(--pencil-soft);
-    border: 1px solid var(--pencil); color: var(--pencil);
-    border-radius: 3px; font-size: 12px;
-    font-family: var(--font-mono); letter-spacing: 0.05em;
-    margin-bottom: 22px;
-  }
-  .pane-int h1 { font-family: var(--font-serif); font-size: 26px; font-weight: 400; line-height: 1.15; margin: 0 0 18px; }
-  .pane-int h2 { font-family: var(--font-serif); font-size: 18px; font-weight: 400; margin: 14px 0 8px; }
-  .pane-int p { font-family: var(--font-sans); font-size: 15px; line-height: 1.7; margin: 0 0 14px; color: var(--ink); }
-  .pane-int .live-pill {
-    font-family: var(--font-mono); font-size: 13px; color: var(--accent);
-    background: var(--accent-soft); padding: 1px 6px; border-radius: 2px;
-    border: 1px solid var(--accent);
-  }
-  .pane-int .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
-  .pane-int .chip {
-    padding: 4px 10px; border-radius: 999px;
-    font-family: var(--font-mono); font-size: 11px;
-    border: 1px solid var(--line); color: var(--ink-2);
-  }
-  .pane-int .chip.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-  .pane-int .chart-box {
-    border: 1px solid var(--line); background: var(--paper); padding: 16px;
-    margin-bottom: 14px;
-  }
-  .pane-int .chart-box svg { display: block; width: 100%; height: 180px; }
-
   /* Closing ----------------------------------------------------- */
   .closing {
     padding: 96px 24px 48px;
@@ -231,8 +98,6 @@
     .welcome { padding: 56px 24px 12px; }
     .tour { padding: 56px 24px 16px; }
     .closing { padding: 72px 24px 40px; }
-    .paper-demo .pane { padding: 20px; }
-    .pane-pub .twocol { column-count: 1; }
   }
 </style>
 </head>
@@ -284,7 +149,7 @@
   </p>
 
   <figure class="shot">
-    <img src="shots/materials.png" alt="Materials screen — preregistration audit">
+    <img src="shots/materials_frame.png" alt="Materials screen — preregistration audit">
   </figure>
   <a class="explore" href="screens/materials.html">Explore the full Materials screen →</a>
 </section>
@@ -302,7 +167,7 @@
   </p>
 
   <figure class="shot">
-    <img src="shots/papers.png" alt="Library screen — paper cluster graph">
+    <img src="shots/papers_frame.png" alt="Library screen — paper cluster graph">
   </figure>
   <a class="explore" href="screens/papers.html">Explore the full Library screen →</a>
 </section>
@@ -324,7 +189,7 @@
   </p>
 
   <figure class="shot">
-    <img src="shots/data.png" alt="Data screen — clean quantitative with refresh banner and pipeline">
+    <img src="shots/data_frame.png" alt="Data screen — clean quantitative with refresh banner and pipeline">
   </figure>
   <a class="explore" href="screens/data.html">Explore the full Data screen →</a>
 </section>
@@ -343,7 +208,7 @@
   </p>
 
   <figure class="shot">
-    <img src="shots/figures.png" alt="Figures screen — editable figure with tweaks panel">
+    <img src="shots/figures_frame.png" alt="Figures screen — editable figure with tweaks panel">
   </figure>
   <a class="explore" href="screens/figures.html">Explore the full Figures screen →</a>
 </section>
@@ -361,144 +226,9 @@
     re-formatting.
   </p>
 
-  <div class="paper-demo" aria-label="Paper — three-view editor">
-    <div class="chrome">
-      <div class="dots"><span></span><span></span><span></span></div>
-      <div class="title">claude-ra · manuscript.md</div>
-    </div>
-    <div class="tab-bar">
-      <div class="segmented">
-        <button class="tab active" data-tab="draft">Draft</button>
-        <button class="tab" data-tab="pub">Publication</button>
-        <button class="tab" data-tab="int">Interactive</button>
-      </div>
-      <span class="hint">↑ try the modes</span>
-    </div>
-
-    <div class="pane pane-draft" data-pane="draft">
-      <div class="meta">Manuscript draft v0.12 · last edit 14 min ago · A. Chen</div>
-      <h1>Calibrated trust in AI research assistants</h1>
-      <div class="byline">A. Chen<sup>1</sup>, M. Okafor<sup>1</sup>, S. Rao<sup>2</sup></div>
-      <h2>Abstract</h2>
-      <p>
-        Scientists increasingly rely on AI assistants for data analysis, literature review,
-        and writing. We combine a pre-registered survey
-        (N=<span class="pill-data">312</span>)
-        with <span class="pill-data">24 semi-structured interviews</span>
-        to characterize <em>calibration</em> — when scientists appropriately trust, verify,
-        or override AI-generated outputs. Trust is highest for
-        <span class="pill-live">literature search (M=4.2)</span>
-        and lowest for <span class="pill-live">causal inference (M=2.1)</span>.
-      </p>
-      <h2>1 · Introduction</h2>
-      <p>
-        The adoption of large language models in scientific workflows has outpaced empirical
-        understanding of how researchers verify, cite, and delegate work to these systems.
-        Prior work (<span class="cite">Shah 2024</span>;
-        <span class="cite">Okafor &amp; Chen 2025</span>) has documented usage; few studies
-        examine <em>calibration</em>.
-      </p>
-      <p>
-        Participants (<span class="pill-data">N=312</span>) were recruited via
-        <span class="pill-material">Qualtrics panel</span>. The interview protocol is in
-        <span class="pill-material">materials/interview_protocol.md</span>.
-      </p>
-    </div>
-
-    <div class="pane pane-pub" data-pane="pub" hidden>
-      <div class="masthead">
-        <span>Research Article · Psychological &amp; Cognitive Sciences</span>
-        <span class="crossmark">✓ CrossMark · doi 10.1073/pnas.26031226</span>
-      </div>
-      <h1>Calibrated trust in AI research assistants: A mixed-methods study of social scientists</h1>
-      <div class="byline">Amanda Chen<sup>a,1</sup>, Michael Okafor<sup>a</sup>, and Sonal Rao<sup>b</sup></div>
-      <div class="aff">
-        <sup>a</sup>Department of Psychology, University of Chicago, Chicago, IL 60637;
-        <sup>b</sup>School of Information, UC Berkeley, Berkeley, CA 94720
-      </div>
-      <div class="aff">Edited by Susan Fiske, Princeton University, and approved February 14, 2026</div>
-      <div class="signif">
-        <div class="lbl">Significance</div>
-        <p>As scientists delegate more analytic and writing work to AI assistants, whether they appropriately trust these outputs becomes a determinant of research quality. We show that trust calibration varies systematically by task — appropriate for descriptive work, dangerously high for causal claims.</p>
-      </div>
-      <div class="twocol">
-        <h2>Abstract</h2>
-        <p>
-          Scientists increasingly rely on AI assistants for data analysis, literature review, and writing.
-          We combine a pre-registered survey (<span class="trace">N=312</span>) with
-          <span class="trace">24 semi-structured interviews</span> to characterize calibration — when
-          scientists appropriately trust, verify, or override AI-generated outputs. Trust is highest
-          for <span class="trace-accent">literature search (M=4.2)</span> and lowest for
-          <span class="trace-accent">causal inference (M=2.1)</span>. The gap narrows with experience
-          and PhD training but does not close.
-        </p>
-        <h2>1. Introduction</h2>
-        <p>
-          The adoption of large language models in scientific workflows has outpaced empirical
-          understanding of how researchers verify, cite, and delegate work to these systems (1, 2).
-          Prior work has documented usage patterns; few studies examine <em>calibration</em> — whether
-          researchers' confidence in AI outputs scales appropriately with the accuracy of those outputs.
-        </p>
-        <p>
-          Calibration matters because miscalibration is not symmetric. Under-trust leads to wasted
-          verification effort. Over-trust leads to propagation of errors into the literature, with
-          second-order consequences for meta-analysis and policy (3–5).
-        </p>
-      </div>
-    </div>
-
-    <div class="pane pane-int" data-pane="int" hidden>
-      <div class="banner">↺ Interactive mode — numbers are live. Move the chips; the paper recomputes.</div>
-      <h1>Calibrated trust in AI research assistants</h1>
-      <h2>Results</h2>
-      <p>
-        Across all participants, mean trust was <span class="live-pill">M=3.4</span>. Filter by discipline:
-      </p>
-      <div class="chips">
-        <span class="chip active">All (312)</span>
-        <span class="chip">Psychology (94)</span>
-        <span class="chip">Economics (72)</span>
-        <span class="chip">Sociology (58)</span>
-        <span class="chip">Pol. Sci. (48)</span>
-        <span class="chip">Comm. (40)</span>
-      </div>
-      <p>
-        Trust varied by task type. For <b>literature search</b>,
-        <span class="live-pill">M=4.2</span> (95% CI: 4.07–4.33).
-        For <b>causal inference</b>, <span class="live-pill">M=2.1</span> (1.95–2.25).
-        The gap is <span class="live-pill">Δ=2.1</span>.
-      </p>
-      <div class="chart-box">
-        <svg viewBox="0 0 500 180" preserveAspectRatio="xMidYMid meet">
-          <path d="M 30 150 Q 130 50 260 80 T 470 50" stroke="#2F6A4D" stroke-width="2.5" fill="none"/>
-          <path d="M 30 155 Q 130 115 260 125 T 470 110" stroke="#2F6A4D" stroke-width="2" fill="none" stroke-dasharray="4 3"/>
-          <line x1="30" y1="162" x2="470" y2="162" stroke="#4F544E" stroke-width="0.5"/>
-          <line x1="30" y1="14" x2="30" y2="162" stroke="#4F544E" stroke-width="0.5"/>
-          <g font-family="JetBrains Mono" font-size="9" fill="#4F544E">
-            <text x="22" y="165" text-anchor="end">1</text>
-            <text x="22" y="130" text-anchor="end">2</text>
-            <text x="22" y="95" text-anchor="end">3</text>
-            <text x="22" y="60" text-anchor="end">4</text>
-            <text x="22" y="25" text-anchor="end">5</text>
-          </g>
-          <g font-family="'Instrument Sans', sans-serif" font-size="10" fill="#4F544E">
-            <text x="30" y="176">search</text>
-            <text x="140" y="176">summarize</text>
-            <text x="250" y="176">code</text>
-            <text x="360" y="176">stats</text>
-            <text x="445" y="176">causal</text>
-          </g>
-          <g transform="translate(360, 18)" font-family="'Instrument Sans', sans-serif" font-size="10" fill="#24272A">
-            <rect x="0" y="0" width="110" height="34" fill="white" stroke="#D7DCD0"/>
-            <line x1="6" y1="10" x2="18" y2="10" stroke="#2F6A4D" stroke-width="2.5"/>
-            <text x="22" y="13">novice (n=148)</text>
-            <line x1="6" y1="24" x2="18" y2="24" stroke="#2F6A4D" stroke-width="2" stroke-dasharray="3 2"/>
-            <text x="22" y="27">expert (n=164)</text>
-          </g>
-        </svg>
-      </div>
-    </div>
-  </div>
+  <figure class="shot">
+    <img src="shots/manuscript_frame.png" alt="Paper screen — draft view with mode switcher">
+  </figure>
   <a class="explore" href="screens/manuscript.html">Explore the full Paper screen →</a>
 </section>
 
@@ -517,20 +247,6 @@
   </p>
   <a class="back" href="/notes.html#3">← back to the note</a>
 </section>
-
-<script>
-  (function () {
-    var tabs = document.querySelectorAll('.paper-demo .tab');
-    var panes = document.querySelectorAll('.paper-demo .pane');
-    tabs.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var target = btn.getAttribute('data-tab');
-        tabs.forEach(function (b) { b.classList.toggle('active', b === btn); });
-        panes.forEach(function (p) { p.hidden = p.getAttribute('data-pane') !== target; });
-      });
-    });
-  })();
-</script>
 
 </body>
 </html>
