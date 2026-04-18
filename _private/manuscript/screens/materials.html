@@ -19,7 +19,8 @@
 const { useState } = React;
 
 function MaterialsScreen() {
-  const [selected, setSelected] = useState('survey');
+  const initial = (typeof location !== 'undefined' && location.hash) ? location.hash.slice(1) : 'analysis';
+  const [selected, setSelected] = useState(initial);
 
   return (
     <>

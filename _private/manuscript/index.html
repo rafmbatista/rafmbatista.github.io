@@ -10,8 +10,6 @@
 <style>
   body { padding-bottom: 40px; }
   .container { max-width: 900px; }
-
-  /* Announcement bar */
   .announce { font-size: var(--fs-sm); }
 
   /* Welcome ------------------------------------------------------- */
@@ -20,14 +18,14 @@
     font-family: var(--font-serif); font-weight: 400;
     font-size: clamp(44px, 6.5vw, 80px);
     line-height: 1.02; letter-spacing: -0.02em;
-    margin: 0 0 28px;
+    margin: 0 0 24px;
   }
   .welcome h1 em { font-style: italic; color: var(--accent); }
   .welcome p {
     font-family: var(--font-serif);
     font-size: clamp(19px, 1.7vw, 22px);
     line-height: 1.55; color: var(--ink-2);
-    max-width: 680px; margin: 0 0 18px;
+    max-width: 680px; margin: 0;
   }
 
   /* Tour sections ------------------------------------------------- */
@@ -61,219 +59,21 @@
   }
   .tour .explore:hover { color: var(--accent-deep); border-bottom-color: var(--accent-deep); }
 
-  /* Screenshot frames -------------------------------------------- */
+  /* Screenshot frame ------------------------------------------- */
   .shot {
-    margin: 32px 0 12px;
+    margin: 32px 0 14px;
     border: 1px solid var(--line); border-radius: 4px;
     background: var(--paper); overflow: hidden;
-    box-shadow: 0 2px 6px rgba(22,24,26,0.04), 0 12px 28px rgba(22,24,26,0.05);
+    box-shadow: 0 2px 6px rgba(22,24,26,0.05), 0 16px 32px rgba(22,24,26,0.08);
   }
-  .shot-chrome {
-    height: 32px; background: var(--paper-2);
-    border-bottom: 1px solid var(--line);
-    display: flex; align-items: center; padding: 0 14px; gap: 8px;
-  }
-  .shot-chrome .dots { display: flex; gap: 6px; }
-  .shot-chrome .dots span { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
-  .shot-chrome .title {
-    flex: 1; text-align: center;
-    font-family: var(--font-mono); font-size: 11px; color: var(--ink-3);
-  }
+  .shot img { display: block; width: 100%; height: auto; }
 
-  /* ── Materials preview ─────────────────────────────────────── */
-  .mat-split { display: grid; grid-template-columns: 220px 1fr; min-height: 460px; }
-  .mat-list { border-right: 1px solid var(--line); background: var(--paper-2); padding: 14px 0; }
-  .mat-list .mat-label {
-    padding: 0 16px 10px; font-family: var(--font-mono);
-    font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
-    color: var(--ink-3);
-  }
-  .mat-list .mat-item {
-    padding: 10px 16px; font-family: var(--font-mono); font-size: 12px;
-    color: var(--ink-2); border-left: 2px solid transparent;
-    display: flex; justify-content: space-between; align-items: baseline; gap: 6px;
-  }
-  .mat-list .mat-item.active {
-    background: var(--paper); color: var(--ink); border-left-color: var(--accent);
-  }
-  .mat-list .mat-item .ver {
-    font-size: 10px; color: var(--ink-3); white-space: nowrap;
-  }
-  .mat-list .mat-item.active .ver { color: var(--accent); }
-  .mat-pane { padding: 22px 24px; }
-  .mat-topline {
-    display: flex; justify-content: space-between; align-items: baseline;
-    margin-bottom: 18px;
-  }
-  .mat-topline .mat-pin {
-    font-family: var(--font-mono); font-size: 11px; color: var(--accent);
-  }
-  .mat-topline .mat-audit-tag {
-    font-family: var(--font-mono); font-size: 10px;
-    letter-spacing: 0.1em; color: var(--ink-3);
-  }
-  .mat-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
-  .mat-chip {
-    border: 1px solid var(--line); border-radius: 3px; background: var(--paper);
-    padding: 10px 12px;
-  }
-  .mat-chip .n {
-    font-family: var(--font-serif); font-size: 26px; line-height: 1;
-  }
-  .mat-chip .n.green { color: var(--accent); }
-  .mat-chip .n.red { color: #c86a4f; }
-  .mat-chip .n.grey { color: var(--ink-3); }
-  .mat-chip .lbl {
-    font-family: var(--font-mono); font-size: 10.5px;
-    color: var(--ink-3); margin-top: 4px; line-height: 1.35;
-  }
-  .mat-row {
-    border: 1px solid var(--line);
-    border-left: 3px solid var(--accent);
-    background: var(--paper); border-radius: 3px;
-    padding: 12px 14px; margin-bottom: 10px;
-  }
-  .mat-row.red { border-left-color: #c86a4f; }
-  .mat-row-head {
-    display: flex; justify-content: space-between; align-items: baseline;
-    gap: 10px; margin-bottom: 10px;
-  }
-  .mat-row-head .label { font-family: var(--font-serif); font-size: 15px; color: var(--ink); }
-  .mat-row-head .status {
-    font-family: var(--font-mono); font-size: 10px;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 2px 8px; border-radius: 999px; white-space: nowrap;
-    border: 1px solid var(--accent); color: var(--accent);
-  }
-  .mat-row-head .status.red { border-color: #c86a4f; color: #c86a4f; }
-  .mat-row-body {
-    display: grid; grid-template-columns: 72px 1fr;
-    gap: 6px 14px; font-size: 13px; line-height: 1.5;
-  }
-  .mat-row-body .row-k {
-    font-family: var(--font-mono); font-size: 10px;
-    text-transform: uppercase; letter-spacing: 0.1em;
-    color: var(--ink-3); padding-top: 2px;
-  }
-
-  /* ── Library preview ───────────────────────────────────────── */
-  .lib-body { height: 460px; background: var(--paper); position: relative; }
-  .lib-body svg { display: block; width: 100%; height: 100%; }
-
-  /* ── Data preview ──────────────────────────────────────────── */
-  .data-body { min-height: 460px; display: flex; flex-direction: column; }
-  .data-subtabs {
-    padding: 0 20px; border-bottom: 1px solid var(--line);
-    display: flex; align-items: center; background: var(--paper-2);
-  }
-  .data-subtab {
-    padding: 12px 16px 14px; font-family: var(--font-sans);
-    font-size: 13px; color: var(--ink-3);
-    border-bottom: 2px solid transparent; margin-bottom: -1px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .data-subtab .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); }
-  .data-subtab.active { color: var(--ink); font-weight: 600; border-bottom-color: var(--accent); }
-  .data-subtab.active .dot { background: var(--qual); }
-  .data-subtab .sub {
-    font-family: var(--font-mono); font-size: 10px;
-    color: var(--ink-3); font-weight: 400; margin-left: 2px;
-  }
-  .data-banner {
-    padding: 10px 20px; background: var(--accent-soft);
-    color: var(--accent-deep); font-family: var(--font-mono); font-size: 12px;
-    border-bottom: 1px solid var(--line);
-    display: flex; align-items: center; gap: 10px;
-  }
-  .data-banner .arrow { margin-left: auto; font-size: 11px; }
-  .data-content { padding: 22px; }
-  .data-sat-head {
-    display: flex; justify-content: space-between;
-    align-items: baseline; margin-bottom: 10px;
-  }
-  .data-sat-head .lead {
-    font-family: var(--font-mono); font-size: 10px;
-    text-transform: uppercase; letter-spacing: 0.1em;
-    color: var(--ink-3); margin-bottom: 4px;
-  }
-  .data-sat-head .h { font-family: var(--font-serif); font-size: 18px; }
-  .data-sat-head .meta {
-    font-family: var(--font-mono); font-size: 11px; color: var(--ink-3);
-  }
-  .data-sat-plot {
-    background: var(--paper); border: 1px solid var(--line); border-radius: 4px;
-    padding: 16px; margin-bottom: 20px;
-  }
-  .data-sat-plot svg { display: block; width: 100%; height: 200px; }
-
-  /* ── Figures preview ──────────────────────────────────────── */
-  .fig-body { min-height: 460px; display: grid; grid-template-columns: 180px 1fr 240px; }
-  .fig-list { border-right: 1px solid var(--line); background: var(--paper-2); padding: 14px 0; }
-  .fig-list .lbl {
-    padding: 0 14px 10px; font-family: var(--font-mono); font-size: 10px;
-    text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-3);
-  }
-  .fig-list .item {
-    padding: 10px 14px; border-left: 2px solid transparent;
-    font-family: var(--font-sans);
-  }
-  .fig-list .item.active {
-    background: var(--paper); border-left-color: var(--accent);
-  }
-  .fig-list .item .kicker {
-    font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); margin-bottom: 2px;
-  }
-  .fig-list .item .name { font-size: 13px; color: var(--ink-2); }
-  .fig-list .item.active .name { color: var(--ink); }
-  .fig-canvas { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-  .fig-canvas .title-row {
-    display: flex; justify-content: space-between; align-items: baseline;
-  }
-  .fig-canvas .fig-title-lbl { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); }
-  .fig-canvas .fig-title-h { font-family: var(--font-serif); font-size: 18px; margin-top: 3px; }
-  .fig-chart {
-    background: var(--paper); border: 1px solid var(--line); border-radius: 4px;
-    padding: 20px;
-  }
-  .fig-chart .cap-lbl { font-family: var(--font-serif); font-size: 13px; margin-bottom: 4px; }
-  .fig-chart .cap-desc {
-    font-family: var(--font-serif); font-style: italic; font-size: 12px;
-    color: var(--ink-2); margin-bottom: 14px;
-  }
-  .fig-chart svg { display: block; width: 100%; max-height: 200px; }
-  .fig-tweaks { border-left: 1px solid var(--line); background: var(--paper-2); padding: 16px; }
-  .fig-tweaks .lbl {
-    font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
-    letter-spacing: 0.1em; color: var(--ink-3); margin-bottom: 12px;
-  }
-  .fig-tweaks .group { margin-bottom: 16px; }
-  .fig-tweaks .group-lbl {
-    font-size: 12px; color: var(--ink-2); font-weight: 500; margin-bottom: 6px;
-  }
-  .fig-tweaks .pill-row { display: flex; gap: 6px; flex-wrap: wrap; }
-  .fig-tweaks .pill-btn {
-    padding: 5px 10px; font-size: 11px; font-family: var(--font-sans);
-    border: 1px solid var(--line); background: var(--paper);
-    color: var(--ink-2); border-radius: 3px;
-  }
-  .fig-tweaks .pill-btn.active {
-    border-color: var(--accent); background: var(--accent-soft); color: var(--accent-deep);
-  }
-  .fig-tweaks .swatches { display: flex; gap: 4px; margin-top: 8px; }
-  .fig-tweaks .swatches span {
-    width: 28px; height: 14px; border-radius: 2px; display: inline-block;
-  }
-  .fig-tweaks .check {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 12.5px; color: var(--ink-2);
-  }
-
-  /* ── Paper demo (live) ────────────────────────────────────── */
+  /* Paper demo (live 3-tab) ------------------------------------ */
   .paper-demo {
-    margin: 32px 0 12px;
+    margin: 32px 0 14px;
     border: 1px solid var(--line); border-radius: 4px; background: var(--paper);
     overflow: hidden;
-    box-shadow: 0 2px 6px rgba(22,24,26,0.04), 0 12px 28px rgba(22,24,26,0.05);
+    box-shadow: 0 2px 6px rgba(22,24,26,0.05), 0 16px 32px rgba(22,24,26,0.08);
   }
   .paper-demo .chrome {
     height: 32px; background: var(--paper-2); border-bottom: 1px solid var(--line);
@@ -282,12 +82,11 @@
   .paper-demo .chrome .dots { display: flex; gap: 6px; }
   .paper-demo .chrome .dots span { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
   .paper-demo .chrome .title { flex: 1; text-align: center; font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); }
-
   .paper-demo .tab-bar {
     display: flex; gap: 4px; align-items: center;
     padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--paper-2);
   }
-  .paper-demo .tab-bar .segmented {
+  .paper-demo .segmented {
     display: inline-flex; border: 1px solid var(--line); border-radius: 999px;
     overflow: hidden; background: var(--paper);
   }
@@ -301,10 +100,9 @@
     font-family: var(--font-mono); font-size: 10px; color: var(--ink-3);
     letter-spacing: 0.08em; text-transform: uppercase; margin-left: 14px;
   }
-
   .paper-demo .pane { padding: 28px 40px; min-height: 420px; }
 
-  /* Paper — Draft pane */
+  /* Paper — Draft */
   .pane-draft .meta { font-family: var(--font-mono); font-size: 10px; color: var(--ink-3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
   .pane-draft h1 { font-family: var(--font-serif); font-size: 28px; font-weight: 400; line-height: 1.15; margin: 0 0 10px; letter-spacing: -0.005em; }
   .pane-draft .byline { font-size: 13px; color: var(--ink-2); margin-bottom: 24px; }
@@ -329,7 +127,7 @@
     text-decoration-color: var(--ink-3); text-underline-offset: 2px;
   }
 
-  /* Paper — Publication pane */
+  /* Paper — Publication */
   .pane-pub {
     background: #FFFCF6;
     font-family: 'Iowan Old Style', Georgia, serif;
@@ -374,7 +172,7 @@
     text-underline-offset: 2px;
   }
 
-  /* Paper — Interactive pane */
+  /* Paper — Interactive */
   .pane-int .banner {
     padding: 8px 12px; background: var(--pencil-soft);
     border: 1px solid var(--pencil); color: var(--pencil);
@@ -403,7 +201,7 @@
   }
   .pane-int .chart-box svg { display: block; width: 100%; height: 180px; }
 
-  /* Closing ------------------------------------------------------ */
+  /* Closing ----------------------------------------------------- */
   .closing {
     padding: 96px 24px 48px;
     border-top: 1px solid var(--line);
@@ -433,10 +231,6 @@
     .welcome { padding: 56px 24px 12px; }
     .tour { padding: 56px 24px 16px; }
     .closing { padding: 72px 24px 40px; }
-    .mat-split { grid-template-columns: 1fr; }
-    .mat-list { display: none; }
-    .fig-body { grid-template-columns: 1fr; }
-    .fig-list, .fig-tweaks { display: none; }
     .paper-demo .pane { padding: 20px; }
     .pane-pub .twocol { column-count: 1; }
   }
@@ -467,13 +261,8 @@
 <section class="container welcome">
   <h1>Welcome to <em>Manuscript</em>.</h1>
   <p>
-    It's a product that doesn't exist. I wrote a prompt one afternoon and Claude Design
-    handed me something I could walk around in. This is the walk — five surfaces a
-    social scientist uses daily, arranged in roughly the order the work happens.
-  </p>
-  <p>
-    Each section has a glimpse of the screen and a link, if you want, to poke at the
-    full thing. At the bottom, I come back out.
+    A product that doesn't exist. Mocked up by Claude Design in response
+    to a prompt I wrote one afternoon.
   </p>
 </section>
 
@@ -489,61 +278,13 @@
     IRB coordinator. In Manuscript they sit together, versioned.
   </p>
   <p>
-    The pre-registration is a commit, not a PDF. Every deviation from the plan is a
-    row in an audit log — visible, named, and quietly drafted into the limitations
+    The pre-registration is a commit, not a PDF. Every deviation from the plan is
+    a row in an audit log — visible, named, and quietly drafted into the limitations
     paragraph for me to tighten later.
   </p>
 
-  <figure class="shot" aria-label="Materials screen — preregistration audit">
-    <div class="shot-chrome">
-      <div class="dots"><span></span><span></span><span></span></div>
-      <div class="title">claude-ra · materials · analysis_plan.md</div>
-    </div>
-    <div class="mat-split">
-      <div class="mat-list">
-        <div class="mat-label">Materials · 5</div>
-        <div class="mat-item">survey_instrument.qsf<span class="ver">🔒 v1.4</span></div>
-        <div class="mat-item">interview_protocol.md<span class="ver">v2.1</span></div>
-        <div class="mat-item">consent_irb.pdf<span class="ver">🔒 appr.</span></div>
-        <div class="mat-item">stimuli/<span class="ver">8 items</span></div>
-        <div class="mat-item active">analysis_plan.md<span class="ver">🔒 v1.0</span></div>
-      </div>
-      <div class="mat-pane">
-        <div class="mat-topline">
-          <span class="mat-pin">🔒 pre-registered v1.0 · locked 2025-03-01</span>
-          <span class="mat-audit-tag">prereg → execution audit</span>
-        </div>
-        <div class="mat-summary">
-          <div class="mat-chip"><div class="n green">1</div><div class="lbl">executed as planned</div></div>
-          <div class="mat-chip"><div class="n red">2</div><div class="lbl">deviations from plan</div></div>
-          <div class="mat-chip"><div class="n grey">1</div><div class="lbl">exploratory (not pre-reg)</div></div>
-        </div>
-        <div class="mat-row">
-          <div class="mat-row-head">
-            <span class="label">H1 · Trust calibration varies by task type.</span>
-            <span class="status">✓ as planned</span>
-          </div>
-          <div class="mat-row-body">
-            <div class="row-k">pre-reg</div>
-            <div>One-way ANOVA on trust ~ task. Expect M_search &gt; 4, M_causal &lt; 3.</div>
-            <div class="row-k">executed</div>
-            <div>F(4, 307) = 24.3, p &lt; .001. Both predictions supported.</div>
-          </div>
-        </div>
-        <div class="mat-row red">
-          <div class="mat-row-head">
-            <span class="label">H2 · Disclosure predicts calibration.</span>
-            <span class="status red">⚠ deviation</span>
-          </div>
-          <div class="mat-row-body">
-            <div class="row-k">pre-reg</div>
-            <div>Correlation on accuracy × confidence; hypothesize r &gt; .3.</div>
-            <div class="row-k">executed</div>
-            <div>r = .22, p = .03. Below the pre-registered threshold.</div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <figure class="shot">
+    <img src="shots/materials.png" alt="Materials screen — preregistration audit">
   </figure>
   <a class="explore" href="screens/materials.html">Explore the full Materials screen →</a>
 </section>
@@ -560,68 +301,8 @@
     haven't actually read; the tool won't let me.
   </p>
 
-  <figure class="shot" aria-label="Library screen — paper cluster graph">
-    <div class="shot-chrome">
-      <div class="dots"><span></span><span></span><span></span></div>
-      <div class="title">claude-ra · library · 47 papers</div>
-    </div>
-    <div class="lib-body">
-      <svg viewBox="0 0 900 460" preserveAspectRatio="xMidYMid meet">
-        <!-- clusters -->
-        <g>
-          <circle cx="240" cy="150" r="110" fill="#2F6A4D" opacity="0.08"/>
-          <circle cx="240" cy="150" r="110" fill="none" stroke="#2F6A4D" stroke-opacity="0.3" stroke-dasharray="3 3"/>
-          <text x="240" y="32" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#2F6A4D" opacity="0.85" letter-spacing="0.5">CALIBRATION &amp; METACOGNITION · 12</text>
-        </g>
-        <g>
-          <circle cx="560" cy="190" r="130" fill="#2F6A4D" opacity="0.08"/>
-          <circle cx="560" cy="190" r="130" fill="none" stroke="#2F6A4D" stroke-opacity="0.3" stroke-dasharray="3 3"/>
-          <text x="560" y="52" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#2F6A4D" opacity="0.85" letter-spacing="0.5">AI USAGE IN SCIENCE · 18</text>
-        </g>
-        <g>
-          <circle cx="340" cy="340" r="95" fill="#4F544E" opacity="0.1"/>
-          <circle cx="340" cy="340" r="95" fill="none" stroke="#4F544E" stroke-opacity="0.3" stroke-dasharray="3 3"/>
-          <text x="340" y="440" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#4F544E" letter-spacing="0.5">HALLUCINATION &amp; VERIFICATION · 11</text>
-        </g>
-        <g>
-          <circle cx="700" cy="380" r="70" fill="#6F746A" opacity="0.1"/>
-          <circle cx="700" cy="380" r="70" fill="none" stroke="#6F746A" stroke-opacity="0.3" stroke-dasharray="3 3"/>
-          <text x="700" y="455" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" fill="#6F746A" letter-spacing="0.5">RESEARCH WORKFLOW · 6</text>
-        </g>
-        <!-- edges -->
-        <g stroke="#4F544E" stroke-width="0.6" opacity="0.35" fill="none">
-          <line x1="540" y1="170" x2="620" y2="205"/>
-          <line x1="540" y1="170" x2="510" y2="290"/>
-          <line x1="540" y1="170" x2="290" y2="160"/>
-          <line x1="540" y1="170" x2="625" y2="145"/>
-          <line x1="240" y1="115" x2="290" y2="160"/>
-          <line x1="290" y1="160" x2="205" y2="170"/>
-          <line x1="340" y1="330" x2="385" y2="370"/>
-          <line x1="385" y1="370" x2="510" y2="290"/>
-          <line x1="620" y1="205" x2="510" y2="290"/>
-          <line x1="700" y1="400" x2="510" y2="290"/>
-        </g>
-        <!-- papers -->
-        <g font-family="'Instrument Sans', sans-serif" font-size="12">
-          <g><circle cx="240" cy="115" r="6" fill="#EEF1EA" stroke="#2F6A4D" stroke-width="1.2"/><text x="252" y="119" fill="#24272A">Chen 2023</text></g>
-          <g><circle cx="290" cy="160" r="6" fill="#EEF1EA" stroke="#2F6A4D" stroke-width="1.2"/><text x="302" y="164" fill="#24272A">Kim 2022</text></g>
-          <g><circle cx="205" cy="170" r="6" fill="#EEF1EA" stroke="#2F6A4D" stroke-width="1.2"/><text x="217" y="174" fill="#24272A">Rao 2024</text></g>
-          <g><circle cx="540" cy="170" r="9" fill="#2F6A4D" stroke="#2F6A4D" stroke-width="2"/><text x="554" y="166" fill="#16181A" font-weight="600" font-size="12.5">Shah 2024</text><text x="554" y="180" fill="#2F6A4D" font-family="JetBrains Mono" font-size="10">cited 3× in manuscript</text></g>
-          <g><circle cx="620" cy="205" r="6" fill="#EEF1EA" stroke="#2F6A4D" stroke-width="1.2"/><text x="632" y="209" fill="#24272A">Okafor 2025</text></g>
-          <g><circle cx="510" cy="290" r="6" fill="#EEF1EA" stroke="#2F6A4D" stroke-width="1.2"/><text x="522" y="294" fill="#24272A">Ng 2024</text></g>
-          <g><circle cx="625" cy="145" r="6" fill="#EEF1EA" stroke="#2F6A4D" stroke-width="1.2"/><text x="637" y="149" fill="#24272A">Weller 2024</text></g>
-          <g><circle cx="340" cy="330" r="6" fill="#EEF1EA" stroke="#4F544E" stroke-width="1.2"/><text x="352" y="334" fill="#24272A">Liu 2025</text></g>
-          <g><circle cx="385" cy="370" r="6" fill="#EEF1EA" stroke="#4F544E" stroke-width="1.2"/><text x="397" y="374" fill="#24272A">Park 2024</text></g>
-          <g><circle cx="700" cy="400" r="6" fill="#EEF1EA" stroke="#6F746A" stroke-width="1.2"/><text x="712" y="404" fill="#24272A">Garcia 2023</text></g>
-        </g>
-        <!-- gap annotation -->
-        <g>
-          <line x1="60" y1="430" x2="150" y2="390" stroke="#4F544E" stroke-width="0.8"/>
-          <text x="60" y="448" font-family="JetBrains Mono" font-size="10" fill="#4F544E" font-style="italic">gap: no papers bridging</text>
-          <text x="60" y="460" font-family="JetBrains Mono" font-size="10" fill="#4F544E" font-style="italic">calibration ↔ hallucination</text>
-        </g>
-      </svg>
-    </div>
+  <figure class="shot">
+    <img src="shots/papers.png" alt="Library screen — paper cluster graph">
   </figure>
   <a class="explore" href="screens/papers.html">Explore the full Library screen →</a>
 </section>
@@ -642,67 +323,8 @@
     tells me which claims in the draft might need a second look.
   </p>
 
-  <figure class="shot" aria-label="Data screen — qualitative clean with saturation curve">
-    <div class="shot-chrome">
-      <div class="dots"><span></span><span></span><span></span></div>
-      <div class="title">claude-ra · clean 🔗 · interviews/</div>
-    </div>
-    <div class="data-body">
-      <div class="data-subtabs">
-        <div class="data-subtab"><span class="dot" style="background: var(--quant)"></span>Quantitative <span class="sub">· 312 participants</span></div>
-        <div class="data-subtab active"><span class="dot"></span>Qualitative <span class="sub">· 24 transcripts</span></div>
-      </div>
-      <div class="data-banner">
-        <span>↻</span>
-        <span><b>survey_clean.csv refreshed 2h ago</b> · 3 claims in manuscript flagged</span>
-        <span class="arrow">show →</span>
-      </div>
-      <div class="data-content">
-        <div class="data-sat-head">
-          <div>
-            <div class="lead">theme saturation</div>
-            <div class="h">Cumulative unique codes across interviews</div>
-          </div>
-          <div class="meta">κ = .78 · 6 themes · 30 codes · 81 excerpts</div>
-        </div>
-        <div class="data-sat-plot">
-          <svg viewBox="0 0 560 200" preserveAspectRatio="xMidYMid meet">
-            <!-- axes -->
-            <line x1="40" y1="172" x2="546" y2="172" stroke="#4F544E" stroke-width="1"/>
-            <line x1="40" y1="16" x2="40" y2="172" stroke="#4F544E" stroke-width="1"/>
-            <!-- y ticks -->
-            <g font-family="JetBrains Mono" font-size="10" fill="#4F544E">
-              <text x="34" y="175" text-anchor="end">0</text>
-              <text x="34" y="136" text-anchor="end">8</text>
-              <text x="34" y="97" text-anchor="end">16</text>
-              <text x="34" y="58" text-anchor="end">24</text>
-              <text x="34" y="19" text-anchor="end">32</text>
-            </g>
-            <text x="14" y="94" font-family="'Instrument Sans', sans-serif" font-size="10.5" fill="#24272A" text-anchor="middle" transform="rotate(-90, 14, 94)">unique codes</text>
-            <!-- x ticks -->
-            <g font-family="JetBrains Mono" font-size="10" fill="#4F544E">
-              <text x="61" y="188" text-anchor="middle">1</text>
-              <text x="166" y="188" text-anchor="middle">6</text>
-              <text x="292" y="188" text-anchor="middle">12</text>
-              <text x="419" y="188" text-anchor="middle">18</text>
-              <text x="546" y="188" text-anchor="middle">24</text>
-            </g>
-            <!-- saturation marker at interview 18 -->
-            <line x1="419" y1="16" x2="419" y2="172" stroke="#2F6A4D" stroke-width="0.8" stroke-dasharray="3 3"/>
-            <text x="425" y="30" font-family="JetBrains Mono" font-size="10" fill="#2F6A4D">saturation at interview 18</text>
-            <!-- curve (cumulative codes) -->
-            <path d="M 61 143 L 82 118 L 103 103 L 124 88 L 145 74 L 166 64 L 187 54 L 208 49 L 229 44 L 250 40 L 271 40 L 292 35 L 314 35 L 335 30 L 356 30 L 377 30 L 398 25 L 419 25 L 440 25 L 461 25 L 482 25 L 503 25 L 524 25 L 546 25" stroke="#4F544E" stroke-width="2" fill="none"/>
-            <!-- dots -->
-            <g fill="#4F544E">
-              <circle cx="61" cy="143" r="3"/><circle cx="82" cy="118" r="3"/><circle cx="103" cy="103" r="3"/><circle cx="124" cy="88" r="3"/><circle cx="145" cy="74" r="3"/><circle cx="166" cy="64" r="3"/><circle cx="187" cy="54" r="3"/><circle cx="208" cy="49" r="3"/><circle cx="229" cy="44" r="3"/><circle cx="250" cy="40" r="3"/>
-            </g>
-            <g fill="#EEF1EA" stroke="#4F544E" stroke-width="1">
-              <circle cx="271" cy="40" r="2"/><circle cx="292" cy="35" r="2"/><circle cx="314" cy="35" r="2"/><circle cx="335" cy="30" r="2"/><circle cx="356" cy="30" r="2"/><circle cx="377" cy="30" r="2"/><circle cx="398" cy="25" r="2"/><circle cx="419" cy="25" r="2"/><circle cx="440" cy="25" r="2"/><circle cx="461" cy="25" r="2"/><circle cx="482" cy="25" r="2"/><circle cx="503" cy="25" r="2"/><circle cx="524" cy="25" r="2"/><circle cx="546" cy="25" r="2"/>
-            </g>
-          </svg>
-        </div>
-      </div>
-    </div>
+  <figure class="shot">
+    <img src="shots/data.png" alt="Data screen — clean quantitative with refresh banner and pipeline">
   </figure>
   <a class="explore" href="screens/data.html">Explore the full Data screen →</a>
 </section>
@@ -720,104 +342,8 @@
     it's the right version</em>.
   </p>
 
-  <figure class="shot" aria-label="Figures screen — editable figure with tweaks panel">
-    <div class="shot-chrome">
-      <div class="dots"><span></span><span></span><span></span></div>
-      <div class="title">claude-ra · figures · fig2_main.R</div>
-    </div>
-    <div class="fig-body">
-      <div class="fig-list">
-        <div class="lbl">Figures · 4</div>
-        <div class="item"><div class="kicker">Fig 1</div><div class="name">participant flow</div></div>
-        <div class="item active"><div class="kicker">Fig 2</div><div class="name">trust by task type</div></div>
-        <div class="item"><div class="kicker">Fig 3</div><div class="name">coded themes</div></div>
-        <div class="item"><div class="kicker">Fig 4</div><div class="name">calibration over time</div></div>
-      </div>
-      <div class="fig-canvas">
-        <div class="title-row">
-          <div>
-            <div class="fig-title-lbl">fig2_main.R · last run 4m ago</div>
-            <div class="fig-title-h">Trust by task type</div>
-          </div>
-        </div>
-        <div class="fig-chart">
-          <div class="cap-lbl">Figure 2.</div>
-          <div class="cap-desc">Researcher trust in AI outputs by task type, N=312.</div>
-          <svg viewBox="0 0 500 240" preserveAspectRatio="xMidYMid meet">
-            <line x1="60" y1="200" x2="480" y2="200" stroke="#16181A" stroke-width="1"/>
-            <line x1="60" y1="30" x2="60" y2="200" stroke="#16181A" stroke-width="1"/>
-            <g font-family="JetBrains Mono" font-size="10" fill="#24272A">
-              <g><line x1="57" y1="200" x2="60" y2="200" stroke="#16181A"/><text x="50" y="204" text-anchor="end">1</text></g>
-              <g><line x1="57" y1="166" x2="60" y2="166" stroke="#16181A"/><text x="50" y="170" text-anchor="end">2</text></g>
-              <g><line x1="57" y1="132" x2="60" y2="132" stroke="#16181A"/><text x="50" y="136" text-anchor="end">3</text></g>
-              <g><line x1="57" y1="98" x2="60" y2="98" stroke="#16181A"/><text x="50" y="102" text-anchor="end">4</text></g>
-              <g><line x1="57" y1="64" x2="60" y2="64" stroke="#16181A"/><text x="50" y="68" text-anchor="end">5</text></g>
-            </g>
-            <text x="30" y="115" font-family="'Instrument Sans', sans-serif" font-size="11" fill="#24272A" text-anchor="middle" transform="rotate(-90, 30, 115)">trust (1-5)</text>
-            <!-- bars: lit search 4.2, data cleaning 3.7, causal inference 2.1 -->
-            <g>
-              <rect x="85" y="91.2" width="50" height="108.8" fill="#c86a4f" opacity="0.85"/>
-              <g stroke="#16181A" stroke-width="1.2">
-                <line x1="110" y1="81" x2="110" y2="101"/>
-                <line x1="102" y1="81" x2="118" y2="81"/>
-                <line x1="102" y1="101" x2="118" y2="101"/>
-              </g>
-              <text x="110" y="73" font-family="JetBrains Mono" font-size="10" fill="#4F544E" text-anchor="middle">M=4.2</text>
-              <text x="110" y="218" font-family="'Instrument Sans', sans-serif" font-size="11" fill="#24272A" text-anchor="middle">lit search</text>
-            </g>
-            <g>
-              <rect x="215" y="108.2" width="50" height="91.8" fill="#d89b6a" opacity="0.85"/>
-              <g stroke="#16181A" stroke-width="1.2">
-                <line x1="240" y1="96.3" x2="240" y2="120.1"/>
-                <line x1="232" y1="96.3" x2="248" y2="96.3"/>
-                <line x1="232" y1="120.1" x2="248" y2="120.1"/>
-              </g>
-              <text x="240" y="88" font-family="JetBrains Mono" font-size="10" fill="#4F544E" text-anchor="middle">M=3.7</text>
-              <text x="240" y="218" font-family="'Instrument Sans', sans-serif" font-size="11" fill="#24272A" text-anchor="middle">data cleaning</text>
-            </g>
-            <g>
-              <rect x="345" y="162.6" width="50" height="37.4" fill="#e8c080" opacity="0.85"/>
-              <g stroke="#16181A" stroke-width="1.2">
-                <line x1="370" y1="149" x2="370" y2="176.2"/>
-                <line x1="362" y1="149" x2="378" y2="149"/>
-                <line x1="362" y1="176.2" x2="378" y2="176.2"/>
-              </g>
-              <text x="370" y="141" font-family="JetBrains Mono" font-size="10" fill="#4F544E" text-anchor="middle">M=2.1</text>
-              <text x="370" y="218" font-family="'Instrument Sans', sans-serif" font-size="11" fill="#24272A" text-anchor="middle">causal inference</text>
-            </g>
-          </svg>
-        </div>
-      </div>
-      <div class="fig-tweaks">
-        <div class="lbl">Tweaks · fig2</div>
-        <div class="group">
-          <div class="group-lbl">Chart type</div>
-          <div class="pill-row">
-            <span class="pill-btn active">bar</span>
-            <span class="pill-btn">box</span>
-            <span class="pill-btn">scatter</span>
-          </div>
-        </div>
-        <div class="group">
-          <div class="group-lbl">Palette</div>
-          <div class="pill-row">
-            <span class="pill-btn active">warm</span>
-            <span class="pill-btn">cool</span>
-            <span class="pill-btn">mono</span>
-            <span class="pill-btn">jewel</span>
-          </div>
-          <div class="swatches">
-            <span style="background: #c86a4f;"></span>
-            <span style="background: #d89b6a;"></span>
-            <span style="background: #e8c080;"></span>
-          </div>
-        </div>
-        <div class="group">
-          <div class="group-lbl">Confidence intervals</div>
-          <label class="check"><input type="checkbox" checked disabled> Show 95% CI error bars</label>
-        </div>
-      </div>
-    </div>
+  <figure class="shot">
+    <img src="shots/figures.png" alt="Figures screen — editable figure with tweaks panel">
   </figure>
   <a class="explore" href="screens/figures.html">Explore the full Figures screen →</a>
 </section>
@@ -849,7 +375,6 @@
       <span class="hint">↑ try the modes</span>
     </div>
 
-    <!-- Draft pane -->
     <div class="pane pane-draft" data-pane="draft">
       <div class="meta">Manuscript draft v0.12 · last edit 14 min ago · A. Chen</div>
       <h1>Calibrated trust in AI research assistants</h1>
@@ -880,7 +405,6 @@
       </p>
     </div>
 
-    <!-- Publication pane -->
     <div class="pane pane-pub" data-pane="pub" hidden>
       <div class="masthead">
         <span>Research Article · Psychological &amp; Cognitive Sciences</span>
@@ -923,7 +447,6 @@
       </div>
     </div>
 
-    <!-- Interactive pane -->
     <div class="pane pane-int" data-pane="int" hidden>
       <div class="banner">↺ Interactive mode — numbers are live. Move the chips; the paper recomputes.</div>
       <h1>Calibrated trust in AI research assistants</h1>

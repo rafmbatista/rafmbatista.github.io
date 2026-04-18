@@ -1,2 +1,3 @@
 CLAUDE.md
-_private/
+/_private/*
+!/_private/manuscript/
