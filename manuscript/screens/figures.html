@@ -19,9 +19,8 @@
 const { useState } = React;
 
 function FiguresScreen() {
-  const [selected, setSelected] = useState('fig2');
   const [palette, setPalette] = useState('warm');
-  const [smoothing, setSmoothing] = useState(0.5);
+  const [chartType, setChartType] = useState('bar');
   const [showCI, setShowCI] = useState(true);
 
   return (
@@ -32,21 +31,21 @@ function FiguresScreen() {
       <ScreenIntro
         kicker="Screen 03 · Figures"
         title={<>Tweak the figure. <em style={{ fontStyle: 'italic' }}>Regenerate the code.</em></>}
-        caption="Every figure is a committed R script bound to clean data. Change the palette or smoothing and the code updates. Insert into the manuscript at a specific heading. No screenshots. No Illustrator."
+        caption="Every figure is a committed R script bound to clean data. Switch geoms, change the palette, toggle error bars — the code updates. No screenshots. No Illustrator."
       />
 
       <MockFrame title={`claude-ra · figures · fig2_main.R`} height={740}>
         <ProjectRail active="figures" />
-        <FiguresBody selected={selected} setSelected={setSelected}
+        <FiguresBody
           palette={palette} setPalette={setPalette}
-          smoothing={smoothing} setSmoothing={setSmoothing}
+          chartType={chartType} setChartType={setChartType}
           showCI={showCI} setShowCI={setShowCI} />
       </MockFrame>
 
       <div className="container" style={{ padding: '32px 24px 0' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, borderTop: `1px solid ${RA.line}`, paddingTop: 24 }}>
           <FNote num="A">
-            <b>Tweaks write code.</b> Change a palette in the panel, the R script updates. Every version is a commit.
+            <b>Tweaks write code.</b> Switch geoms or palettes in the panel, the R script updates. Every version is a commit.
           </FNote>
           <FNote num="B">
             <b>Bound to data.</b> Figures reference <code style={{ fontFamily: RA.mono, fontSize: 11.5, background: RA.paper2, padding: '1px 4px' }}>survey_clean.csv</code> by path. Update the data, the figure redraws.
@@ -73,32 +72,36 @@ function FNote({ num, children }) {
 
 function FiguresBody(p) {
   const figs = [
-    { id: 'fig1', num: 1, name: 'participant flow', kind: 'diagram' },
-    { id: 'fig2', num: 2, name: 'trust by task type', kind: 'bar+ci' },
-    { id: 'fig3', num: 3, name: 'coded themes',     kind: 'bar' },
-    { id: 'fig4', num: 4, name: 'calibration over time', kind: 'line' },
+    { id: 'fig1', num: 1, name: 'participant flow' },
+    { id: 'fig2', num: 2, name: 'trust by task type', current: true },
+    { id: 'fig3', num: 3, name: 'coded themes' },
+    { id: 'fig4', num: 4, name: 'calibration over time' },
   ];
   return (
     <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '220px 1fr 320px', overflow: 'hidden' }}>
 
-      {/* figure list */}
+      {/* figure list — static in this mock */}
       <div style={{ borderRight: `1px solid ${RA.line}`, padding: '16px 0', overflow: 'auto', background: RA.paper2 }}>
         <div style={{ padding: '0 16px 10px', fontFamily: RA.mono, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.1, color: RA.ink3 }}>
           Figures · 4
         </div>
         {figs.map(f => (
-          <button key={f.id} onClick={() => p.setSelected(f.id)} style={{
-            display: 'block', width: '100%', textAlign: 'left',
-            padding: '10px 16px', border: 'none', background: p.selected === f.id ? RA.paper : 'transparent',
-            borderLeft: p.selected === f.id ? `2px solid ${RA.accent}` : '2px solid transparent',
-            cursor: 'pointer', fontFamily: RA.sans,
+          <div key={f.id} style={{
+            padding: '10px 16px',
+            background: f.current ? RA.paper : 'transparent',
+            borderLeft: f.current ? `2px solid ${RA.accent}` : '2px solid transparent',
+            fontFamily: RA.sans,
           }}>
             <div style={{ fontSize: 11, color: RA.ink3, fontFamily: RA.mono, marginBottom: 2 }}>Fig {f.num}</div>
-            <div style={{ fontSize: 13, color: p.selected === f.id ? RA.ink : RA.ink2 }}>{f.name}</div>
-          </button>
+            <div style={{ fontSize: 13, color: f.current ? RA.ink : RA.ink2 }}>{f.name}</div>
+          </div>
         ))}
         <div style={{ padding: '16px', marginTop: 8, borderTop: `1px solid ${RA.line}` }}>
-          <button style={addBtn()}>+ new figure</button>
+          <div style={{
+            width: '100%', padding: '6px 10px', fontFamily: RA.sans, fontSize: 12,
+            background: 'transparent', color: RA.ink3, border: `1px dashed ${RA.line}`,
+            borderRadius: 3, textAlign: 'center',
+          }}>+ new figure</div>
         </div>
       </div>
 
@@ -116,17 +119,31 @@ function FiguresBody(p) {
           </div>
         </div>
 
-        <FigureCanvas palette={p.palette} smoothing={p.smoothing} showCI={p.showCI} />
+        <FigureCanvas palette={p.palette} chartType={p.chartType} showCI={p.showCI} />
 
-        <div style={{ marginTop: 14, padding: 14, background: RA.code, borderRadius: 4, fontFamily: RA.mono, fontSize: 11.5, color: '#d4d4d4', lineHeight: 1.65 }}>
-          <div style={{ color: RA.accentDeep, marginBottom: 4, fontSize: 10, letterSpacing: 0.1, textTransform: 'uppercase' }}>fig2_main.R · generated</div>
+        <div style={{ marginTop: 14, padding: 14, background: '#1e1c1a', borderRadius: 4, fontFamily: RA.mono, fontSize: 11.5, color: '#d4d4d4', lineHeight: 1.65 }}>
+          <div style={{ color: RA.accentSoft, marginBottom: 4, fontSize: 10, letterSpacing: 0.1, textTransform: 'uppercase' }}>fig2_main.R · generated</div>
           <div><span style={{ color: '#8ec07c' }}>library</span>(tidyverse)</div>
           <div>df &lt;- <span style={{ color: '#8ec07c' }}>read_csv</span>(<span style={{ color: '#d79921' }}>"survey_clean.csv"</span>)</div>
           <div>df |&gt; </div>
-          <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>ggplot</span>(<span style={{ color: '#8ec07c' }}>aes</span>(task, trust_ai, fill=task)) +</div>
-          <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_bar</span>(stat=<span style={{ color: '#d79921' }}>"summary"</span>, fun=mean) +</div>
-          {p.showCI && <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_errorbar</span>(stat=<span style={{ color: '#d79921' }}>"summary"</span>, fun.data=mean_cl_normal) +</div>}
-          <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>scale_fill_manual</span>(values=c(<span style={{ color: '#d79921' }}>"{paletteHex(p.palette)[0]}"</span>, <span style={{ color: '#d79921' }}>"{paletteHex(p.palette)[1]}"</span>, <span style={{ color: '#d79921' }}>"{paletteHex(p.palette)[2]}"</span>)) +</div>
+          <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>ggplot</span>(<span style={{ color: '#8ec07c' }}>aes</span>(task, trust_ai, {p.chartType === 'scatter' ? 'color=task' : 'fill=task'})) +</div>
+          {p.chartType === 'bar' && (
+            <>
+              <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_bar</span>(stat=<span style={{ color: '#d79921' }}>"summary"</span>, fun=mean) +</div>
+              {p.showCI && <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_errorbar</span>(stat=<span style={{ color: '#d79921' }}>"summary"</span>, fun.data=mean_cl_normal, width=0.2) +</div>}
+            </>
+          )}
+          {p.chartType === 'box' && (
+            <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_boxplot</span>() +</div>
+          )}
+          {p.chartType === 'scatter' && (
+            <>
+              <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_jitter</span>(width=0.15, alpha=0.5) +</div>
+              <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>stat_summary</span>(fun=mean, geom=<span style={{ color: '#d79921' }}>"point"</span>, size=4) +</div>
+              {p.showCI && <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_errorbar</span>(stat=<span style={{ color: '#d79921' }}>"summary"</span>, fun.data=mean_cl_normal, width=0.1) +</div>}
+            </>
+          )}
+          <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>scale_{p.chartType === 'scatter' ? 'color' : 'fill'}_manual</span>(values=c(<span style={{ color: '#d79921' }}>"{paletteHex(p.palette)[0]}"</span>, <span style={{ color: '#d79921' }}>"{paletteHex(p.palette)[1]}"</span>, <span style={{ color: '#d79921' }}>"{paletteHex(p.palette)[2]}"</span>)) +</div>
           <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>theme_minimal</span>()</div>
         </div>
       </div>
@@ -136,6 +153,20 @@ function FiguresBody(p) {
         <div style={{ fontFamily: RA.mono, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.1, color: RA.ink3, marginBottom: 16 }}>
           Tweaks · fig2
         </div>
+
+        <Tweak label="Chart type">
+          <div style={{ display: 'flex', gap: 6 }}>
+            {['bar','box','scatter'].map(k => (
+              <button key={k} onClick={() => p.setChartType(k)} style={{
+                padding: '6px 10px', fontSize: 11, fontFamily: RA.sans, cursor: 'pointer',
+                border: `1px solid ${p.chartType === k ? RA.accent : RA.line}`,
+                background: p.chartType === k ? RA.accentSoft : RA.paper,
+                color: p.chartType === k ? RA.accentDeep : RA.ink2, borderRadius: 3,
+                textTransform: 'capitalize',
+              }}>{k}</button>
+            ))}
+          </div>
+        </Tweak>
 
         <Tweak label="Palette">
           <div style={{ display: 'flex', gap: 6 }}>
@@ -155,32 +186,14 @@ function FiguresBody(p) {
           </div>
         </Tweak>
 
-        <Tweak label="Smoothing" value={p.smoothing.toFixed(2)}>
-          <input type="range" min={0} max={1} step={0.05} value={p.smoothing}
-            onChange={e => p.setSmoothing(parseFloat(e.target.value))}
-            style={{ width: '100%', accentColor: RA.accent }} />
-        </Tweak>
-
         <Tweak label="Confidence intervals">
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: RA.ink2, cursor: 'pointer' }}>
-            <input type="checkbox" checked={p.showCI} onChange={e => p.setShowCI(e.target.checked)} />
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: RA.ink2, cursor: p.chartType === 'box' ? 'not-allowed' : 'pointer', opacity: p.chartType === 'box' ? 0.5 : 1 }}>
+            <input type="checkbox" checked={p.showCI && p.chartType !== 'box'} disabled={p.chartType === 'box'} onChange={e => p.setShowCI(e.target.checked)} />
             <span>Show 95% CI error bars</span>
           </label>
-        </Tweak>
-
-        <Tweak label="Theme">
-          <select style={selectSty}>
-            <option>minimal</option><option>classic</option><option>bw</option>
-          </select>
-        </Tweak>
-
-        <Tweak label="Insert location">
-          <select style={selectSty}>
-            <option>§ 3.2 Results — Calibration</option>
-            <option>§ 3.1 Descriptives</option>
-            <option>§ 4 Discussion</option>
-            <option>Appendix A</option>
-          </select>
+          {p.chartType === 'box' && (
+            <div style={{ fontSize: 11, color: RA.ink3, marginTop: 6, fontFamily: RA.mono }}>boxplots show IQR + whiskers instead</div>
+          )}
         </Tweak>
 
         <div style={{ marginTop: 20, padding: 10, background: RA.paper, border: `1px solid ${RA.line}`, borderRadius: 3 }}>
@@ -196,11 +209,6 @@ function FiguresBody(p) {
     </div>
   );
 }
-
-const selectSty = {
-  width: '100%', padding: '6px 8px', fontSize: 13, fontFamily: RA.sans,
-  border: `1px solid ${RA.line}`, background: RA.paper, color: RA.ink, borderRadius: 3,
-};
 
 function Tweak({ label, value, children }) {
   return (
@@ -224,13 +232,15 @@ function paletteHex(k) {
   return p[k] || p.warm;
 }
 
-function FigureCanvas({ palette, smoothing, showCI }) {
+function FigureCanvas({ palette, chartType, showCI }) {
   const colors = paletteHex(palette);
   const data = [
-    { label: 'lit search', mean: 4.2, ci: 0.3 },
-    { label: 'data cleaning', mean: 3.7, ci: 0.35 },
-    { label: 'causal inference', mean: 2.1, ci: 0.4 },
+    { label: 'lit search',       mean: 4.2, ci: 0.3,  q1: 3.6, median: 4.3, q3: 4.7, min: 2.8, max: 4.9 },
+    { label: 'data cleaning',    mean: 3.7, ci: 0.35, q1: 3.0, median: 3.8, q3: 4.3, min: 2.2, max: 4.7 },
+    { label: 'causal inference', mean: 2.1, ci: 0.4,  q1: 1.5, median: 2.0, q3: 2.7, min: 1.0, max: 3.5 },
   ];
+  const toY = (v) => 200 - (v - 1) * 34;
+
   return (
     <div style={{
       background: RA.paper, border: `1px solid ${RA.line}`, borderRadius: 4,
@@ -238,40 +248,95 @@ function FigureCanvas({ palette, smoothing, showCI }) {
     }}>
       <div style={{ fontSize: 13, fontFamily: RA.serif, marginBottom: 4 }}>Figure 2.</div>
       <div style={{ fontSize: 12, color: RA.ink2, marginBottom: 20, fontFamily: RA.serif, fontStyle: 'italic' }}>
-        Researcher trust in AI outputs by task type (mean, 95% CI), N=312.
+        Researcher trust in AI outputs by task type, N=312.
       </div>
       <svg viewBox="0 0 500 240" width="100%" style={{ maxHeight: 240 }}>
-        {/* axes */}
         <line x1="60" y1="200" x2="480" y2="200" stroke={RA.ink} strokeWidth="1" />
         <line x1="60" y1="30" x2="60" y2="200" stroke={RA.ink} strokeWidth="1" />
-        {/* y ticks */}
         {[1,2,3,4,5].map(t => (
           <g key={t}>
-            <line x1="57" y1={200 - (t-1)*34} x2="60" y2={200 - (t-1)*34} stroke={RA.ink} />
-            <text x="50" y={200 - (t-1)*34 + 4} fontSize="10" fill={RA.ink2} textAnchor="end" fontFamily={RA.mono}>{t}</text>
+            <line x1="57" y1={toY(t)} x2="60" y2={toY(t)} stroke={RA.ink} />
+            <text x="50" y={toY(t) + 4} fontSize="10" fill={RA.ink2} textAnchor="end" fontFamily={RA.mono}>{t}</text>
           </g>
         ))}
         <text x="30" y="115" fontSize="11" fill={RA.ink2} textAnchor="middle" transform="rotate(-90, 30, 115)" fontFamily={RA.sans}>trust (1-5)</text>
-        {/* bars */}
+
+        {data.map((d, i) => (
+          <text key={'lbl-'+d.label} x={110 + i * 130} y="218" fontSize="11" fill={RA.ink2} textAnchor="middle" fontFamily={RA.sans}>{d.label}</text>
+        ))}
+
         {data.map((d, i) => {
           const x = 110 + i * 130;
-          const h = (d.mean - 1) * 34;
-          const y = 200 - h;
-          const w = 60 - smoothing * 20; // "smoothing" modulates bar width as visual feedback
-          return (
-            <g key={d.label}>
-              <rect x={x - w/2} y={y} width={w} height={h} fill={colors[i]} opacity="0.85" />
-              {showCI && (
+          const color = colors[i];
+
+          if (chartType === 'bar') {
+            const w = 50;
+            const yTop = toY(d.mean);
+            const h = 200 - yTop;
+            return (
+              <g key={d.label}>
+                <rect x={x - w/2} y={yTop} width={w} height={h} fill={color} opacity="0.85" />
+                {showCI && (
+                  <g stroke={RA.ink} strokeWidth="1.2">
+                    <line x1={x} y1={yTop - d.ci * 34} x2={x} y2={yTop + d.ci * 34} />
+                    <line x1={x - 8} y1={yTop - d.ci * 34} x2={x + 8} y2={yTop - d.ci * 34} />
+                    <line x1={x - 8} y1={yTop + d.ci * 34} x2={x + 8} y2={yTop + d.ci * 34} />
+                  </g>
+                )}
+                <text x={x} y={yTop - (showCI ? d.ci * 34 + 6 : 6)} fontSize="10" fill={RA.ink3} textAnchor="middle" fontFamily={RA.mono}>M={d.mean}</text>
+              </g>
+            );
+          }
+
+          if (chartType === 'box') {
+            const w = 50;
+            const yQ1 = toY(d.q1);
+            const yQ3 = toY(d.q3);
+            const yMed = toY(d.median);
+            const yMin = toY(d.min);
+            const yMax = toY(d.max);
+            return (
+              <g key={d.label}>
                 <g stroke={RA.ink} strokeWidth="1.2">
-                  <line x1={x} y1={y - d.ci * 34} x2={x} y2={y + d.ci * 34} />
-                  <line x1={x - 8} y1={y - d.ci * 34} x2={x + 8} y2={y - d.ci * 34} />
-                  <line x1={x - 8} y1={y + d.ci * 34} x2={x + 8} y2={y + d.ci * 34} />
+                  <line x1={x} y1={yMin} x2={x} y2={yQ1} />
+                  <line x1={x} y1={yQ3} x2={x} y2={yMax} />
+                  <line x1={x - 10} y1={yMin} x2={x + 10} y2={yMin} />
+                  <line x1={x - 10} y1={yMax} x2={x + 10} y2={yMax} />
                 </g>
-              )}
-              <text x={x} y="218" fontSize="11" fill={RA.ink2} textAnchor="middle" fontFamily={RA.sans}>{d.label}</text>
-              <text x={x} y={y - (showCI ? d.ci * 34 + 6 : 6)} fontSize="10" fill={RA.ink3} textAnchor="middle" fontFamily={RA.mono}>M={d.mean}</text>
-            </g>
-          );
+                <rect x={x - w/2} y={yQ3} width={w} height={yQ1 - yQ3} fill={color} opacity="0.85" stroke={RA.ink} strokeWidth="1" />
+                <line x1={x - w/2} y1={yMed} x2={x + w/2} y2={yMed} stroke={RA.ink} strokeWidth="1.8" />
+                <text x={x} y={yMax - 6} fontSize="10" fill={RA.ink3} textAnchor="middle" fontFamily={RA.mono}>Mdn={d.median}</text>
+              </g>
+            );
+          }
+
+          if (chartType === 'scatter') {
+            const pts = [];
+            for (let j = 0; j < 18; j++) {
+              const dx = Math.sin(j * 7.13 + i * 2.1) * 18;
+              const dy = Math.cos(j * 11.7 + i * 3.3) * (d.q3 - d.q1) * 0.85;
+              pts.push({ px: x + dx, py: toY(d.mean + dy) });
+            }
+            const yMean = toY(d.mean);
+            return (
+              <g key={d.label}>
+                {pts.map((pt, j) => (
+                  <circle key={j} cx={pt.px} cy={pt.py} r="2.6" fill={color} opacity="0.45" />
+                ))}
+                {showCI && (
+                  <g stroke={RA.ink} strokeWidth="1.2">
+                    <line x1={x} y1={yMean - d.ci * 34} x2={x} y2={yMean + d.ci * 34} />
+                    <line x1={x - 8} y1={yMean - d.ci * 34} x2={x + 8} y2={yMean - d.ci * 34} />
+                    <line x1={x - 8} y1={yMean + d.ci * 34} x2={x + 8} y2={yMean + d.ci * 34} />
+                  </g>
+                )}
+                <circle cx={x} cy={yMean} r="5.5" fill={color} stroke={RA.ink} strokeWidth="1.2" />
+                <text x={x} y={yMean - (showCI ? d.ci * 34 + 6 : 10)} fontSize="10" fill={RA.ink3} textAnchor="middle" fontFamily={RA.mono}>M={d.mean}</text>
+              </g>
+            );
+          }
+
+          return null;
         })}
       </svg>
       <div style={{ marginTop: 12, fontSize: 11, color: RA.ink3, fontFamily: RA.mono, textAlign: 'center' }}>
@@ -288,13 +353,6 @@ function miniBtn(accent) {
     color: accent ? RA.paper : RA.ink2,
     border: `1px solid ${accent ? RA.accent : RA.line}`,
     borderRadius: 4, cursor: 'pointer',
-  };
-}
-
-function addBtn() {
-  return {
-    width: '100%', padding: '6px 10px', fontFamily: RA.sans, fontSize: 12,
-    background: 'transparent', color: RA.ink2, border: `1px dashed ${RA.line}`, cursor: 'pointer', borderRadius: 3,
   };
 }
 
