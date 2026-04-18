@@ -250,15 +250,104 @@ function StimuliPreview() {
 }
 
 function AnalysisPreview() {
+  const audits = [
+    {
+      id: 'h1', label: 'H1 · Trust calibration varies by task type.',
+      status: 'planned',
+      prereg: 'One-way ANOVA on trust ~ task. Hypothesize M_search > 4 and M_causal < 3.',
+      executed: 'F(4, 307) = 24.3, p < .001. M_search = 4.2, M_causal = 2.1. Both predictions supported.',
+    },
+    {
+      id: 'h2', label: 'H2 · Disclosure predicts calibration.',
+      status: 'deviated',
+      prereg: 'Correlation between disclosure and accuracy × confidence; hypothesize r > .3.',
+      executed: 'r = .22, p = .03. Below the pre-registered threshold.',
+      note: 'Reported in §3 as "partial support." Drafted paragraph added to §4.3 Limitations.',
+    },
+    {
+      id: 'exc', label: 'Exclusion rules',
+      status: 'deviated',
+      prereg: '(1) Fail attention check. (2) Duration < 120s. (3) Completion ≥ 45 min.',
+      executed: 'Rules (1) and (3) applied; rule (2) dropped.',
+      note: 'Duration rule removed at R&R per reviewer request ("excludes legitimate fast responders"). Sensitivity analysis with rule (2) applied reported in Appendix C.',
+    },
+    {
+      id: 'mod', label: 'Moderation by PhD training',
+      status: 'exploratory',
+      prereg: 'Not pre-registered.',
+      executed: 'β = −0.18, SE = 0.06, p < .01. Added during revision at editor\'s request.',
+      note: 'Labeled exploratory throughout §3 and §4 per best practice.',
+    },
+  ];
+
+  const counts = {
+    planned: audits.filter(a => a.status === 'planned').length,
+    deviated: audits.filter(a => a.status === 'deviated').length,
+    exploratory: audits.filter(a => a.status === 'exploratory').length,
+  };
+
   return (
-    <div style={{ fontFamily: RA.serif, fontSize: 14, color: RA.ink2, lineHeight: 1.7, maxWidth: 640 }}>
-      <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.accent, marginBottom: 10 }}>🔒 pre-registered v1.0 · locked 2025-03-01</div>
-      <h3 style={{ fontSize: 16, fontFamily: RA.serif, fontWeight: 500, marginTop: 0 }}>H1. Trust calibration varies by task type.</h3>
-      <p>We predict trust (1-5 Likert) will be highest for literature search (M &gt; 4) and lowest for causal inference (M &lt; 3). Tested with one-way ANOVA.</p>
-      <h3 style={{ fontSize: 16, fontFamily: RA.serif, fontWeight: 500 }}>H2. Disclosure predicts calibration.</h3>
-      <p>Participants who report disclosing AI use to reviewers will show better calibration (accuracy × confidence correlation, r &gt; .3).</p>
-      <h3 style={{ fontSize: 16, fontFamily: RA.serif, fontWeight: 500 }}>Exclusions</h3>
-      <p>Fail attention check (q_attn ≠ 3) → excluded. Duration &lt; 120s → excluded. All exclusions reported.</p>
+    <div style={{ maxWidth: 760 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 18 }}>
+        <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.accent }}>🔒 pre-registered v1.0 · locked 2025-03-01</div>
+        <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase' }}>prereg → execution audit</div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 22 }}>
+        <AuditSummary n={counts.planned} label="executed as planned" color={RA.accent} />
+        <AuditSummary n={counts.deviated} label="deviations from plan" color="#c86a4f" />
+        <AuditSummary n={counts.exploratory} label="exploratory (not pre-reg)" color={RA.ink3} />
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {audits.map(a => <AuditRow key={a.id} {...a} />)}
+      </div>
+
+      <div style={{ marginTop: 20, padding: 14, background: RA.paper2, border: `1px solid ${RA.line}`, borderRadius: 3, fontSize: 13, color: RA.ink2, lineHeight: 1.6 }}>
+        <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase', marginBottom: 6 }}>
+          auto-drafted
+        </div>
+        Deviation paragraph drafted from this audit for the <span style={{ color: RA.accent, textDecoration: 'underline', textDecorationStyle: 'dotted' }}>Limitations section (§4.3) ↗</span>
+      </div>
+    </div>
+  );
+}
+
+function AuditSummary({ n, label, color }) {
+  return (
+    <div style={{ padding: '10px 12px', border: `1px solid ${RA.line}`, borderRadius: 3, background: RA.paper }}>
+      <div style={{ fontFamily: RA.serif, fontSize: 28, color, lineHeight: 1 }}>{n}</div>
+      <div style={{ fontSize: 11, color: RA.ink3, fontFamily: RA.mono, marginTop: 4, lineHeight: 1.35 }}>{label}</div>
+    </div>
+  );
+}
+
+function AuditRow({ label, status, prereg, executed, note }) {
+  const meta = {
+    planned:     { icon: '✓', color: RA.accent, text: 'as planned' },
+    deviated:    { icon: '⚠', color: '#c86a4f', text: 'deviation' },
+    exploratory: { icon: '+', color: RA.ink3,   text: 'exploratory' },
+    skipped:     { icon: '✗', color: '#c86a4f', text: 'skipped' },
+  }[status];
+
+  return (
+    <div style={{ border: `1px solid ${RA.line}`, borderLeft: `3px solid ${meta.color}`, borderRadius: 3, padding: 14, background: RA.paper }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10, gap: 10, flexWrap: 'wrap' }}>
+        <div style={{ fontFamily: RA.serif, fontSize: 15, color: RA.ink }}>{label}</div>
+        <span style={{ fontFamily: RA.mono, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.1, color: meta.color, padding: '2px 8px', border: `1px solid ${meta.color}`, borderRadius: 999, whiteSpace: 'nowrap' }}>
+          {meta.icon} {meta.text}
+        </span>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '72px 1fr', gap: '6px 14px', fontSize: 13, lineHeight: 1.5 }}>
+        <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, textTransform: 'uppercase', letterSpacing: 0.1, paddingTop: 2 }}>pre-reg</div>
+        <div style={{ color: RA.ink2 }}>{prereg}</div>
+        <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, textTransform: 'uppercase', letterSpacing: 0.1, paddingTop: 2 }}>executed</div>
+        <div style={{ color: RA.ink }}>{executed}</div>
+        {note && (<>
+          <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, textTransform: 'uppercase', letterSpacing: 0.1, paddingTop: 2 }}>note</div>
+          <div style={{ color: RA.ink3, fontFamily: RA.serif, fontStyle: 'italic' }}>{note}</div>
+        </>)}
+      </div>
     </div>
   );
 }

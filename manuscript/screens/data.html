@@ -20,6 +20,7 @@ const { useState } = React;
 
 function DataScreen() {
   const [mode, setMode] = useState('clean');
+  const [subtab, setSubtab] = useState('quant');
 
   return (
     <>
@@ -28,21 +29,31 @@ function DataScreen() {
 
       <ScreenIntro
         kicker="Screen 02 · Data"
-        title={<>Raw and Clean, <em style={{ fontStyle: 'italic' }}>side by side.</em></>}
-        caption="Two tabs, same file. Raw is encrypted, PII-flagged, never shared. Clean is anonymized and ready to deposit. Quant and qual in the same pane, because they live in the same project."
+        title={<>Raw, Clean, <em style={{ fontStyle: 'italic' }}>quant and qual.</em></>}
+        caption="Raw is encrypted and PII-flagged; Clean is anonymized and ready to deposit. Quantitative and qualitative live in the same project — toggle between them without switching tools."
       />
 
       <div className="container" style={{ padding: '0 24px 24px' }}>
-        <div style={{ display: 'inline-flex', border: `1px solid ${RA.line}`, borderRadius: 999, overflow: 'hidden' }}>
-          <button onClick={() => setMode('raw')} style={tabBtn(mode === 'raw')}>🔒 Raw (private)</button>
-          <button onClick={() => setMode('clean')} style={tabBtn(mode === 'clean')}>🔗 Clean (shareable)</button>
+        <div style={{ display: 'inline-flex', border: `1px solid ${RA.line}`, borderRadius: 999, overflow: 'hidden', background: RA.paper }}>
+          {['raw', 'clean'].map(m => (
+            <button key={m} onClick={() => setMode(m)} style={{
+              padding: '8px 20px', fontFamily: RA.sans, fontSize: 13, fontWeight: 500,
+              background: mode === m ? RA.ink : 'transparent',
+              color: mode === m ? RA.paper : RA.ink2,
+              border: 'none', cursor: 'pointer', letterSpacing: 0.2,
+            }}>
+              {m === 'raw' ? '🔒 Raw (private)' : '🔗 Clean (shareable)'}
+            </button>
+          ))}
         </div>
+        <span style={{ marginLeft: 16, fontFamily: RA.mono, fontSize: 11, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase' }}>
+          ↑ try the modes
+        </span>
       </div>
 
-      <MockFrame title={`claude-ra · data · ${mode === 'raw' ? 'raw 🔒' : 'clean 🔗'}`} height={720}>
+      <MockFrame title={`claude-ra · ${mode === 'raw' ? 'raw 🔒' : 'clean 🔗'} · ${subtab === 'quant' ? 'survey.csv' : 'interviews/'}`} height={720}>
         <ProjectRail active="data" />
-        <DataBody mode={mode} />
-        <ClaudeRail />
+        <DataBody mode={mode} subtab={subtab} setSubtab={setSubtab} />
       </MockFrame>
 
       <div className="container" style={{ padding: '32px 24px 0' }}>
@@ -51,10 +62,10 @@ function DataScreen() {
             <b>One-click share.</b> Clean data gets an anonymized, versioned link to OSF. Raw never leaves the device.
           </FeatureNote>
           <FeatureNote num="B">
-            <b>The pipeline is the proof.</b> Dedupe → attention-check → reverse-code → scale. Each step is a commit. Each commit is reviewable.
+            <b>The pipeline is the proof.</b> Dedupe → attention-check → reverse-code → scale. Each step is a commit, reviewable.
           </FeatureNote>
           <FeatureNote num="C">
-            <b>Qual lives here too.</b> 24 transcripts, themed and excerpted, all addressable from the manuscript.
+            <b>Refresh-aware.</b> When Clean updates, the tool flags which claims in the manuscript may need revisiting.
           </FeatureNote>
         </div>
       </div>
@@ -62,15 +73,6 @@ function DataScreen() {
       <ScreenFooter prev="manuscript" next="figures" />
     </>
   );
-}
-
-function tabBtn(active) {
-  return {
-    padding: '8px 20px', fontFamily: RA.sans, fontSize: 13, fontWeight: 500,
-    background: active ? RA.ink : 'transparent',
-    color: active ? RA.paper : RA.ink2,
-    border: 'none', cursor: 'pointer',
-  };
 }
 
 function FeatureNote({ num, children }) {
@@ -87,187 +89,313 @@ function FeatureNote({ num, children }) {
   );
 }
 
-function DataBody({ mode }) {
+function DataBody({ mode, subtab, setSubtab }) {
   const raw = mode === 'raw';
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      {/* Tab header */}
+      {/* Sub-tabs */}
       <div style={{
-        padding: '12px 20px 0', borderBottom: `1px solid ${RA.line}`,
-        display: 'flex', alignItems: 'flex-end',
+        padding: '0 20px', borderBottom: `1px solid ${RA.line}`,
+        display: 'flex', alignItems: 'center', gap: 0, background: RA.paper2,
       }}>
-        <DataTab active={raw} icon="🔒" label="Raw" sub="private · IRB" />
-        <DataTab active={!raw} icon="🔗" label="Clean" sub="shareable · anonymized" />
+        <SubTab
+          active={subtab === 'quant'} onClick={() => setSubtab('quant')}
+          dot={RA.quant} label="Quantitative"
+          sub={raw ? '410 responses' : '312 participants'}
+        />
+        <SubTab
+          active={subtab === 'qual'} onClick={() => setSubtab('qual')}
+          dot={RA.qual} label="Qualitative"
+          sub="24 transcripts"
+        />
         <div style={{ flex: 1 }} />
         <div style={{ display: 'flex', gap: 8, paddingBottom: 10 }}>
-          <button style={miniBtn()}>+ upload</button>
-          <button style={miniBtn(true)}>→ clean with claude</button>
-          {!raw && <button style={miniBtn()}>deposit to OSF ↗</button>}
+          {raw ? (
+            <>
+              <button style={miniBtn()}>+ upload</button>
+              <button style={miniBtn(true)}>→ clean with claude</button>
+            </>
+          ) : (
+            <>
+              <button style={miniBtn()}>view pipeline</button>
+              <button style={miniBtn(true)}>deposit to OSF ↗</button>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Body split */}
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', overflow: 'hidden' }}>
-        <div style={{ borderRight: `1px solid ${RA.line}`, padding: 18, overflow: 'auto' }}>
-          <SectionHead dot={RA.quant} label="Quantitative" file="survey.csv" n={raw ? '410 rows' : '312 rows'} />
-          {raw && (
-            <div style={{ marginBottom: 10, padding: 8, border: `1px dashed ${RA.accent}`, background: RA.accentSoft, color: RA.accentDeep, fontFamily: RA.mono, fontSize: 11 }}>
-              ⚠ contains PII (email, IP). Encrypted at rest. No sharing.
-            </div>
-          )}
-          <MockTable raw={raw} />
-          <div style={{ marginTop: 14, fontFamily: RA.mono, fontSize: 11, color: RA.ink3 }}>
-            {raw ? 'unchecked · no pipeline applied' : 'pipeline: dedupe → attention-check → reverse-code → scale'}
-          </div>
-          {!raw && <PipelineStrip />}
-        </div>
+      {!raw && <RefreshBanner />}
 
-        <div style={{ padding: 18, overflow: 'auto' }}>
-          <SectionHead dot={RA.qual} label="Qualitative" file="interviews/" n="24 transcripts" />
-          {raw ? <InterviewListRaw /> : <InterviewListClean />}
-        </div>
+      <div style={{ flex: 1, padding: 22, overflow: 'auto' }}>
+        {raw && subtab === 'quant' && <QuantRaw />}
+        {raw && subtab === 'qual'  && <QualRaw />}
+        {!raw && subtab === 'quant' && <QuantClean />}
+        {!raw && subtab === 'qual'  && <QualClean />}
       </div>
     </div>
   );
 }
 
-function DataTab({ active, icon, label, sub }) {
+function SubTab({ active, onClick, dot, label, sub }) {
   return (
-    <div style={{
-      padding: '10px 16px 12px',
+    <button onClick={onClick} style={{
+      padding: '12px 16px 14px',
+      background: 'transparent',
+      border: 'none',
       borderBottom: active ? `2px solid ${RA.accent}` : '2px solid transparent',
-      fontSize: 13, fontWeight: active ? 600 : 400,
+      fontFamily: RA.sans, fontSize: 13,
       color: active ? RA.ink : RA.ink3,
-      cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
+      fontWeight: active ? 600 : 400,
+      cursor: 'pointer',
+      display: 'flex', alignItems: 'center', gap: 8,
       marginBottom: -1,
     }}>
-      <span>{icon}</span>
+      <span style={{ width: 8, height: 8, borderRadius: '50%', background: dot, display: 'inline-block' }} />
       <span>{label}</span>
       <span style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, fontWeight: 400, marginLeft: 4 }}>· {sub}</span>
-    </div>
+    </button>
   );
 }
 
-function miniBtn(accent) {
-  return {
-    padding: '6px 12px', fontFamily: RA.sans, fontSize: 12, fontWeight: 500,
-    background: accent ? RA.accent : 'transparent',
-    color: accent ? RA.paper : RA.ink2,
-    border: `1px solid ${accent ? RA.accent : RA.line}`,
-    borderRadius: 4, cursor: 'pointer',
-  };
-}
-
-function SectionHead({ dot, label, file, n }) {
-  return (
-    <div style={{ marginBottom: 12, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-        <span style={{ width: 8, height: 8, borderRadius: '50%', background: dot, display: 'inline-block' }} />
-        <span style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3, textTransform: 'uppercase', letterSpacing: 0.1 }}>{label}</span>
-        <span style={{ fontFamily: RA.mono, fontSize: 13, color: RA.ink }}>{file}</span>
-      </div>
-      <span style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3 }}>{n}</span>
-    </div>
-  );
-}
-
-function MockTable({ raw }) {
-  const headers = raw
-    ? ['pid','email','ip_addr','age','trust_ai','trust_h','acc','dur']
-    : ['pid','age_bin','trust_ai','trust_h','acc','dur_z'];
-  const rows = raw
-    ? [
-        ['p001','a.c@…','10.0.1.4','34','4.2','3.8','0.71','412'],
-        ['p002','mok@…','10.0.1.5','27','3.5','4.1','0.84','301'],
-        ['p003','sr@…','10.0.1.6','42','4.8','4.0','0.65','498'],
-        ['p004','—','10.0.1.7','28','2.9','3.6','0.90','198'],
-        ['p005','—','10.0.1.8','35','4.0','3.9','0.78','355'],
-      ]
-    : [
-        ['p001','30–39','4.2','3.8','0.71','+0.2'],
-        ['p002','25–29','3.5','4.1','0.84','-0.1'],
-        ['p003','40–49','4.8','4.0','0.65','+1.1'],
-        ['p004','25–29','2.9','3.6','0.90','-0.8'],
-        ['p005','30–39','4.0','3.9','0.78','+0.3'],
-      ];
-  return (
-    <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: RA.mono, fontSize: 12 }}>
-      <thead>
-        <tr>{headers.map(h => <th key={h} style={{ padding: '6px 8px', textAlign: 'left', borderBottom: `1px solid ${RA.line}`, color: RA.ink3, fontWeight: 500, fontSize: 11, letterSpacing: 0.05 }}>{h}</th>)}</tr>
-      </thead>
-      <tbody>
-        {rows.map((r, i) => (
-          <tr key={i} style={{ borderBottom: `1px solid ${RA.lineSoft}` }}>
-            {r.map((v, j) => <td key={j} style={{ padding: '6px 8px', color: raw && (j === 1 || j === 2) ? RA.accent : RA.ink2 }}>{v}</td>)}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
-function PipelineStrip() {
-  const steps = [
-    { n: 1, k: 'dedupe', v: '410 → 398' },
-    { n: 2, k: 'attn-check', v: '398 → 341' },
-    { n: 3, k: 'reverse-code', v: 'q2, q4' },
-    { n: 4, k: 'trust scale', v: 'α = .87' },
-    { n: 5, k: 'anonymize', v: '312 → clean', done: true },
+function RefreshBanner() {
+  const [open, setOpen] = useState(false);
+  const flagged = [
+    { section: '§ 3.2 Results · Calibration gap', delta: 'β(experience) shifted −0.18 → −0.12', status: 'attention', note: 'still significant, but effect size dropped 33%. Re-read the paragraph.' },
+    { section: '§ Abstract · N',                  delta: 'N updated 312 → 348',                  status: 'auto',      note: '36 late respondents added; inline statistic updated.' },
+    { section: '§ 3.1 Descriptives',              delta: 'M_causal = 2.1 (unchanged)',           status: 'ok',        note: 'no action needed.' },
   ];
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginTop: 10 }}>
-      {steps.map(s => (
-        <div key={s.n} style={{
-          padding: '8px 10px',
-          border: `1px solid ${s.done ? RA.accent : RA.line}`,
-          background: s.done ? RA.accentSoft : RA.paper2,
-          borderRadius: 3,
-        }}>
-          <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, marginBottom: 2 }}>{s.n} · {s.k}</div>
-          <div style={{ fontFamily: RA.mono, fontSize: 11, color: s.done ? RA.accentDeep : RA.ink2 }}>{s.v}</div>
+    <div style={{ borderBottom: `1px solid ${RA.line}` }}>
+      <button onClick={() => setOpen(!open)} style={{
+        width: '100%', padding: '10px 20px', background: RA.accentSoft,
+        border: 'none', textAlign: 'left',
+        fontFamily: RA.mono, fontSize: 12, color: RA.accentDeep,
+        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
+      }}>
+        <span>↻</span>
+        <span><b>survey_clean.csv refreshed 2h ago</b> · 3 claims in manuscript flagged</span>
+        <span style={{ marginLeft: 'auto', fontSize: 11 }}>{open ? 'hide' : 'show'} →</span>
+      </button>
+      {open && (
+        <div style={{ padding: '12px 20px 14px', background: RA.paper2, borderTop: `1px solid ${RA.line}`, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {flagged.map((f, i) => {
+            const meta = {
+              attention: { icon: '⚠', color: '#c86a4f', text: 'attention' },
+              auto:      { icon: '↻', color: RA.accent, text: 'auto-applied' },
+              ok:        { icon: '✓', color: RA.ink3,   text: 'unchanged' },
+            }[f.status];
+            return (
+              <div key={i} style={{ display: 'grid', gridTemplateColumns: '120px 1fr auto', gap: 14, alignItems: 'baseline', fontSize: 12, padding: '4px 0', borderTop: i === 0 ? 'none' : `1px solid ${RA.lineSoft}`, paddingTop: i === 0 ? 0 : 10 }}>
+                <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink2 }}>{f.section}</div>
+                <div>
+                  <div style={{ fontFamily: RA.mono, fontSize: 11.5, color: RA.ink, marginBottom: 2 }}>{f.delta}</div>
+                  <div style={{ fontFamily: RA.serif, fontSize: 12, color: RA.ink3, fontStyle: 'italic' }}>{f.note}</div>
+                </div>
+                <div style={{ fontFamily: RA.mono, fontSize: 10, color: meta.color, textTransform: 'uppercase', letterSpacing: 0.1, padding: '2px 8px', border: `1px solid ${meta.color}`, borderRadius: 999, whiteSpace: 'nowrap' }}>
+                  {meta.icon} {meta.text}
+                </div>
+              </div>
+            );
+          })}
         </div>
-      ))}
+      )}
     </div>
   );
 }
 
-function InterviewListRaw() {
+// ── QUANT RAW ──────────────────────────────────────────────────
+function QuantRaw() {
+  return (
+    <div>
+      <div style={{ marginBottom: 12, padding: 10, border: `1px dashed ${RA.accent}`, background: RA.accentSoft, color: RA.accentDeep, fontFamily: RA.mono, fontSize: 11.5 }}>
+        ⚠ contains PII (email, IP). Encrypted at rest. No sharing.
+      </div>
+      <MockTable raw />
+      <div style={{ marginTop: 14, fontFamily: RA.mono, fontSize: 11, color: RA.ink3 }}>
+        unchecked · 410 rows · no pipeline applied
+      </div>
+    </div>
+  );
+}
+
+// ── QUANT CLEAN ────────────────────────────────────────────────
+function QuantClean() {
+  return (
+    <div>
+      <MockTable />
+      <div style={{ marginTop: 14, fontFamily: RA.mono, fontSize: 11, color: RA.ink3, marginBottom: 10 }}>
+        pipeline: dedupe → attention-check → reverse-code → scale
+      </div>
+      <PipelineStrip />
+    </div>
+  );
+}
+
+// ── QUAL RAW ───────────────────────────────────────────────────
+function QualRaw() {
   const files = [
-    { name: 'p001_transcript.txt', size: '42KB', sensitive: true },
-    { name: 'p002_transcript.txt', size: '38KB', sensitive: true },
-    { name: 'p003_transcript.txt', size: '51KB', sensitive: true },
-    { name: 'p004_transcript.txt', size: '47KB', sensitive: true },
-    { name: 'p005_audio.m4a', size: '12MB', sensitive: true },
-    { name: 'p006_transcript.txt', size: '44KB', sensitive: true },
-  ];
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <div style={{ padding: 8, background: RA.accentSoft, border: `1px dashed ${RA.accent}`, color: RA.accentDeep, fontFamily: RA.mono, fontSize: 11, marginBottom: 8 }}>
-        ⚠ names, timestamps, affiliations not yet redacted
-      </div>
-      {files.map(f => (
-        <div key={f.name} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 8px', fontFamily: RA.mono, fontSize: 12, color: RA.ink2, borderBottom: `1px solid ${RA.lineSoft}` }}>
-          <span>{f.sensitive && <span style={{ color: RA.accent, marginRight: 6 }}>🔒</span>}{f.name}</span>
-          <span style={{ color: RA.ink3 }}>{f.size}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function InterviewListClean() {
-  const themes = [
-    { name: 'verification rituals', n: 18, w: 0.86 },
-    { name: 'epistemic humility', n: 14, w: 0.72 },
-    { name: 'workflow delegation', n: 22, w: 0.98 },
-    { name: 'disclosure to reviewers', n: 9, w: 0.46 },
-    { name: 'calibration over time', n: 11, w: 0.58 },
-    { name: 'tool stickiness', n: 7, w: 0.38 },
+    { name: 'p001_transcript.txt', size: '42 KB', sensitive: true },
+    { name: 'p002_transcript.txt', size: '38 KB', sensitive: true },
+    { name: 'p003_transcript.txt', size: '51 KB', sensitive: true },
+    { name: 'p004_transcript.txt', size: '47 KB', sensitive: true },
+    { name: 'p005_audio.m4a',      size: '12 MB', sensitive: true },
+    { name: 'p006_transcript.txt', size: '44 KB', sensitive: true },
+    { name: 'p007_transcript.txt', size: '39 KB', sensitive: true },
+    { name: 'p008_transcript.txt', size: '45 KB', sensitive: true },
   ];
   return (
     <div>
-      <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3, marginBottom: 10 }}>
-        coded · κ=.78 · 5 themes · 74 excerpts
+      <div style={{ marginBottom: 12, padding: 10, border: `1px dashed ${RA.accent}`, background: RA.accentSoft, color: RA.accentDeep, fontFamily: RA.mono, fontSize: 11.5 }}>
+        ⚠ names, timestamps, affiliations not yet redacted
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {files.map(f => (
+          <div key={f.name} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 10px', fontFamily: RA.mono, fontSize: 12.5, color: RA.ink2, borderBottom: `1px solid ${RA.lineSoft}` }}>
+            <span>{f.sensitive && <span style={{ color: RA.accent, marginRight: 6 }}>🔒</span>}{f.name}</span>
+            <span style={{ color: RA.ink3 }}>{f.size}</span>
+          </div>
+        ))}
+        <div style={{ padding: '8px 10px', fontFamily: RA.mono, fontSize: 11, color: RA.ink3 }}>
+          + 16 more · 24 total
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── QUAL CLEAN ─────────────────────────────────────────────────
+function QualClean() {
+  const sat = [
+    { i: 1,  cum: 6,  newC: 6 },
+    { i: 2,  cum: 11, newC: 5 },
+    { i: 3,  cum: 14, newC: 3 },
+    { i: 4,  cum: 17, newC: 3 },
+    { i: 5,  cum: 20, newC: 3 },
+    { i: 6,  cum: 22, newC: 2 },
+    { i: 7,  cum: 24, newC: 2 },
+    { i: 8,  cum: 25, newC: 1 },
+    { i: 9,  cum: 26, newC: 1 },
+    { i: 10, cum: 27, newC: 1 },
+    { i: 11, cum: 27, newC: 0 },
+    { i: 12, cum: 28, newC: 1 },
+    { i: 13, cum: 28, newC: 0 },
+    { i: 14, cum: 29, newC: 1 },
+    { i: 15, cum: 29, newC: 0 },
+    { i: 16, cum: 29, newC: 0 },
+    { i: 17, cum: 30, newC: 1 },
+    { i: 18, cum: 30, newC: 0 },
+    { i: 19, cum: 30, newC: 0 },
+    { i: 20, cum: 30, newC: 0 },
+    { i: 21, cum: 30, newC: 0 },
+    { i: 22, cum: 30, newC: 0 },
+    { i: 23, cum: 30, newC: 0 },
+    { i: 24, cum: 30, newC: 0 },
+  ];
+
+  const themes = [
+    { name: 'verification rituals',    n: 18, w: 0.86 },
+    { name: 'epistemic humility',       n: 14, w: 0.72 },
+    { name: 'workflow delegation',      n: 22, w: 0.98 },
+    { name: 'disclosure to reviewers',  n: 9,  w: 0.46 },
+    { name: 'calibration over time',    n: 11, w: 0.58 },
+    { name: 'tool stickiness',          n: 7,  w: 0.38 },
+  ];
+
+  const xMax = 24;
+  const yMax = 32;
+  const w = 560, h = 200;
+  const padL = 40, padR = 14, padT = 16, padB = 28;
+  const plotW = w - padL - padR;
+  const plotH = h - padT - padB;
+  const xToPx = (x) => padL + (x / xMax) * plotW;
+  const yToPx = (y) => padT + plotH - (y / yMax) * plotH;
+
+  // find saturation point: first interview after which newC is 0 for 3 consecutive
+  let satAt = null;
+  for (let i = 0; i < sat.length - 2; i++) {
+    if (sat[i].newC === 0 && sat[i+1].newC === 0 && sat[i+2].newC === 0) { satAt = sat[i].i; break; }
+  }
+
+  const pathD = sat.map((d, idx) => `${idx === 0 ? 'M' : 'L'} ${xToPx(d.i)} ${yToPx(d.cum)}`).join(' ');
+
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
+        <div>
+          <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase', marginBottom: 3 }}>
+            Theme saturation
+          </div>
+          <div style={{ fontFamily: RA.serif, fontSize: 18 }}>
+            Cumulative unique codes across interviews
+          </div>
+        </div>
+        <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3 }}>
+          κ = .78 · 6 themes · 30 codes · 81 excerpts
+        </div>
+      </div>
+
+      <div style={{ background: RA.paper, border: `1px solid ${RA.line}`, borderRadius: 4, padding: 16, marginBottom: 20 }}>
+        <svg viewBox={`0 0 ${w} ${h}`} width="100%" style={{ maxHeight: h, display: 'block' }}>
+          {/* axes */}
+          <line x1={padL} y1={padT + plotH} x2={w - padR} y2={padT + plotH} stroke={RA.ink3} strokeWidth="1" />
+          <line x1={padL} y1={padT} x2={padL} y2={padT + plotH} stroke={RA.ink3} strokeWidth="1" />
+
+          {/* y ticks */}
+          {[0, 8, 16, 24, 32].map(t => (
+            <g key={t}>
+              <line x1={padL - 3} y1={yToPx(t)} x2={padL} y2={yToPx(t)} stroke={RA.ink3} />
+              <text x={padL - 6} y={yToPx(t) + 3.5} fontSize="10" textAnchor="end" fill={RA.ink3} fontFamily={RA.mono}>{t}</text>
+            </g>
+          ))}
+          <text x="14" y={padT + plotH / 2} fontSize="10.5" fill={RA.ink2}
+                textAnchor="middle" fontFamily={RA.sans}
+                transform={`rotate(-90, 14, ${padT + plotH / 2})`}>
+            unique codes
+          </text>
+
+          {/* x ticks */}
+          {[1, 6, 12, 18, 24].map(t => (
+            <g key={t}>
+              <line x1={xToPx(t)} y1={padT + plotH} x2={xToPx(t)} y2={padT + plotH + 3} stroke={RA.ink3} />
+              <text x={xToPx(t)} y={padT + plotH + 14} fontSize="10" textAnchor="middle" fill={RA.ink3} fontFamily={RA.mono}>{t}</text>
+            </g>
+          ))}
+          <text x={padL + plotW / 2} y={h - 4} fontSize="10.5" fill={RA.ink2} textAnchor="middle" fontFamily={RA.sans}>
+            interview
+          </text>
+
+          {/* saturation marker */}
+          {satAt && (
+            <g>
+              <line x1={xToPx(satAt)} y1={padT} x2={xToPx(satAt)} y2={padT + plotH} stroke={RA.accent} strokeWidth="0.8" strokeDasharray="3 3" />
+              <text x={xToPx(satAt) + 6} y={padT + 10} fontSize="10" fill={RA.accent} fontFamily={RA.mono}>
+                saturation at interview {satAt}
+              </text>
+            </g>
+          )}
+
+          {/* curve */}
+          <path d={pathD} stroke={RA.qual} strokeWidth="2" fill="none" />
+          {sat.map(d => (
+            <circle key={d.i} cx={xToPx(d.i)} cy={yToPx(d.cum)} r={d.newC > 0 ? 3 : 2} fill={d.newC > 0 ? RA.qual : RA.paper} stroke={RA.qual} strokeWidth="1" />
+          ))}
+
+          {/* small bars under x-axis for newC per interview */}
+          {sat.map(d => {
+            if (d.newC === 0) return null;
+            const bh = d.newC * 2;
+            return (
+              <rect key={'b'+d.i}
+                    x={xToPx(d.i) - 2} y={padT + plotH - bh}
+                    width="4" height={bh} fill={RA.qual} opacity="0.25" />
+            );
+          })}
+        </svg>
+      </div>
+
+      {/* themes list */}
+      <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase', marginBottom: 10 }}>
+        themes · sorted by excerpts
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {themes.map(t => (
@@ -288,6 +416,79 @@ function InterviewListClean() {
       </div>
     </div>
   );
+}
+
+// ── SHARED TABLE + PIPELINE ────────────────────────────────────
+function MockTable({ raw }) {
+  const headers = raw
+    ? ['pid','email','ip_addr','age','trust_ai','trust_h','acc','dur']
+    : ['pid','age_bin','trust_ai','trust_h','acc','dur_z'];
+  const rows = raw
+    ? [
+        ['p001','a.c@…','10.0.1.4','34','4.2','3.8','0.71','412'],
+        ['p002','mok@…','10.0.1.5','27','3.5','4.1','0.84','301'],
+        ['p003','sr@…','10.0.1.6','42','4.8','4.0','0.65','498'],
+        ['p004','—','10.0.1.7','28','2.9','3.6','0.90','198'],
+        ['p005','—','10.0.1.8','35','4.0','3.9','0.78','355'],
+        ['p006','lr@…','10.0.1.9','31','3.1','3.5','0.62','389'],
+      ]
+    : [
+        ['p001','30–39','4.2','3.8','0.71','+0.2'],
+        ['p002','25–29','3.5','4.1','0.84','-0.1'],
+        ['p003','40–49','4.8','4.0','0.65','+1.1'],
+        ['p004','25–29','2.9','3.6','0.90','-0.8'],
+        ['p005','30–39','4.0','3.9','0.78','+0.3'],
+        ['p006','30–39','3.1','3.5','0.62','+0.2'],
+      ];
+  return (
+    <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: RA.mono, fontSize: 12 }}>
+      <thead>
+        <tr>{headers.map(h => <th key={h} style={{ padding: '6px 8px', textAlign: 'left', borderBottom: `1px solid ${RA.line}`, color: RA.ink3, fontWeight: 500, fontSize: 11, letterSpacing: 0.05 }}>{h}</th>)}</tr>
+      </thead>
+      <tbody>
+        {rows.map((r, i) => (
+          <tr key={i} style={{ borderBottom: `1px solid ${RA.lineSoft}` }}>
+            {r.map((v, j) => <td key={j} style={{ padding: '6px 8px', color: raw && (j === 1 || j === 2) ? RA.accent : RA.ink2 }}>{v}</td>)}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function PipelineStrip() {
+  const steps = [
+    { n: 1, k: 'dedupe',       v: '410 → 398' },
+    { n: 2, k: 'attn-check',   v: '398 → 341' },
+    { n: 3, k: 'reverse-code', v: 'q2, q4' },
+    { n: 4, k: 'trust scale',  v: 'α = .87' },
+    { n: 5, k: 'anonymize',    v: '312 → clean', done: true },
+  ];
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginTop: 4 }}>
+      {steps.map(s => (
+        <div key={s.n} style={{
+          padding: '8px 10px',
+          border: `1px solid ${s.done ? RA.accent : RA.line}`,
+          background: s.done ? RA.accentSoft : RA.paper2,
+          borderRadius: 3,
+        }}>
+          <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, marginBottom: 2 }}>{s.n} · {s.k}</div>
+          <div style={{ fontFamily: RA.mono, fontSize: 11, color: s.done ? RA.accentDeep : RA.ink2 }}>{s.v}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function miniBtn(accent) {
+  return {
+    padding: '6px 12px', fontFamily: RA.sans, fontSize: 12, fontWeight: 500,
+    background: accent ? RA.accent : 'transparent',
+    color: accent ? RA.paper : RA.ink2,
+    border: `1px solid ${accent ? RA.accent : RA.line}`,
+    borderRadius: 4, cursor: 'pointer',
+  };
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<DataScreen />);

@@ -18,8 +18,35 @@
 <script type="text/babel" data-presets="react">
 const { useState } = React;
 
+const PAPERS = {
+  shah2024: {
+    label: 'Shah 2024',
+    title: 'AI use among researchers: a survey of 2,400 scientists',
+    authors: 'Shah, N., Li, M., & Patel, K.',
+    venue: 'Nature Human Behaviour',
+    year: 2024,
+    excerpts: [
+      { page: 4,  text: '72% of respondents reported using at least one AI tool weekly, but only 31% disclosed this in methods sections.' },
+      { page: 7,  text: 'Trust varied widely by task: high for literature search (M=4.1), low for statistical analysis (M=2.3).' },
+      { page: 11, text: 'Researchers who verified AI outputs showed better calibration than those who did not, r=.42.' },
+    ],
+  },
+  okafor2025: {
+    label: 'Okafor & Chen 2025',
+    title: 'A field experiment on AI-assisted drafting in research labs',
+    authors: 'Okafor, J., & Chen, A.',
+    venue: 'PNAS',
+    year: 2025,
+    excerpts: [
+      { page: 2, text: 'Treatment labs produced drafts 38% faster but caught 22% fewer errors at first review.' },
+      { page: 9, text: 'Effects attenuated when teams added a verification checkpoint before submission.' },
+    ],
+  },
+};
+
 function ManuscriptScreen() {
   const [mode, setMode] = useState('draft');
+  const [citedPaper, setCitedPaper] = useState(null);
 
   return (
     <>
@@ -55,10 +82,14 @@ function ManuscriptScreen() {
       {/* Mock frame */}
       <MockFrame title={`claude-ra · Trust & AI Study 3 · manuscript.md${mode === 'publication' ? ' → Proceedings of the National Academy of Sciences' : ''}`} height={820}>
         <ProjectRail active="manuscript" />
-        {mode === 'draft' && <DraftPane />}
+        {mode === 'draft' && <DraftPane onCite={setCitedPaper} citedPaper={citedPaper} />}
         {mode === 'publication' && <PubPane />}
         {mode === 'interactive' && <InteractivePane />}
-        {mode === 'draft' && <ClaudeRail />}
+        {mode === 'draft' && (
+          citedPaper
+            ? <CitationRail paperId={citedPaper} onClose={() => setCitedPaper(null)} />
+            : <ClaudeRail />
+        )}
       </MockFrame>
 
       {/* Caption below the mock */}
@@ -68,7 +99,7 @@ function ManuscriptScreen() {
             <b>Live statistics.</b> Numbers in orange recompute from <code>survey_clean.csv</code> on every save. Hover to see the underlying query.
           </FeatureNote>
           <FeatureNote num="B">
-            <b>Reproducibility pills.</b> <Pill data>data</Pill> <Pill material>material</Pill> <Pill accent>code</Pill> — every pill opens its source file in one click.
+            <b>Pills and citations open their source.</b> Click <Pill data>data</Pill> or <Pill material>material</Pill> for the file; click a citation for the excerpts you highlighted in the original paper.
           </FeatureNote>
           <FeatureNote num="C">
             <b>Three modes, one source.</b> Draft, Publication, and Interactive are views on the same file. Journal templates are swappable.
@@ -97,7 +128,7 @@ function FeatureNote({ num, children }) {
 }
 
 // ── DRAFT ──────────────────────────────────────────────────────
-function DraftPane() {
+function DraftPane({ onCite, citedPaper }) {
   return (
     <div style={{ flex: 1, overflow: 'auto', padding: '36px 56px', background: RA.paper, position: 'relative' }}>
       <div style={{ maxWidth: 640, margin: '0 auto' }}>
@@ -125,8 +156,10 @@ function DraftPane() {
         <H2>1 · Introduction</H2>
         <P>
           The adoption of large language models in scientific workflows has outpaced empirical understanding
-          of how researchers verify, cite, and delegate work to these systems. Prior work (<Cite>Shah 2024</Cite>;{' '}
-          <Cite>Okafor &amp; Chen 2025</Cite>) has documented usage; few studies examine <em>calibration</em>.
+          of how researchers verify, cite, and delegate work to these systems. Prior work (
+          <Cite id="shah2024" onClick={onCite} active={citedPaper === 'shah2024'}>Shah 2024</Cite>;{' '}
+          <Cite id="okafor2025" onClick={onCite} active={citedPaper === 'okafor2025'}>Okafor &amp; Chen 2025</Cite>
+          ) has documented usage; few studies examine <em>calibration</em>.
         </P>
 
         <FigureInline num={1} caption="Study design. Survey (quant) and interview (qual) arms, analyzed in parallel then integrated." />
@@ -161,8 +194,72 @@ function H2({ children }) {
 function P({ children, style }) {
   return <p style={{ fontSize: 15, lineHeight: 1.68, margin: '0 0 14px', color: RA.ink, fontFamily: RA.sans, ...style }}>{children}</p>;
 }
-function Cite({ children }) {
-  return <span style={{ fontFamily: RA.mono, fontSize: 13, color: RA.ink3 }}>{children}</span>;
+function Cite({ id, onClick, active, children }) {
+  if (!id) {
+    return <span style={{ fontFamily: RA.mono, fontSize: 13, color: RA.ink3 }}>{children}</span>;
+  }
+  return (
+    <button
+      onClick={() => onClick && onClick(id)}
+      style={{
+        fontFamily: RA.mono, fontSize: 13,
+        color: active ? RA.accent : RA.ink2,
+        background: active ? RA.accentSoft : 'transparent',
+        border: 'none', padding: '0 2px', margin: 0,
+        cursor: 'pointer',
+        textDecoration: 'underline',
+        textDecorationStyle: 'dotted',
+        textDecorationColor: active ? RA.accent : RA.ink3,
+        textUnderlineOffset: 2,
+        verticalAlign: 'baseline',
+        lineHeight: 'inherit',
+      }}>{children}</button>
+  );
+}
+
+function CitationRail({ paperId, onClose }) {
+  const p = PAPERS[paperId];
+  if (!p) return <ClaudeRail />;
+
+  return (
+    <div style={{ width: 320, borderLeft: `1px solid ${RA.line}`, background: RA.paper, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <div style={{ padding: '14px 18px', borderBottom: `1px solid ${RA.lineSoft}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase' }}>
+          Citation · in-text
+        </div>
+        <button onClick={onClose} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: RA.ink3, fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
+      </div>
+
+      <div style={{ padding: 18, borderBottom: `1px solid ${RA.lineSoft}` }}>
+        <div style={{ fontFamily: RA.serif, fontSize: 16, lineHeight: 1.3, marginBottom: 8, color: RA.ink }}>
+          {p.title}
+        </div>
+        <div style={{ fontSize: 12, color: RA.ink2, marginBottom: 2 }}>{p.authors}</div>
+        <div style={{ fontFamily: RA.serif, fontStyle: 'italic', fontSize: 12.5, color: RA.ink2 }}>
+          {p.venue}, {p.year}
+        </div>
+      </div>
+
+      <div style={{ flex: 1, overflow: 'auto', padding: '16px 18px' }}>
+        <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase', marginBottom: 10 }}>
+          Your highlighted excerpts
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {p.excerpts.map((e, i) => (
+            <div key={i} style={{ padding: 12, background: RA.paper2, borderLeft: `3px solid ${RA.accent}`, borderRadius: 3 }}>
+              <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, marginBottom: 4 }}>p. {e.page}</div>
+              <div style={{ fontFamily: RA.serif, fontSize: 13, color: RA.ink, lineHeight: 1.5, fontStyle: 'italic' }}>"{e.text}"</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ padding: 12, borderTop: `1px solid ${RA.lineSoft}`, display: 'flex', gap: 6 }}>
+        <MiniBtn>open PDF</MiniBtn>
+        <MiniBtn>see in library ↗</MiniBtn>
+      </div>
+    </div>
+  );
 }
 
 function FigureInline({ num, caption }) {
