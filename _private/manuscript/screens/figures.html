@@ -109,12 +109,8 @@ function FiguresBody(p) {
       <div style={{ padding: 24, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
           <div>
-            <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3 }}>
-              {p.chartType === 'multiverse' ? 'fig2_multiverse.R · last run 1m ago · 24 specs' : 'fig2_main.R · last run 4m ago'}
-            </div>
-            <div style={{ fontFamily: RA.serif, fontSize: 20, marginTop: 4 }}>
-              {p.chartType === 'multiverse' ? 'Specification curve · experience → calibration gap' : 'Trust by task type'}
-            </div>
+            <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3 }}>fig2_main.R · last run 4m ago</div>
+            <div style={{ fontFamily: RA.serif, fontSize: 20, marginTop: 4 }}>Trust by task type</div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button style={miniBtn()}>↻ re-run</button>
@@ -126,47 +122,29 @@ function FiguresBody(p) {
         <FigureCanvas palette={p.palette} chartType={p.chartType} showCI={p.showCI} />
 
         <div style={{ marginTop: 14, padding: 14, background: '#1e1c1a', borderRadius: 4, fontFamily: RA.mono, fontSize: 11.5, color: '#d4d4d4', lineHeight: 1.65 }}>
-          <div style={{ color: RA.accentSoft, marginBottom: 4, fontSize: 10, letterSpacing: 0.1, textTransform: 'uppercase' }}>
-            {p.chartType === 'multiverse' ? 'fig2_multiverse.R · generated' : 'fig2_main.R · generated'}
-          </div>
-          {p.chartType === 'multiverse' ? (
+          <div style={{ color: RA.accentSoft, marginBottom: 4, fontSize: 10, letterSpacing: 0.1, textTransform: 'uppercase' }}>fig2_main.R · generated</div>
+          <div><span style={{ color: '#8ec07c' }}>library</span>(tidyverse)</div>
+          <div>df &lt;- <span style={{ color: '#8ec07c' }}>read_csv</span>(<span style={{ color: '#d79921' }}>"survey_clean.csv"</span>)</div>
+          <div>df |&gt; </div>
+          <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>ggplot</span>(<span style={{ color: '#8ec07c' }}>aes</span>(task, trust_ai, {p.chartType === 'scatter' ? 'color=task' : 'fill=task'})) +</div>
+          {p.chartType === 'bar' && (
             <>
-              <div><span style={{ color: '#8ec07c' }}>library</span>(specr)</div>
-              <div>df &lt;- <span style={{ color: '#8ec07c' }}>read_csv</span>(<span style={{ color: '#d79921' }}>"survey_clean.csv"</span>)</div>
-              <div>specs &lt;- <span style={{ color: '#8ec07c' }}>setup</span>(</div>
-              <div>&nbsp;&nbsp;data = df,</div>
-              <div>&nbsp;&nbsp;y = <span style={{ color: '#d79921' }}>c("trust_overall", "trust_search", "trust_causal")</span>,</div>
-              <div>&nbsp;&nbsp;x = <span style={{ color: '#d79921' }}>"experience"</span>,</div>
-              <div>&nbsp;&nbsp;controls = <span style={{ color: '#d79921' }}>c("demographics", "discipline")</span>,</div>
-              <div>&nbsp;&nbsp;subsets = <span style={{ color: '#8ec07c' }}>list</span>(phd_only = df$phd == 1))</div>
-              <div><span style={{ color: '#8ec07c' }}>specr</span>(specs) |&gt; <span style={{ color: '#8ec07c' }}>plot_specs</span>()</div>
-            </>
-          ) : (
-            <>
-              <div><span style={{ color: '#8ec07c' }}>library</span>(tidyverse)</div>
-              <div>df &lt;- <span style={{ color: '#8ec07c' }}>read_csv</span>(<span style={{ color: '#d79921' }}>"survey_clean.csv"</span>)</div>
-              <div>df |&gt; </div>
-              <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>ggplot</span>(<span style={{ color: '#8ec07c' }}>aes</span>(task, trust_ai, {p.chartType === 'scatter' ? 'color=task' : 'fill=task'})) +</div>
-              {p.chartType === 'bar' && (
-                <>
-                  <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_bar</span>(stat=<span style={{ color: '#d79921' }}>"summary"</span>, fun=mean) +</div>
-                  {p.showCI && <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_errorbar</span>(stat=<span style={{ color: '#d79921' }}>"summary"</span>, fun.data=mean_cl_normal, width=0.2) +</div>}
-                </>
-              )}
-              {p.chartType === 'box' && (
-                <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_boxplot</span>() +</div>
-              )}
-              {p.chartType === 'scatter' && (
-                <>
-                  <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_jitter</span>(width=0.15, alpha=0.5) +</div>
-                  <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>stat_summary</span>(fun=mean, geom=<span style={{ color: '#d79921' }}>"point"</span>, size=4) +</div>
-                  {p.showCI && <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_errorbar</span>(stat=<span style={{ color: '#d79921' }}>"summary"</span>, fun.data=mean_cl_normal, width=0.1) +</div>}
-                </>
-              )}
-              <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>scale_{p.chartType === 'scatter' ? 'color' : 'fill'}_manual</span>(values=c(<span style={{ color: '#d79921' }}>"{paletteHex(p.palette)[0]}"</span>, <span style={{ color: '#d79921' }}>"{paletteHex(p.palette)[1]}"</span>, <span style={{ color: '#d79921' }}>"{paletteHex(p.palette)[2]}"</span>)) +</div>
-              <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>theme_minimal</span>()</div>
+              <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_bar</span>(stat=<span style={{ color: '#d79921' }}>"summary"</span>, fun=mean) +</div>
+              {p.showCI && <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_errorbar</span>(stat=<span style={{ color: '#d79921' }}>"summary"</span>, fun.data=mean_cl_normal, width=0.2) +</div>}
             </>
           )}
+          {p.chartType === 'box' && (
+            <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_boxplot</span>() +</div>
+          )}
+          {p.chartType === 'scatter' && (
+            <>
+              <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_jitter</span>(width=0.15, alpha=0.5) +</div>
+              <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>stat_summary</span>(fun=mean, geom=<span style={{ color: '#d79921' }}>"point"</span>, size=4) +</div>
+              {p.showCI && <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_errorbar</span>(stat=<span style={{ color: '#d79921' }}>"summary"</span>, fun.data=mean_cl_normal, width=0.1) +</div>}
+            </>
+          )}
+          <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>scale_{p.chartType === 'scatter' ? 'color' : 'fill'}_manual</span>(values=c(<span style={{ color: '#d79921' }}>"{paletteHex(p.palette)[0]}"</span>, <span style={{ color: '#d79921' }}>"{paletteHex(p.palette)[1]}"</span>, <span style={{ color: '#d79921' }}>"{paletteHex(p.palette)[2]}"</span>)) +</div>
+          <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>theme_minimal</span>()</div>
         </div>
       </div>
 
@@ -178,7 +156,7 @@ function FiguresBody(p) {
 
         <Tweak label="Chart type">
           <div style={{ display: 'flex', gap: 6 }}>
-            {['bar','box','scatter','multiverse'].map(k => (
+            {['bar','box','scatter'].map(k => (
               <button key={k} onClick={() => p.setChartType(k)} style={{
                 padding: '6px 10px', fontSize: 11, fontFamily: RA.sans, cursor: 'pointer',
                 border: `1px solid ${p.chartType === k ? RA.accent : RA.line}`,
@@ -255,10 +233,6 @@ function paletteHex(k) {
 }
 
 function FigureCanvas({ palette, chartType, showCI }) {
-  if (chartType === 'multiverse') {
-    return <MultiverseCanvas palette={palette} showCI={showCI} />;
-  }
-
   const colors = paletteHex(palette);
   const data = [
     { label: 'lit search',       mean: 4.2, ci: 0.3,  q1: 3.6, median: 4.3, q3: 4.7, min: 2.8, max: 4.9 },
@@ -367,161 +341,6 @@ function FigureCanvas({ palette, chartType, showCI }) {
       </svg>
       <div style={{ marginTop: 12, fontSize: 11, color: RA.ink3, fontFamily: RA.mono, textAlign: 'center' }}>
         source: survey_clean.csv · regenerated {new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}
-      </div>
-    </div>
-  );
-}
-
-function genSpecs() {
-  const excls = ['all rules', 'attn only'];
-  const covs  = ['full', 'none'];
-  const outs  = ['overall', 'search', 'causal'];
-  const subs  = ['all', 'PhD only'];
-  const specs = [];
-  let id = 0;
-  for (const excl of excls) for (const cov of covs) for (const out of outs) for (const sub of subs) {
-    const ed = excl === 'all rules' ? -0.02 : 0.03;
-    const cd = cov === 'full' ? -0.04 : 0.05;
-    const od = out === 'search' ? -0.08 : (out === 'causal' ? 0.06 : 0);
-    const sd = sub === 'PhD only' ? 0.02 : 0;
-    const beta = 0.18 + ed + cd + od + sd;
-    const ciHalf = 0.09 + Math.sin(id * 0.73) * 0.02;
-    const prereg = excl === 'all rules' && cov === 'full' && out === 'overall' && sub === 'all';
-    specs.push({ id, excl, cov, out, sub, beta, ciHalf, prereg });
-    id++;
-  }
-  specs.sort((a, b) => a.beta - b.beta);
-  return specs;
-}
-
-function MultiverseCanvas({ palette, showCI }) {
-  const specs = genSpecs();
-  const n = specs.length;
-
-  const plotX0 = 90, plotX1 = 540;
-  const colW = (plotX1 - plotX0) / n;
-  const centerX = (i) => plotX0 + colW * (i + 0.5);
-
-  const topY0 = 40, topY1 = 180;
-  const bMin = 0, bMax = 0.4;
-  const yForBeta = (b) => topY1 - ((b - bMin) / (bMax - bMin)) * (topY1 - topY0);
-
-  const matY0 = 215;
-  const rowH = 18;
-  const rows = [
-    { group: 'Exclusions', level: 'all rules',  match: s => s.excl === 'all rules' },
-    { group: null,         level: 'attn only',  match: s => s.excl === 'attn only' },
-    { group: 'Controls',   level: 'full',       match: s => s.cov === 'full' },
-    { group: null,         level: 'none',       match: s => s.cov === 'none' },
-    { group: 'Outcome',    level: 'overall',    match: s => s.out === 'overall' },
-    { group: null,         level: 'search',     match: s => s.out === 'search' },
-    { group: null,         level: 'causal',     match: s => s.out === 'causal' },
-    { group: 'Subsample',  level: 'all',        match: s => s.sub === 'all' },
-    { group: null,         level: 'PhD only',   match: s => s.sub === 'PhD only' },
-  ];
-
-  const nSig   = specs.filter(s => s.beta - s.ciHalf > 0).length;
-  const median = specs[Math.floor(n / 2)].beta;
-  const bandHex = paletteHex(palette)[0];
-
-  return (
-    <div style={{
-      background: RA.paper, border: `1px solid ${RA.line}`, borderRadius: 4,
-      padding: 20, display: 'flex', flexDirection: 'column', minHeight: 420,
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
-        <div style={{ fontSize: 13, fontFamily: RA.serif, color: RA.ink }}>
-          Figure 2 (multiverse). <span style={{ fontStyle: 'italic', color: RA.ink2 }}>experience × calibration gap, β across {n} specifications, 95% CI.</span>
-        </div>
-        <div style={{ display: 'flex', gap: 8, fontFamily: RA.mono, fontSize: 10.5, color: RA.ink2 }}>
-          <span style={{ padding: '2px 8px', border: `1px solid ${RA.accent}`, color: RA.accent, borderRadius: 999 }}>
-            {nSig} / {n} sig. at p&lt;.05
-          </span>
-          <span style={{ padding: '2px 8px', border: `1px solid ${RA.line}`, color: RA.ink3, borderRadius: 999 }}>
-            median β = {median.toFixed(2)}
-          </span>
-        </div>
-      </div>
-
-      <svg viewBox="0 0 560 420" width="100%" style={{ maxHeight: 420 }}>
-        {/* top panel · effect-size curve */}
-        <line x1={plotX0} y1={topY1} x2={plotX1} y2={topY1} stroke={RA.ink3} strokeWidth="1" />
-        <line x1={plotX0} y1={topY0} x2={plotX0} y2={topY1} stroke={RA.ink3} strokeWidth="1" />
-        {[0, 0.1, 0.2, 0.3, 0.4].map(t => (
-          <g key={t}>
-            <line x1={plotX0 - 3} y1={yForBeta(t)} x2={plotX0} y2={yForBeta(t)} stroke={RA.ink3} />
-            <text x={plotX0 - 6} y={yForBeta(t) + 3.5} fontSize="9.5" textAnchor="end" fill={RA.ink3} fontFamily={RA.mono}>{t.toFixed(2)}</text>
-          </g>
-        ))}
-        <text x="30" y={(topY0 + topY1) / 2} fontSize="10.5" fill={RA.ink2}
-              textAnchor="middle" fontFamily={RA.sans}
-              transform={`rotate(-90, 30, ${(topY0 + topY1) / 2})`}>
-          β · experience → calibration gap
-        </text>
-
-        {/* zero reference already at topY1; draw median line */}
-        <line x1={plotX0} y1={yForBeta(median)} x2={plotX1} y2={yForBeta(median)}
-              stroke={RA.ink3} strokeWidth="0.6" strokeDasharray="3 3" />
-        <text x={plotX1 + 4} y={yForBeta(median) + 3} fontSize="9" fill={RA.ink3} fontFamily={RA.mono}>median</text>
-
-        {specs.map((s, i) => {
-          const cx = centerX(i);
-          const cy = yForBeta(s.beta);
-          const yTop = yForBeta(s.beta + s.ciHalf);
-          const yBot = yForBeta(s.beta - s.ciHalf);
-          const sig = s.beta - s.ciHalf > 0;
-          const color = sig ? bandHex : RA.ink3;
-          return (
-            <g key={s.id}>
-              {showCI && <line x1={cx} y1={yTop} x2={cx} y2={yBot} stroke={color} strokeWidth="1" opacity={sig ? 1 : 0.5} />}
-              <circle cx={cx} cy={cy} r={s.prereg ? 4.5 : 2.8}
-                      fill={sig ? color : RA.paper}
-                      stroke={color} strokeWidth={s.prereg ? 1.8 : 1} />
-              {s.prereg && (
-                <g>
-                  <line x1={cx} y1={topY0 - 2} x2={cx} y2={cy - 6} stroke={RA.accent} strokeWidth="0.7" strokeDasharray="2 2" />
-                  <text x={cx} y={topY0 - 6} fontSize="9" fill={RA.accent} fontFamily={RA.mono} textAnchor="middle">★ pre-reg</text>
-                </g>
-              )}
-            </g>
-          );
-        })}
-
-        {/* separator */}
-        <line x1={plotX0} y1={195} x2={plotX1} y2={195} stroke={RA.line} strokeWidth="0.5" />
-
-        {/* bottom panel · choice matrix */}
-        {rows.map((r, ri) => {
-          const y = matY0 + ri * rowH + rowH / 2;
-          return (
-            <g key={ri}>
-              {r.group && (
-                <text x={plotX0 - 72} y={y + 3.5} fontSize="9.5" fill={RA.ink2} fontFamily={RA.mono}
-                      style={{ textTransform: 'uppercase', letterSpacing: 0.05 }}>
-                  {r.group}
-                </text>
-              )}
-              <text x={plotX0 - 6} y={y + 3.5} fontSize="10" fill={RA.ink2} textAnchor="end" fontFamily={RA.sans}>
-                {r.level}
-              </text>
-              <line x1={plotX0} y1={y} x2={plotX1} y2={y} stroke={RA.lineSoft} strokeWidth="0.5" />
-              {specs.map((s, i) => r.match(s) && (
-                <circle key={s.id} cx={centerX(i)} cy={y} r={s.prereg ? 3.4 : 2.6}
-                        fill={s.prereg ? RA.accent : RA.ink2} />
-              ))}
-            </g>
-          );
-        })}
-
-        {/* x-axis label */}
-        <text x={(plotX0 + plotX1) / 2} y="402" fontSize="10" fill={RA.ink3}
-              textAnchor="middle" fontFamily={RA.sans}>
-          specification (sorted by β, ascending)
-        </text>
-      </svg>
-
-      <div style={{ marginTop: 12, fontSize: 11, color: RA.ink3, fontFamily: RA.mono, textAlign: 'center' }}>
-        source: survey_clean.csv · 24 specifications · each bar is one analytic choice-set
       </div>
     </div>
   );
