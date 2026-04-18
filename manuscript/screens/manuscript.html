@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>The Paper — Manuscript</title>
+<link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="../shared/shared-components.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState } = React;
+
+function ManuscriptScreen() {
+  const [mode, setMode] = useState('draft');
+
+  return (
+    <>
+      <ScreenBar current="manuscript" label="Manuscript" />
+      <ConceptNote>
+        The paper is the interface to the project. Data, materials, figures, and references are <em>in</em> the document, not around it.
+      </ConceptNote>
+
+      <ScreenIntro
+        kicker="Screen 01 · The Manuscript"
+        title={<>The manuscript <em style={{ fontStyle: 'italic' }}>is</em> the app.</>}
+        caption="One source of truth, three surfaces. Draft for writing. Publication for submission. Interactive for readers who want to poke the numbers themselves."
+      />
+
+      {/* Mode switcher */}
+      <div className="container" style={{ padding: '0 24px 24px' }}>
+        <div style={{ display: 'inline-flex', border: `1px solid ${RA.line}`, borderRadius: 999, overflow: 'hidden', background: RA.paper }}>
+          {['draft', 'publication', 'interactive'].map(m => (
+            <button key={m} onClick={() => setMode(m)} style={{
+              padding: '8px 20px', fontFamily: RA.sans, fontSize: 13, fontWeight: 500,
+              background: mode === m ? RA.ink : 'transparent',
+              color: mode === m ? RA.paper : RA.ink2,
+              border: 'none', cursor: 'pointer', textTransform: 'capitalize',
+              letterSpacing: 0.2,
+            }}>{m}</button>
+          ))}
+        </div>
+        <span style={{ marginLeft: 16, fontFamily: RA.mono, fontSize: 11, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase' }}>
+          ↑ try the modes
+        </span>
+      </div>
+
+      {/* Mock frame */}
+      <MockFrame title={`claude-ra · Trust & AI Study 3 · manuscript.md${mode === 'publication' ? ' → Proceedings of the National Academy of Sciences' : ''}`} height={820}>
+        <ProjectRail active="manuscript" />
+        {mode === 'draft' && <DraftPane />}
+        {mode === 'publication' && <PubPane />}
+        {mode === 'interactive' && <InteractivePane />}
+        {mode === 'draft' && <ClaudeRail />}
+      </MockFrame>
+
+      {/* Caption below the mock */}
+      <div className="container" style={{ padding: '32px 24px 0' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, borderTop: `1px solid ${RA.line}`, paddingTop: 24 }}>
+          <FeatureNote num="A">
+            <b>Live statistics.</b> Numbers in orange recompute from <code>survey_clean.csv</code> on every save. Hover to see the underlying query.
+          </FeatureNote>
+          <FeatureNote num="B">
+            <b>Reproducibility pills.</b> <Pill data>data</Pill> <Pill material>material</Pill> <Pill accent>code</Pill> — every pill opens its source file in one click.
+          </FeatureNote>
+          <FeatureNote num="C">
+            <b>Three modes, one source.</b> Draft, Publication, and Interactive are views on the same file. Journal templates are swappable.
+          </FeatureNote>
+        </div>
+      </div>
+
+      <ScreenFooter next="data" />
+    </>
+  );
+}
+
+function FeatureNote({ num, children }) {
+  return (
+    <div style={{ display: 'flex', gap: 14 }}>
+      <span style={{
+        width: 26, height: 26, borderRadius: '50%',
+        background: RA.paper2, border: `1px solid ${RA.line}`,
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        fontFamily: RA.serif, fontSize: 15, color: RA.accent,
+        flexShrink: 0,
+      }}>{num}</span>
+      <div style={{ fontSize: 14, color: RA.ink2, lineHeight: 1.55 }}>{children}</div>
+    </div>
+  );
+}
+
+// ── DRAFT ──────────────────────────────────────────────────────
+function DraftPane() {
+  return (
+    <div style={{ flex: 1, overflow: 'auto', padding: '36px 56px', background: RA.paper, position: 'relative' }}>
+      <div style={{ maxWidth: 640, margin: '0 auto' }}>
+        <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase', marginBottom: 14 }}>
+          Manuscript draft v0.12 · last edit 14 min ago · A. Chen
+        </div>
+        <h1 style={{ fontFamily: RA.serif, fontSize: 36, fontWeight: 400, lineHeight: 1.1, letterSpacing: '-0.01em', margin: '0 0 12px' }}>
+          Calibrated trust in AI research assistants:<br />
+          A mixed-methods study of social scientists
+        </h1>
+        <div style={{ fontSize: 13, color: RA.ink2, marginBottom: 28 }}>
+          A. Chen<sup>1</sup>, M. Okafor<sup>1</sup>, S. Rao<sup>2</sup>
+        </div>
+
+        <H2>Abstract</H2>
+        <P>
+          Scientists increasingly rely on AI assistants for data analysis, literature review, and writing.
+          We combine a pre-registered survey (<Cite>N=</Cite><Pill data>312</Pill>) with{' '}
+          <Pill data>24 semi-structured interviews</Pill>{' '}
+          to characterize <em>calibration</em> — when scientists appropriately trust, verify, or override
+          AI-generated outputs. Trust is highest for <Pill live>literature search (M=4.2)</Pill>{' '}
+          and lowest for <Pill live>causal inference (M=2.1)</Pill>.
+        </P>
+
+        <H2>1 · Introduction</H2>
+        <P>
+          The adoption of large language models in scientific workflows has outpaced empirical understanding
+          of how researchers verify, cite, and delegate work to these systems. Prior work (<Cite>Shah 2024</Cite>;{' '}
+          <Cite>Okafor &amp; Chen 2025</Cite>) has documented usage; few studies examine <em>calibration</em>.
+        </P>
+
+        <FigureInline num={1} caption="Study design. Survey (quant) and interview (qual) arms, analyzed in parallel then integrated." />
+
+        <H2>2 · Methods</H2>
+        <P>
+          Participants (<Pill data>N=312</Pill>) were recruited via <Pill material>Qualtrics panel</Pill>.
+          Interview protocol available in <Pill material>materials/interview_protocol.md</Pill>.
+          Analysis scripts are deposited at <Pill accent>/code/analysis.R</Pill>.
+        </P>
+
+        <H2>3 · Results</H2>
+        <P style={{ opacity: 0.6 }}>
+          <span style={{ background: RA.paper2, padding: '0 2px' }}>Trust calibration varies systematically by task type.</span>
+          Scientists show appropriate caution for <Pill live>causal claims (M=2.1, SD=0.7)</Pill> and higher
+          confidence in <Pill live>descriptive tasks (M=4.2, SD=0.4)</Pill>. The gap narrows with experience
+          (β=<Pill live>-0.18</Pill>, <em>p</em>&lt;.01).
+        </P>
+
+        <div style={{ opacity: 0.3, marginTop: 32 }}>
+          <H2>4 · Discussion</H2>
+          <P>Lorem ipsum draft content below the fold…</P>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function H2({ children }) {
+  return <h2 style={{ fontFamily: RA.serif, fontSize: 22, fontWeight: 400, margin: '28px 0 8px', color: RA.ink, letterSpacing: '-0.005em' }}>{children}</h2>;
+}
+function P({ children, style }) {
+  return <p style={{ fontSize: 15, lineHeight: 1.68, margin: '0 0 14px', color: RA.ink, fontFamily: RA.sans, ...style }}>{children}</p>;
+}
+function Cite({ children }) {
+  return <span style={{ fontFamily: RA.mono, fontSize: 13, color: RA.ink3 }}>{children}</span>;
+}
+
+function FigureInline({ num, caption }) {
+  return (
+    <figure style={{ margin: '20px 0 24px', border: `1px solid ${RA.line}`, background: RA.paper, padding: 20 }}>
+      <svg viewBox="0 0 560 200" width="100%" height="180">
+        <rect width="560" height="200" fill={RA.paper} />
+        <rect x="90" y="40" width="140" height="50" fill="white" stroke={RA.pencil} strokeWidth="1.5"/>
+        <text x="160" y="70" textAnchor="middle" fontFamily={RA.sans} fontSize="13" fill={RA.pencil}>Survey N=312</text>
+        <rect x="90" y="110" width="140" height="50" fill="white" stroke={RA.qual} strokeWidth="1.5" strokeDasharray="4 2"/>
+        <text x="160" y="140" textAnchor="middle" fontFamily={RA.sans} fontSize="13" fill={RA.qual}>Interviews 24</text>
+        <path d="M 230 65 L 330 100" stroke={RA.ink3} strokeWidth="1" markerEnd="url(#arrow)"/>
+        <path d="M 230 135 L 330 100" stroke={RA.ink3} strokeWidth="1" markerEnd="url(#arrow)"/>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <polygon points="0 0, 6 3, 0 6" fill={RA.ink3}/>
+          </marker>
+        </defs>
+        <rect x="340" y="75" width="130" height="50" fill={RA.paper2} stroke={RA.ink3} strokeWidth="1"/>
+        <text x="405" y="105" textAnchor="middle" fontFamily={RA.sans} fontSize="13" fill={RA.ink2}>Integration</text>
+      </svg>
+      <figcaption style={{ fontSize: 12, color: RA.ink2, marginTop: 10, fontStyle: 'italic', fontFamily: RA.serif }}>
+        <b style={{ fontStyle: 'normal', fontFamily: RA.sans }}>Fig. {num}.</b> {caption}
+      </figcaption>
+    </figure>
+  );
+}
+
+// ── PUBLICATION ──────────────────────────────────────────────────
+function PubPane() {
+  return (
+    <div style={{ flex: 1, overflow: 'auto', padding: '36px 48px', background: '#FFFCF6', position: 'relative', fontFamily: "'Iowan Old Style', Georgia, serif" }}>
+      <div style={{ maxWidth: 720, margin: '0 auto', position: 'relative' }}>
+        {/* PNAS runner */}
+        <div style={{ position: 'absolute', left: -42, top: 0, bottom: 0, width: 30, borderRight: `1px solid ${RA.pencil}`, display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 40, gap: 24, fontFamily: "'Iowan Old Style', Georgia, serif", fontSize: 9, color: RA.pencil, letterSpacing: 0.5, writingMode: 'vertical-rl', transform: 'rotate(180deg)', textOrientation: 'mixed' }}>
+          <div style={{ textTransform: 'uppercase', letterSpacing: 2 }}>PNAS · Vol. 124 · No. 18 · 2026</div>
+        </div>
+
+        {/* Masthead */}
+        <div style={{ borderBottom: `2px solid ${RA.ink}`, paddingBottom: 10, marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <div>
+            <div style={{ fontFamily: "'Iowan Old Style', Georgia, serif", fontSize: 11, color: RA.ink2, letterSpacing: 0.5 }}>RESEARCH ARTICLE · PSYCHOLOGICAL AND COGNITIVE SCIENCES</div>
+          </div>
+          <div style={{ display: 'flex', gap: 8, fontSize: 9, color: RA.ink3, fontFamily: RA.mono }}>
+            <span style={{ padding: '2px 6px', border: `1px solid ${RA.ink3}` }}>✓ CrossMark</span>
+            <span>DOI: 10.1073/pnas.2603122​​6</span>
+          </div>
+        </div>
+
+        <h1 style={{ fontFamily: "'Iowan Old Style', Georgia, serif", fontSize: 28, fontWeight: 400, lineHeight: 1.15, margin: '0 0 14px', letterSpacing: '-0.005em' }}>
+          Calibrated trust in AI research assistants: A mixed-methods study of social scientists
+        </h1>
+        <div style={{ fontSize: 14, fontFamily: "'Iowan Old Style', Georgia, serif" }}>
+          <div>Amanda Chen<sup>a,1</sup>, Michael Okafor<sup>a</sup>, and Sonal Rao<sup>b</sup></div>
+          <div style={{ fontSize: 11, color: RA.ink3, marginTop: 6, lineHeight: 1.5 }}>
+            <sup>a</sup>Department of Psychology, University of Chicago, Chicago, IL 60637;
+            <sup>b</sup>School of Information, UC Berkeley, Berkeley, CA 94720
+          </div>
+          <div style={{ fontSize: 11, color: RA.ink3, marginTop: 6 }}>
+            Edited by Susan Fiske, Princeton University, and approved February 14, 2026
+          </div>
+        </div>
+
+        {/* Significance box */}
+        <div style={{ margin: '24px 0', padding: '14px 16px', background: RA.accentSoft, border: `1px solid ${RA.line}`, borderLeft: `3px solid ${RA.accent}` }}>
+          <div style={{ fontFamily: RA.sans, fontSize: 10.5, fontWeight: 600, letterSpacing: 0.4, textTransform: 'uppercase', color: RA.accent, marginBottom: 6 }}>Significance</div>
+          <div style={{ fontSize: 13, lineHeight: 1.55, color: RA.ink }}>
+            As scientists delegate more analytic and writing work to AI assistants, whether they appropriately
+            trust these outputs becomes a determinant of research quality. We show that trust calibration
+            varies systematically by task — appropriate for descriptive work, dangerously high for causal claims.
+          </div>
+        </div>
+
+        {/* Two-column body */}
+        <div style={{ columnCount: 2, columnGap: 24, fontSize: 12, lineHeight: 1.55, textAlign: 'justify', hyphens: 'auto' }}>
+          <h2 style={{ fontSize: 13, fontWeight: 700, margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: 0.5, color: RA.ink }}>Abstract</h2>
+          <p style={{ margin: '0 0 14px' }}>
+            Scientists increasingly rely on AI assistants for data analysis, literature review, and writing.
+            We combine a pre-registered survey (<span style={{ color: RA.pencil, textDecoration: 'underline dotted' }}>N=312</span>) with{' '}
+            <span style={{ color: RA.pencil, textDecoration: 'underline dotted' }}>24 semi-structured interviews</span>{' '}
+            to characterize calibration — when scientists appropriately trust, verify, or override AI-generated
+            outputs. Trust is highest for <span style={{ color: RA.accent, textDecoration: 'underline dotted' }}>literature search (M=4.2)</span>{' '}
+            and lowest for <span style={{ color: RA.accent, textDecoration: 'underline dotted' }}>causal inference (M=2.1)</span>.
+            The gap narrows with experience and PhD training but does not close. Implications for peer review
+            and methods pedagogy are discussed.
+          </p>
+          <h2 style={{ fontSize: 13, fontWeight: 700, margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: 0.5 }}>1. Introduction</h2>
+          <p style={{ margin: '0 0 10px' }}>
+            The adoption of large language models in scientific workflows has outpaced empirical understanding
+            of how researchers verify, cite, and delegate work to these systems (<span style={{ color: RA.ink3 }}>1, 2</span>).
+            Prior work has documented usage patterns; few studies examine <em>calibration</em> — whether researchers'
+            confidence in AI outputs scales appropriately with the accuracy of those outputs.
+          </p>
+          <p style={{ margin: '0 0 10px' }}>
+            Calibration matters because miscalibration is not symmetric. Under-trust leads to wasted verification
+            effort and adoption friction. Over-trust leads to propagation of errors into the literature, with
+            second-order consequences for meta-analysis and policy (<span style={{ color: RA.ink3 }}>3–5</span>).
+          </p>
+
+          {/* Inline figure */}
+          <figure style={{ breakInside: 'avoid', margin: '14px 0', padding: 10, background: '#FFFCF6', border: `1px solid ${RA.line}` }}>
+            <svg viewBox="0 0 260 130" width="100%">
+              <path d="M 20 110 Q 70 40 130 55 T 240 30" stroke={RA.ink} strokeWidth="1.5" fill="none"/>
+              <path d="M 20 115 Q 70 85 130 80 T 240 70" stroke={RA.ink} strokeWidth="1" fill="none" strokeDasharray="3 2"/>
+              <line x1="20" y1="120" x2="240" y2="120" stroke={RA.ink} strokeWidth="0.5"/>
+              <line x1="20" y1="15" x2="20" y2="120" stroke={RA.ink} strokeWidth="0.5"/>
+              <text x="130" y="12" textAnchor="middle" fontSize="8" fill={RA.ink3}>Trust (1–5)</text>
+              <text x="42" y="118" fontSize="7" fill={RA.ink3} transform="rotate(-30 42 118)">search</text>
+              <text x="240" y="118" fontSize="7" fill={RA.ink3} transform="rotate(-30 240 118)" textAnchor="end">causal</text>
+            </svg>
+            <div style={{ fontSize: 10, lineHeight: 1.4, marginTop: 6 }}>
+              <b>Fig. 2.</b> Trust calibration across task types. Solid line: novices (n=148). Dashed: experts (n=164).
+            </div>
+          </figure>
+
+          <p style={{ margin: '0 0 10px' }}>
+            In this paper we report the first large-scale mixed-methods study of trust calibration in
+            scientific AI use. Section 2 describes methods; Section 3, results.
+          </p>
+          <h2 style={{ fontSize: 13, fontWeight: 700, margin: '8px 0 8px', textTransform: 'uppercase', letterSpacing: 0.5 }}>2. Methods</h2>
+          <p style={{ margin: '0 0 10px' }}>
+            Participants (<span style={{ color: RA.pencil, textDecoration: 'underline dotted' }}>N=312</span>) were recruited
+            via Qualtrics academic panel in January 2026. Eligibility required a PhD (or equivalent) in a
+            social-science discipline and self-reported AI-tool use in the past 90 days.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── INTERACTIVE ─────────────────────────────────────────────────
+function InteractivePane() {
+  return (
+    <div style={{ flex: 1, overflow: 'auto', padding: '36px 56px', background: RA.paper, position: 'relative' }}>
+      <div style={{ maxWidth: 700, margin: '0 auto' }}>
+        <div style={{
+          padding: '8px 12px', background: RA.pencilSoft, border: `1px solid ${RA.pencil}`,
+          color: RA.pencil, borderRadius: 3, fontSize: 12, marginBottom: 24,
+          fontFamily: RA.mono, letterSpacing: 0.05,
+        }}>
+          ↺ Interactive mode &mdash; numbers are live. Move the sliders; the paper recomputes.
+        </div>
+
+        <h1 style={{ fontFamily: RA.serif, fontSize: 32, fontWeight: 400, lineHeight: 1.1, margin: '0 0 24px' }}>
+          Calibrated trust in AI research assistants
+        </h1>
+
+        <H2>Results</H2>
+        <P>
+          Across all participants, mean trust was <LivePill>M=3.4</LivePill>. Filter by discipline:
+        </P>
+
+        <div style={{ display: 'flex', gap: 6, margin: '0 0 20px', flexWrap: 'wrap' }}>
+          <FilterChip active>All (312)</FilterChip>
+          <FilterChip>Psychology (94)</FilterChip>
+          <FilterChip>Economics (72)</FilterChip>
+          <FilterChip>Sociology (58)</FilterChip>
+          <FilterChip>Pol. Sci. (48)</FilterChip>
+          <FilterChip>Comm. (40)</FilterChip>
+        </div>
+
+        <P>
+          Trust varied by task type. For <b>literature search</b>, mean trust was <LivePill>M=4.2</LivePill>{' '}
+          (95% CI: 4.07–4.33). For <b>causal inference</b>, <LivePill>M=2.1</LivePill> (1.95–2.25).
+          The gap between these is <LivePill>Δ=2.1</LivePill>.
+        </P>
+
+        {/* Interactive chart */}
+        <div style={{ border: `1px solid ${RA.line}`, background: RA.paper, padding: 18, margin: '12px 0 20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
+            <div style={{ fontFamily: RA.serif, fontSize: 15 }}>Fig. 2 · Calibration by task</div>
+            <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3 }}>↺ recomputed 2s ago</div>
+          </div>
+          <svg viewBox="0 0 500 200" width="100%" height="200">
+            <path d="M 30 170 Q 130 60 260 90 T 470 60" stroke={RA.accent} strokeWidth="2.5" fill="none"/>
+            <path d="M 30 175 Q 130 130 260 140 T 470 120" stroke={RA.pencil} strokeWidth="2" fill="none" strokeDasharray="4 3"/>
+            <path d="M 30 160 Q 130 50 260 80 T 470 50" stroke={RA.accent} strokeWidth="8" fill="none" opacity="0.15"/>
+            <line x1="30" y1="180" x2="470" y2="180" stroke={RA.ink3} strokeWidth="0.5"/>
+            <line x1="30" y1="20" x2="30" y2="180" stroke={RA.ink3} strokeWidth="0.5"/>
+            {[1,2,3,4,5].map((n,i) => <text key={n} x="22" y={180 - i*35} textAnchor="end" fontSize="9" fill={RA.ink3}>{n}</text>)}
+            {['search','summarize','code','stats','causal'].map((t,i) => (
+              <text key={t} x={30 + i*110} y="195" fontSize="10" fill={RA.ink3}>{t}</text>
+            ))}
+            <g transform="translate(360, 30)" fontSize="10" fill={RA.ink2} fontFamily={RA.sans}>
+              <rect x="0" y="0" width="110" height="36" fill="white" stroke={RA.line}/>
+              <line x1="6" y1="10" x2="18" y2="10" stroke={RA.accent} strokeWidth="2.5"/>
+              <text x="22" y="13">novice (n=148)</text>
+              <line x1="6" y1="24" x2="18" y2="24" stroke={RA.pencil} strokeWidth="2" strokeDasharray="3 2"/>
+              <text x="22" y="27">expert (n=164)</text>
+            </g>
+          </svg>
+
+          {/* Interactive controls */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 14, paddingTop: 14, borderTop: `1px solid ${RA.lineSoft}` }}>
+            <div>
+              <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase', marginBottom: 4 }}>Smoothing</div>
+              <div style={{ position: 'relative', height: 6, background: RA.paper2, borderRadius: 3 }}>
+                <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '55%', background: RA.accent, borderRadius: 3 }} />
+                <div style={{ position: 'absolute', left: '55%', top: -4, width: 14, height: 14, background: RA.ink, borderRadius: '50%', transform: 'translateX(-50%)' }} />
+              </div>
+            </div>
+            <div>
+              <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase', marginBottom: 4 }}>Bootstraps · 5000</div>
+              <div style={{ position: 'relative', height: 6, background: RA.paper2, borderRadius: 3 }}>
+                <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '80%', background: RA.accent, borderRadius: 3 }} />
+                <div style={{ position: 'absolute', left: '80%', top: -4, width: 14, height: 14, background: RA.ink, borderRadius: '50%', transform: 'translateX(-50%)' }} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <P>
+          Readers can download the source data (<Pill data>survey_clean.csv</Pill>) or run their own
+          analysis in a browser-hosted R kernel <Pill accent>fork in observable →</Pill>.
+        </P>
+      </div>
+    </div>
+  );
+}
+
+function LivePill({ children }) {
+  return <span style={{ fontFamily: RA.mono, fontSize: 13, color: RA.accent, background: RA.accentSoft, padding: '1px 6px', borderRadius: 2, border: `1px solid ${RA.accent}` }}>{children}</span>;
+}
+function FilterChip({ active, children }) {
+  return (
+    <span style={{
+      padding: '4px 10px', borderRadius: 999,
+      fontFamily: RA.mono, fontSize: 11,
+      border: `1px solid ${active ? RA.ink : RA.line}`,
+      background: active ? RA.ink : 'transparent',
+      color: active ? RA.paper : RA.ink2,
+      cursor: 'pointer',
+    }}>{children}</span>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<ManuscriptScreen />);
+</script>
+</body>
+</html>

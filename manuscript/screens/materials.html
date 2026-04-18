@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Materials — Manuscript</title>
+<link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="../shared/shared-components.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState } = React;
+
+function MaterialsScreen() {
+  const [selected, setSelected] = useState('survey');
+
+  return (
+    <>
+      <ScreenBar current="materials" label="Materials" />
+      <ConceptNote>Materials are versioned. Pre-registration is a commit, not a PDF.</ConceptNote>
+
+      <ScreenIntro
+        kicker="Screen 04 · Materials"
+        title={<>Pre-registration, <em style={{ fontStyle: 'italic' }}>as a commit.</em></>}
+        caption="The survey instrument, interview protocol, consent form, stimuli, and analysis plan — all versioned. Every change is a diff. The pre-reg freeze is just a tag. OSF + IRB see the same file."
+      />
+
+      <MockFrame title="claude-ra · materials" height={680}>
+        <ProjectRail active="materials" />
+        <MaterialsBody selected={selected} setSelected={setSelected} />
+      </MockFrame>
+
+      <div className="container" style={{ padding: '32px 24px 0' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, borderTop: `1px solid ${RA.line}`, paddingTop: 24 }}>
+          <FN num="A"><b>Everything is versioned.</b> Survey v1.3 → v1.4: reviewer sees the diff, not a new PDF.</FN>
+          <FN num="B"><b>Pre-reg is a tag.</b> At submission, you tag a commit <code style={mono}>prereg-2025-03-01</code>. OSF reads the tag.</FN>
+          <FN num="C"><b>IRB sees source.</b> Approved consent form lives here, next to the protocol that references it.</FN>
+        </div>
+      </div>
+
+      <ScreenFooter prev="figures" next="papers" />
+    </>
+  );
+}
+
+const mono = { fontFamily: RA.mono, fontSize: 11.5, background: RA.paper2, padding: '1px 4px' };
+
+function FN({ num, children }) {
+  return (
+    <div style={{ display: 'flex', gap: 14 }}>
+      <span style={{ width: 26, height: 26, borderRadius: '50%', background: RA.paper2, border: `1px solid ${RA.line}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontFamily: RA.serif, fontSize: 15, color: RA.accent, flexShrink: 0 }}>{num}</span>
+      <div style={{ fontSize: 14, color: RA.ink2, lineHeight: 1.55 }}>{children}</div>
+    </div>
+  );
+}
+
+function MaterialsBody({ selected, setSelected }) {
+  const items = [
+    { id: 'survey',    name: 'survey_instrument.qsf',   kind: 'Qualtrics', v: 'v1.4', status: 'locked', note: 'pre-registered' },
+    { id: 'interview', name: 'interview_protocol.md',   kind: 'protocol',  v: 'v2.1', status: 'draft',  note: '12 questions · semi-structured' },
+    { id: 'consent',   name: 'consent_irb.pdf',         kind: 'IRB',       v: 'approved', status: 'locked', note: 'IRB #24-0451 · Mar 2025' },
+    { id: 'stim',      name: 'stimuli/',                kind: 'folder',    v: '8 items', status: 'draft', note: 'task vignettes' },
+    { id: 'analysis',  name: 'analysis_plan.md',        kind: 'plan',      v: 'v1.0', status: 'locked', note: 'pre-registered' },
+  ];
+  const sel = items.find(i => i.id === selected) || items[0];
+
+  return (
+    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '340px 1fr', overflow: 'hidden' }}>
+      <div style={{ borderRight: `1px solid ${RA.line}`, padding: '16px 0', overflow: 'auto' }}>
+        <div style={{ padding: '0 20px 10px', fontFamily: RA.mono, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.1, color: RA.ink3, display: 'flex', justifyContent: 'space-between' }}>
+          <span>Materials · {items.length}</span>
+          <span>+ add</span>
+        </div>
+        {items.map(it => (
+          <button key={it.id} onClick={() => setSelected(it.id)} style={{
+            display: 'block', width: '100%', textAlign: 'left',
+            padding: '12px 20px', border: 'none', cursor: 'pointer',
+            background: selected === it.id ? RA.paper2 : 'transparent',
+            borderLeft: selected === it.id ? `2px solid ${RA.accent}` : '2px solid transparent',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+              <span style={{ fontFamily: RA.mono, fontSize: 12.5, color: RA.ink }}>{it.name}</span>
+              <span style={{ fontFamily: RA.mono, fontSize: 10, color: it.status === 'locked' ? RA.accent : RA.ink3 }}>
+                {it.status === 'locked' && '🔒 '}{it.v}
+              </span>
+            </div>
+            <div style={{ fontSize: 11, color: RA.ink3 }}>{it.kind} · {it.note}</div>
+          </button>
+        ))}
+      </div>
+
+      <div style={{ padding: 28, overflow: 'auto', background: RA.paper }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 18, paddingBottom: 14, borderBottom: `1px solid ${RA.line}` }}>
+          <div>
+            <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3 }}>{sel.kind} · {sel.status}</div>
+            <div style={{ fontFamily: RA.serif, fontSize: 22, marginTop: 3 }}>{sel.name}</div>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button style={miniBtn()}>view diff</button>
+            <button style={miniBtn()}>history</button>
+            <button style={miniBtn(true)}>share ↗</button>
+          </div>
+        </div>
+
+        {selected === 'survey' && <SurveyPreview />}
+        {selected === 'interview' && <InterviewPreview />}
+        {selected === 'consent' && <ConsentPreview />}
+        {selected === 'stim' && <StimuliPreview />}
+        {selected === 'analysis' && <AnalysisPreview />}
+      </div>
+    </div>
+  );
+}
+
+function SurveyPreview() {
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 16, marginBottom: 20, padding: 12, background: RA.accentSoft, border: `1px solid ${RA.accent}`, borderRadius: 3 }}>
+        <span style={{ color: RA.accent, fontSize: 18 }}>🔒</span>
+        <div style={{ fontSize: 13, color: RA.accentDeep }}>
+          <b>Pre-registered v1.4</b> — tagged <span style={mono}>prereg-2025-03-01</span>. Any edit after this point creates a v2 branch and appears in the deviation log.
+        </div>
+      </div>
+
+      <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3, marginBottom: 10 }}>
+        10 items · 5-point Likert · α=.87 on pilot N=40
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {[
+          'q1. I trust AI-generated literature reviews to be accurate.',
+          'q2. I verify AI outputs against primary sources.',
+          'q3. I would cite a claim from an AI without checking it.',
+          'q4. AI tools make my research worse.',
+          'q5. I disclose AI use in my methods section.',
+        ].map((q, i) => (
+          <div key={i} style={{ padding: '10px 14px', border: `1px solid ${RA.line}`, borderRadius: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 13, color: RA.ink2 }}>{q}</span>
+            <div style={{ display: 'flex', gap: 4 }}>
+              {[1,2,3,4,5].map(n => (
+                <span key={n} style={{ width: 18, height: 18, borderRadius: '50%', border: `1px solid ${RA.line}`, fontSize: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: RA.ink3, fontFamily: RA.mono }}>{n}</span>
+              ))}
+            </div>
+          </div>
+        ))}
+        <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3, textAlign: 'center', padding: 10 }}>
+          + 5 more items · click to expand
+        </div>
+      </div>
+
+      <div style={{ marginTop: 20, padding: 14, background: RA.paper2, borderRadius: 3 }}>
+        <div style={{ fontFamily: RA.mono, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.1, color: RA.ink3, marginBottom: 10 }}>Recent diffs</div>
+        <div style={{ fontFamily: RA.mono, fontSize: 12, color: RA.ink2, lineHeight: 1.8 }}>
+          <div><span style={{ color: RA.accent }}>v1.4</span> · 2025-03-01 · pre-reg freeze</div>
+          <div><span style={{ color: RA.ink3 }}>v1.3</span> · rewrote q7 (double-barrel)</div>
+          <div><span style={{ color: RA.ink3 }}>v1.2</span> · added attention check</div>
+          <div><span style={{ color: RA.ink3 }}>v1.1</span> · pilot N=40 round</div>
+          <div><span style={{ color: RA.ink3 }}>v1.0</span> · initial draft from lit review</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function InterviewPreview() {
+  return (
+    <div style={{ fontFamily: RA.serif, fontSize: 14, color: RA.ink2, lineHeight: 1.65, maxWidth: 640 }}>
+      <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3, marginBottom: 10 }}>protocol · v2.1 · semi-structured · ~45min</div>
+      <h3 style={{ fontSize: 16, fontFamily: RA.serif, fontWeight: 500, marginTop: 0 }}>Warm-up</h3>
+      <p>1. Walk me through a recent project where you used an AI tool. What did it help with? What did it not?</p>
+      <p>2. When you notice an AI output is wrong, what tips you off?</p>
+      <h3 style={{ fontSize: 16, fontFamily: RA.serif, fontWeight: 500 }}>Calibration</h3>
+      <p>3. Describe a time you trusted an AI output and were wrong. What happened after?</p>
+      <p>4. Describe a time you doubted an AI output and it was right. What did you learn?</p>
+      <h3 style={{ fontSize: 16, fontFamily: RA.serif, fontWeight: 500 }}>Disclosure</h3>
+      <p>5. How do you describe AI assistance in your methods sections? To co-authors? To reviewers?</p>
+      <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3, marginTop: 16 }}>+ 7 more · click to expand</div>
+    </div>
+  );
+}
+
+function ConsentPreview() {
+  return (
+    <div>
+      <div style={{ padding: 12, background: RA.paper2, border: `1px solid ${RA.line}`, marginBottom: 16, fontSize: 12, color: RA.ink2, fontFamily: RA.mono }}>
+        🔒 IRB approved · #24-0451 · expires 2026-03-01
+      </div>
+      <div style={{ padding: 32, background: RA.paper, border: `1px solid ${RA.line}`, fontFamily: RA.serif, fontSize: 13, lineHeight: 1.65, color: RA.ink2, maxWidth: 640 }}>
+        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+          <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.15 }}>UNIVERSITY IRB</div>
+          <div style={{ fontSize: 16, fontWeight: 500, marginTop: 4 }}>Informed Consent for Research Participation</div>
+        </div>
+        <p><b>Study:</b> Calibrated trust in AI research assistants.</p>
+        <p><b>Purpose:</b> This study examines how researchers evaluate the accuracy of AI-generated outputs...</p>
+        <p><b>Procedures:</b> You will complete a 15-minute survey and may be invited for a 45-minute follow-up interview...</p>
+        <p><b>Risks:</b> Minimal. No identifying information will be published.</p>
+        <p style={{ color: RA.ink3, fontSize: 12, marginTop: 20 }}>[… 4 more paragraphs …]</p>
+      </div>
+    </div>
+  );
+}
+
+function StimuliPreview() {
+  const stim = [
+    { name: '01_lit_search_accurate.md',   task: 'literature search', condition: 'accurate' },
+    { name: '02_lit_search_hallucinated.md', task: 'literature search', condition: 'hallucinated' },
+    { name: '03_data_clean_correct.md',    task: 'data cleaning',    condition: 'correct' },
+    { name: '04_data_clean_wrong_dedup.md',task: 'data cleaning',    condition: 'subtle error' },
+    { name: '05_causal_correct.md',        task: 'causal inference', condition: 'correct' },
+    { name: '06_causal_confounded.md',     task: 'causal inference', condition: 'confounded' },
+    { name: '07_writing_clear.md',         task: 'writing',          condition: 'clear' },
+    { name: '08_writing_vague.md',         task: 'writing',          condition: 'vague' },
+  ];
+  return (
+    <div>
+      <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3, marginBottom: 12 }}>
+        8 vignettes · 4 tasks × 2 conditions · randomized within-subject
+      </div>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+        <thead>
+          <tr style={{ borderBottom: `1px solid ${RA.line}` }}>
+            {['file','task','condition'].map(h => (
+              <th key={h} style={{ padding: '8px 10px', textAlign: 'left', fontFamily: RA.mono, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.1, color: RA.ink3, fontWeight: 400 }}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {stim.map(s => (
+            <tr key={s.name} style={{ borderBottom: `1px solid ${RA.lineSoft}` }}>
+              <td style={{ padding: '8px 10px', fontFamily: RA.mono, fontSize: 12, color: RA.ink }}>{s.name}</td>
+              <td style={{ padding: '8px 10px', color: RA.ink2 }}>{s.task}</td>
+              <td style={{ padding: '8px 10px' }}>
+                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, background: s.condition.includes('correct') || s.condition === 'accurate' || s.condition === 'clear' ? '#e8ebe5' : RA.accentSoft, color: s.condition.includes('correct') || s.condition === 'accurate' || s.condition === 'clear' ? '#4a5a42' : RA.accentDeep, fontFamily: RA.mono }}>
+                  {s.condition}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function AnalysisPreview() {
+  return (
+    <div style={{ fontFamily: RA.serif, fontSize: 14, color: RA.ink2, lineHeight: 1.7, maxWidth: 640 }}>
+      <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.accent, marginBottom: 10 }}>🔒 pre-registered v1.0 · locked 2025-03-01</div>
+      <h3 style={{ fontSize: 16, fontFamily: RA.serif, fontWeight: 500, marginTop: 0 }}>H1. Trust calibration varies by task type.</h3>
+      <p>We predict trust (1-5 Likert) will be highest for literature search (M &gt; 4) and lowest for causal inference (M &lt; 3). Tested with one-way ANOVA.</p>
+      <h3 style={{ fontSize: 16, fontFamily: RA.serif, fontWeight: 500 }}>H2. Disclosure predicts calibration.</h3>
+      <p>Participants who report disclosing AI use to reviewers will show better calibration (accuracy × confidence correlation, r &gt; .3).</p>
+      <h3 style={{ fontSize: 16, fontFamily: RA.serif, fontWeight: 500 }}>Exclusions</h3>
+      <p>Fail attention check (q_attn ≠ 3) → excluded. Duration &lt; 120s → excluded. All exclusions reported.</p>
+    </div>
+  );
+}
+
+function miniBtn(accent) {
+  return {
+    padding: '6px 12px', fontFamily: RA.sans, fontSize: 12, fontWeight: 500,
+    background: accent ? RA.accent : 'transparent',
+    color: accent ? RA.paper : RA.ink2,
+    border: `1px solid ${accent ? RA.accent : RA.line}`,
+    borderRadius: 4, cursor: 'pointer',
+  };
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<MaterialsScreen />);
+</script>
+</body>
+</html>

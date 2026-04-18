@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Manuscript — an editor for replicable academic papers</title>
+<meta name="description" content="A speculative design study: what if the tools around academic writing — formatting, cleaning, cross-checks, citations — got out of the researcher's way?">
+<link rel="stylesheet" href="shared/tokens.css">
+<style>
+  /* Hero ------------------------------------------------------------ */
+  .hero {
+    padding: 72px 0 64px;
+    position: relative;
+  }
+  .hero-kicker {
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 28px;
+  }
+  .hero-kicker .accent-dot {
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); margin-right: 10px; vertical-align: middle;
+  }
+  .hero h1 {
+    font-family: var(--font-serif); font-weight: 400;
+    font-size: clamp(56px, 9.5vw, 128px);
+    line-height: 0.96; letter-spacing: -0.02em;
+    margin: 0 0 36px;
+    max-width: 1100px;
+  }
+  .hero h1 .i { font-style: italic; color: var(--accent); }
+  .hero h1 .muted { color: var(--ink-3); }
+  .hero-sub {
+    font-family: var(--font-serif); font-size: clamp(22px, 2.2vw, 28px);
+    line-height: 1.35; color: var(--ink-2);
+    max-width: 680px; margin: 0 0 40px;
+  }
+  .hero-ctas { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .hero-ctas .meta {
+    margin-left: 12px;
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  /* Section wrappers ----------------------------------------------- */
+  section { padding: var(--sp-9) 0; border-top: 1px solid var(--line); }
+  .section-kicker {
+    display: flex; align-items: baseline; gap: 14px;
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: var(--sp-6);
+  }
+  .section-kicker .num { color: var(--accent); font-weight: 500; }
+
+  /* Problem statement — big editorial type */
+  .statement h2 {
+    font-family: var(--font-serif); font-weight: 400;
+    font-size: clamp(40px, 6vw, 76px);
+    line-height: 1.05; letter-spacing: -0.015em;
+    margin: 0 0 var(--sp-6); max-width: 1000px;
+  }
+  .statement h2 .i { font-style: italic; }
+  .statement h2 .muted { color: var(--ink-3); }
+  .statement .lede {
+    font-family: var(--font-serif); font-size: clamp(22px, 2.1vw, 26px);
+    line-height: 1.45; color: var(--ink-2);
+    max-width: 720px; margin: 0;
+  }
+  .statement-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-7);
+    margin-top: var(--sp-8);
+  }
+  .broken {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .broken .num {
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    color: var(--ink-3); min-width: 28px; padding-top: 3px;
+    letter-spacing: 0.1em;
+  }
+  .broken .text { font-family: var(--font-serif); font-size: var(--fs-lg); line-height: 1.4; color: var(--ink); }
+  .broken .text .strike { color: var(--mute); text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
+
+  /* Thesis — 3 pillars, editorial */
+  .pillars {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--line);
+    border: 1px solid var(--line);
+    margin-top: var(--sp-6);
+  }
+  .pillar {
+    background: var(--paper); padding: var(--sp-6);
+    display: flex; flex-direction: column; gap: 14px; min-height: 280px;
+  }
+  .pillar .label {
+    font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--accent);
+    letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  .pillar h3 {
+    font-family: var(--font-serif); font-size: 34px; line-height: 1.1; font-weight: 400;
+    margin: 0; letter-spacing: -0.01em;
+  }
+  .pillar p { color: var(--ink-2); margin: 0; font-size: var(--fs-md); line-height: 1.5; }
+  .pillar .pillar-foot {
+    margin-top: auto; padding-top: var(--sp-5);
+    font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-3);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  /* Screen gallery — product feature deep-links */
+  .screens-intro {
+    display: grid; grid-template-columns: 5fr 4fr; gap: var(--sp-8); align-items: end;
+    margin-bottom: var(--sp-7);
+  }
+  .screens-intro h2 {
+    font-family: var(--font-serif); font-size: clamp(40px, 6vw, 72px); font-weight: 400;
+    line-height: 1.03; letter-spacing: -0.015em; margin: 0;
+  }
+  .screens-intro p { color: var(--ink-2); font-size: var(--fs-md); line-height: 1.6; margin: 0; }
+
+  .screen-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-5);
+  }
+  .screen-card {
+    background: var(--paper-2); border: 1px solid var(--line);
+    padding: var(--sp-5); text-decoration: none; color: inherit;
+    display: flex; flex-direction: column; gap: 14px;
+    transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+  }
+  .screen-card:hover { border-color: var(--ink); transform: translateY(-2px); background: var(--paper); }
+  .screen-card.feature { grid-column: 1 / 3; background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .screen-card.feature:hover { background: #24221F; border-color: var(--accent); }
+  .screen-card .idx {
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    color: var(--ink-3); letter-spacing: 0.14em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .screen-card.feature .idx { color: rgba(250,250,247,0.55); }
+  .screen-card .idx .arrow { margin-left: auto; font-family: var(--font-sans); font-size: 18px; color: var(--ink-3); transition: transform 180ms, color 180ms; }
+  .screen-card:hover .arrow { transform: translate(4px,-4px); color: var(--accent); }
+  .screen-card h3 {
+    font-family: var(--font-serif); font-size: 30px; font-weight: 400;
+    line-height: 1.08; letter-spacing: -0.01em; margin: 0;
+  }
+  .screen-card.feature h3 { font-size: 44px; }
+  .screen-card p { margin: 0; color: var(--ink-2); font-size: var(--fs-sm); line-height: 1.55; }
+  .screen-card.feature p { color: rgba(250,250,247,0.75); font-size: var(--fs-md); }
+  .preview-thumb {
+    aspect-ratio: 16 / 9; border: 1px solid var(--line);
+    background: var(--paper); position: relative; overflow: hidden;
+    border-radius: var(--r-xs);
+  }
+  .screen-card.feature .preview-thumb { border-color: rgba(250,250,247,0.15); aspect-ratio: 21/9; }
+
+  /* Thumb renditions — tiny vector stand-ins so each card is distinct */
+  .thumb-dots { position: absolute; top: 8px; left: 10px; display: flex; gap: 4px; }
+  .thumb-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--line); }
+
+  /* Audience strip */
+  .audience {
+    display: flex; flex-wrap: wrap; gap: var(--sp-5);
+    padding: var(--sp-6) 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    align-items: center; justify-content: space-between;
+  }
+  .audience .label {
+    font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-3);
+    letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  .audience .tags { display: flex; gap: 10px; flex-wrap: wrap; }
+  .audience .tag {
+    font-family: var(--font-serif); font-size: var(--fs-lg);
+    color: var(--ink-2);
+  }
+  .audience .tag + .tag::before { content: "·"; margin-right: 10px; color: var(--mute); }
+
+  /* Developer teaser / CTA block */
+  .cta-block {
+    background: var(--paper-2); padding: var(--sp-8); border: 1px solid var(--line);
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-7); align-items: center;
+  }
+  .cta-block h2 {
+    font-family: var(--font-serif); font-weight: 400;
+    font-size: clamp(36px, 5vw, 56px); line-height: 1.05; letter-spacing: -0.015em;
+    margin: 0;
+  }
+  .cta-block p { color: var(--ink-2); font-size: var(--fs-md); line-height: 1.5; margin: 0 0 var(--sp-5); }
+
+  /* Speculative banner */
+  .speculative {
+    margin: var(--sp-5) 0 0;
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 6px 12px; border-radius: 999px;
+    border: 1px solid var(--accent); background: var(--accent-soft);
+    color: var(--accent-deep); font-size: var(--fs-xs);
+    font-family: var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .speculative .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  @media (max-width: 860px) {
+    .statement-grid, .pillars, .screen-grid, .cta-block, .screens-intro { grid-template-columns: 1fr; }
+    .screen-card.feature { grid-column: 1 / 2; }
+    .pillars { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Announcement bar -->
+<div class="announce">
+  <span class="pill">Concept</span>
+  A speculative response to Anthropic's <a href="https://www.anthropic.com/news/claude-design-anthropic-labs">Claude Design preview</a> — imagining the academic counterpart.
+</div>
+
+<!-- Nav -->
+<header class="container">
+  <nav class="navbar">
+    <a class="wordmark" href="index.html">
+      <span class="dot"></span>
+      <span style="font-family: var(--font-serif); font-size: 20px;">Manuscript</span>
+    </a>
+    <div class="nav-links">
+      <a href="#thesis">The thesis</a>
+      <a href="#screens">Screens</a>
+      <a href="#audience">For whom</a>
+      <a href="/notes.html#3">← Back to the note</a>
+    </div>
+  </nav>
+</header>
+
+<!-- Hero -->
+<section class="hero container" style="border-top: 0; padding-top: 72px;">
+  <div class="hero-kicker"><span class="accent-dot"></span>A speculative landing page for an imagined product</div>
+  <h1>
+    A place to write<br>
+    <span class="i">replicable academic papers.</span>
+  </h1>
+  <p class="hero-sub">Manuscript is an editor for research writing. You develop the ideas and shape the argument; a quiet assistant handles the formatting, the cleaning, the cross-checks, and the citations — the work that used to stand between a finished thought and a finished paper.</p>
+  <div class="hero-ctas">
+    <a class="btn accent" href="#screens">Tour the concept →</a>
+    <a class="btn ghost" href="screens/manuscript.html">See the editor</a>
+    <span class="meta">5 screens · ~3 min walkthrough</span>
+  </div>
+  <div class="speculative"><span class="dot"></span> This is fiction. No product exists.</div>
+</section>
+
+<!-- Thesis — three pillars -->
+<section class="container" id="thesis" style="padding-top: 96px;">
+  <div class="section-kicker"><span class="num">01</span><span>The idea</span></div>
+  <h2 style="font-family: var(--font-serif); font-size: clamp(40px, 6vw, 76px); line-height: 1.05; font-weight: 400; letter-spacing: -0.015em; margin: 0 0 var(--sp-5); max-width: 900px;">
+    The researcher does the thinking. <em class="i">The software does the rest.</em>
+  </h2>
+  <p style="font-family: var(--font-serif); font-size: var(--fs-lg); color: var(--ink-2); max-width: 720px; margin: 0;">Writing a paper is mostly not writing. It's formatting tables, chasing citations, re-running a figure, checking a number against a spreadsheet, threading revisions. Manuscript is built to do that work quietly in the background — so the hours you spend at your desk are the hours that actually move the argument forward.</p>
+
+  <div class="pillars">
+    <div class="pillar">
+      <div class="label">Principle 01</div>
+      <h3>Your ideas. Your&nbsp;voice.</h3>
+      <p>The assistant doesn't draft your argument — you do. It handles the paperwork around the argument: formatting, consistency, reference plumbing, figure regeneration. The sentences that matter stay yours.</p>
+      <div class="pillar-foot">you write · it tidies</div>
+    </div>
+    <div class="pillar">
+      <div class="label">Principle 02</div>
+      <h3>Replicable by&nbsp;default.</h3>
+      <p>Every figure traces back to its data; every statistic to the cell it was computed from; every claim to the paper it came from. The work checks itself as you write, so reviewers (and your future self) find fewer mistakes.</p>
+      <div class="pillar-foot">draft ⇄ data ⇄ sources</div>
+    </div>
+    <div class="pillar">
+      <div class="label">Principle 03</div>
+      <h3>From desk to&nbsp;DOI,&nbsp;faster.</h3>
+      <p>The weeks that usually disappear into formatting, re-typesetting for each journal, and reconciling revisions — compressed into the click that says "ready." More time at the whiteboard; less time at the styleguide.</p>
+      <div class="pillar-foot">ideas in · papers out</div>
+    </div>
+  </div>
+</section>
+
+<!-- Screens gallery -->
+<section class="container" id="screens">
+  <div class="section-kicker"><span class="num">02</span><span>Five surfaces</span></div>
+  <div class="screens-intro">
+    <h2>What would this look&nbsp;like, day to&nbsp;day?</h2>
+    <p>Five surfaces a researcher actually uses — the draft, the data, the figures, the instruments, the prior literature. Each one designed so the person does the thinking and the software handles the rest.</p>
+  </div>
+
+  <div class="screen-grid">
+
+    <a class="screen-card feature" href="screens/manuscript.html">
+      <div class="idx">
+        <span>Screen 01</span><span>·</span><span>Manuscript</span>
+        <span class="arrow">↗</span>
+      </div>
+      <h3>The manuscript is the&nbsp;app.</h3>
+      <p>Draft, publication, and interactive reading modes — from one file. You write in the margin; the typeset page rebuilds itself. No re-formatting between journals, no copy-paste, no last-minute LaTeX.</p>
+      <div class="preview-thumb" aria-hidden="true">
+        <svg viewBox="0 0 420 180" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+          <rect width="420" height="180" fill="#EEF1EA"/>
+          <rect x="0" y="0" width="80" height="180" fill="#E4E8DE"/>
+          <rect x="310" y="0" width="110" height="180" fill="#E4E8DE"/>
+          <g fill="#D7DCD0">
+            <rect x="10" y="14" width="60" height="4"/>
+            <rect x="10" y="28" width="44" height="3"/>
+            <rect x="10" y="38" width="52" height="3"/>
+            <rect x="10" y="48" width="40" height="3"/>
+          </g>
+          <g fill="#24272A">
+            <rect x="100" y="22" width="190" height="10" rx="1"/>
+            <rect x="100" y="40" width="140" height="6" rx="1"/>
+          </g>
+          <g fill="#D7DCD0">
+            <rect x="100" y="62" width="200" height="3"/>
+            <rect x="100" y="70" width="180" height="3"/>
+            <rect x="100" y="78" width="190" height="3"/>
+            <rect x="100" y="86" width="120" height="3"/>
+          </g>
+          <rect x="100" y="100" width="30" height="10" fill="#BCD3C6" stroke="#2F6A4D" stroke-width="0.8" rx="1"/>
+          <rect x="135" y="100" width="44" height="10" fill="#BCD3C6" stroke="#2F6A4D" stroke-width="0.8" rx="1"/>
+          <g fill="#D7DCD0">
+            <rect x="100" y="118" width="200" height="3"/>
+            <rect x="100" y="126" width="180" height="3"/>
+          </g>
+          <rect x="100" y="140" width="200" height="30" fill="#EEF1EA" stroke="#D7DCD0" stroke-dasharray="2 2"/>
+          <g fill="#D7DCD0">
+            <rect x="320" y="14" width="90" height="3"/>
+            <rect x="320" y="22" width="70" height="3"/>
+            <rect x="320" y="30" width="80" height="3"/>
+          </g>
+          <rect x="320" y="50" width="90" height="60" fill="#E4E8DE" stroke="#D7DCD0"/>
+          <circle cx="325" cy="55" r="2" fill="#2F6A4D"/>
+        </svg>
+      </div>
+    </a>
+
+    <a class="screen-card" href="screens/data.html">
+      <div class="idx"><span>02</span><span>·</span><span>Data</span><span class="arrow">↗</span></div>
+      <h3>Raw and Clean,<br>side by side.</h3>
+      <p>A workspace for the tables and transcripts you're writing about. Private by default; shareable when you say so.</p>
+      <div class="preview-thumb" aria-hidden="true">
+        <svg viewBox="0 0 300 168" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+          <rect width="300" height="168" fill="#EEF1EA"/>
+          <rect x="0" y="0" width="150" height="20" fill="#E4E8DE"/>
+          <rect x="150" y="0" width="150" height="20" fill="#EEF1EA"/>
+          <line x1="150" y1="20" x2="150" y2="168" stroke="#D7DCD0"/>
+          <text x="8" y="14" font-family="JetBrains Mono" font-size="8" fill="#4F544E">🔒 RAW</text>
+          <text x="158" y="14" font-family="JetBrains Mono" font-size="8" fill="#2F6A4D" font-weight="600">🔗 CLEAN</text>
+          <g fill="#D7DCD0">
+            <rect x="10" y="30" width="130" height="3"/>
+            <rect x="10" y="38" width="130" height="3"/>
+            <rect x="10" y="46" width="130" height="3"/>
+            <rect x="10" y="54" width="130" height="3"/>
+            <rect x="10" y="62" width="130" height="3"/>
+            <rect x="10" y="70" width="130" height="3"/>
+          </g>
+          <g stroke="#2F6A4D" stroke-width="3" stroke-linecap="round">
+            <line x1="10" y1="80" x2="20" y2="80"/>
+            <line x1="30" y1="80" x2="45" y2="80"/>
+            <line x1="55" y1="80" x2="75" y2="80"/>
+            <line x1="85" y1="80" x2="105" y2="80"/>
+            <line x1="115" y1="80" x2="140" y2="80"/>
+          </g>
+          <g fill="#4F544E">
+            <rect x="160" y="30" width="120" height="10" rx="1" opacity="0.2"/>
+            <rect x="160" y="30" width="78" height="10" rx="1" opacity="0.7"/>
+            <rect x="160" y="45" width="120" height="8" rx="1" opacity="0.15"/>
+            <rect x="160" y="45" width="50" height="8" rx="1" opacity="0.7"/>
+            <rect x="160" y="58" width="120" height="8" rx="1" opacity="0.15"/>
+            <rect x="160" y="58" width="96" height="8" rx="1" opacity="0.7"/>
+            <rect x="160" y="71" width="120" height="8" rx="1" opacity="0.15"/>
+            <rect x="160" y="71" width="40" height="8" rx="1" opacity="0.7"/>
+          </g>
+        </svg>
+      </div>
+    </a>
+
+    <a class="screen-card" href="screens/figures.html">
+      <div class="idx"><span>03</span><span>·</span><span>Figures</span><span class="arrow">↗</span></div>
+      <h3>Figures that stay&nbsp;editable.</h3>
+      <p>Nudge a palette, toggle error bars, drop the figure into the draft at a named heading. No round-trip through Illustrator.</p>
+      <div class="preview-thumb" aria-hidden="true">
+        <svg viewBox="0 0 300 168" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+          <rect width="300" height="168" fill="#EEF1EA"/>
+          <rect x="10" y="14" width="190" height="130" fill="white" stroke="#D7DCD0"/>
+          <path d="M 20 120 Q 60 60 110 70 T 190 44" stroke="#2F6A4D" stroke-width="2.5" fill="none"/>
+          <path d="M 20 130 Q 60 100 110 92 T 190 86" stroke="#2F6A4D" stroke-width="2" fill="none" stroke-dasharray="4 3"/>
+          <path d="M 20 110 Q 60 50 110 62 T 190 36" stroke="#2F6A4D" stroke-width="6" fill="none" opacity="0.15"/>
+          <line x1="20" y1="134" x2="190" y2="134" stroke="#6F746A" stroke-width="0.5"/>
+          <line x1="20" y1="20" x2="20" y2="134" stroke="#6F746A" stroke-width="0.5"/>
+          <rect x="210" y="14" width="80" height="130" fill="#E4E8DE"/>
+          <g fill="#D7DCD0">
+            <rect x="216" y="22" width="68" height="3"/>
+            <rect x="216" y="30" width="50" height="3"/>
+            <rect x="216" y="42" width="68" height="3"/>
+            <rect x="216" y="50" width="44" height="3"/>
+            <rect x="216" y="62" width="68" height="3"/>
+          </g>
+          <rect x="216" y="74" width="68" height="6" fill="#2F6A4D" opacity="0.3"/>
+          <rect x="216" y="74" width="40" height="6" fill="#2F6A4D"/>
+          <g fill="#D7DCD0">
+            <rect x="216" y="90" width="68" height="3"/>
+            <rect x="216" y="98" width="40" height="3"/>
+            <rect x="216" y="108" width="68" height="3"/>
+          </g>
+        </svg>
+      </div>
+    </a>
+
+    <a class="screen-card" href="screens/materials.html">
+      <div class="idx"><span>04</span><span>·</span><span>Materials</span><span class="arrow">↗</span></div>
+      <h3>Every instrument,<br>in one&nbsp;place.</h3>
+      <p>Surveys, protocols, stimuli, consent forms, notes. Versioned alongside the draft so you always know what went with what.</p>
+      <div class="preview-thumb" aria-hidden="true">
+        <svg viewBox="0 0 300 168" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+          <rect width="300" height="168" fill="#EEF1EA"/>
+          <rect x="0" y="0" width="110" height="168" fill="#E4E8DE"/>
+          <g fill="#24272A" font-family="JetBrains Mono" font-size="7">
+            <text x="8" y="18">▸ survey.qsf</text>
+            <text x="8" y="32" fill="#2F6A4D">▸ demographics.qsf</text>
+            <text x="8" y="46">▸ interview.md</text>
+            <text x="8" y="60">▸ vignette_A.png</text>
+            <text x="8" y="74">▸ vignette_B.png</text>
+            <text x="8" y="88">▸ prompt.m4a</text>
+            <text x="8" y="102">▸ consent.pdf</text>
+            <text x="8" y="116">▸ preregistration.md</text>
+            <text x="8" y="130">▸ analysis.R</text>
+          </g>
+          <g transform="translate(120, 14)">
+            <rect width="168" height="60" fill="white" stroke="#D7DCD0"/>
+            <rect x="6" y="6" width="50" height="6" fill="#24272A"/>
+            <rect x="6" y="18" width="156" height="3" fill="#D7DCD0"/>
+            <rect x="6" y="25" width="156" height="3" fill="#D7DCD0"/>
+            <g transform="translate(6, 34)" fill="#6F746A" font-family="JetBrains Mono" font-size="6">
+              <circle cx="3" cy="3" r="2"/><text x="10" y="5">1</text>
+              <circle cx="22" cy="3" r="2"/><text x="28" y="5">2</text>
+              <circle cx="40" cy="3" r="2"/><text x="46" y="5">3</text>
+            </g>
+          </g>
+          <g transform="translate(120, 82)">
+            <rect width="168" height="60" fill="white" stroke="#D7DCD0"/>
+            <rect x="6" y="6" width="60" height="6" fill="#24272A"/>
+            <rect x="6" y="18" width="156" height="3" fill="#D7DCD0"/>
+          </g>
+        </svg>
+      </div>
+    </a>
+
+    <a class="screen-card" href="screens/papers.html">
+      <div class="idx"><span>05</span><span>·</span><span>Library</span><span class="arrow">↗</span></div>
+      <h3>A library that remembers what you&nbsp;read.</h3>
+      <p>The papers you've read, organized by the ideas you read them for. Every highlight traces back to the sentence in your draft that needed it.</p>
+      <div class="preview-thumb" aria-hidden="true">
+        <svg viewBox="0 0 300 168" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+          <rect width="300" height="168" fill="#EEF1EA"/>
+          <g stroke="#D7DCD0" fill="none">
+            <line x1="80" y1="60" x2="150" y2="84"/>
+            <line x1="150" y1="84" x2="220" y2="50"/>
+            <line x1="150" y1="84" x2="220" y2="120"/>
+            <line x1="150" y1="84" x2="90" y2="130"/>
+            <line x1="220" y1="50" x2="260" y2="90"/>
+          </g>
+          <circle cx="150" cy="84" r="14" fill="#2F6A4D"/>
+          <circle cx="80" cy="60" r="8" fill="#2F6A4D"/>
+          <circle cx="220" cy="50" r="8" fill="#2F6A4D"/>
+          <circle cx="220" cy="120" r="8" fill="#4F544E"/>
+          <circle cx="90" cy="130" r="8" fill="#4F544E"/>
+          <circle cx="260" cy="90" r="6" fill="#6F746A"/>
+          <circle cx="50" cy="100" r="5" fill="#6F746A"/>
+          <circle cx="260" cy="30" r="5" fill="#6F746A"/>
+          <text x="150" y="87" font-family="Instrument Serif" font-size="9" fill="white" text-anchor="middle" font-style="italic">this paper</text>
+        </svg>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- Closing CTA -->
+<section class="container">
+  <div class="cta-block">
+    <div>
+      <div class="eyebrow" style="margin-bottom: 14px;">Read the post</div>
+      <h2>Why this, why&nbsp;now?</h2>
+    </div>
+    <div>
+      <p>This site is a visual essay accompanying a short post on what an editor for academic writing could look like when it's built around the researcher — not around the model. A landing-page example, not a product.</p>
+      <a class="btn" href="/notes.html#3">← Back to the note</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container">
+    <div>
+      <div class="wordmark" style="margin-bottom: 8px;">
+        <span class="dot"></span><span style="font-family: var(--font-serif); font-size: 20px;">Manuscript</span>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--mute); letter-spacing: 0.08em; margin-bottom: 10px;">
+        A SPECULATIVE DESIGN STUDY · 2026
+      </div>
+      <div style="font-size: 13px; color: var(--ink-3); max-width: 420px;">
+        An imagined product, in the spirit of <a href="https://www.anthropic.com/news/claude-design-anthropic-labs">Claude Design</a>. Not affiliated with Anthropic.
+      </div>
+    </div>
+    <div>
+      <a href="/notes.html#3">Back to the note</a> · <a href="https://github.com/rafmbatista/rafmbatista.github.io">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Library — Manuscript</title>
+<link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="../shared/shared-components.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState } = React;
+
+function LibraryScreen() {
+  const [selected, setSelected] = useState('shah2024');
+
+  return (
+    <>
+      <ScreenBar current="papers" label="Library" />
+      <ConceptNote>The reference list is a knowledge graph. Every citation traces back to a sentence you've actually read.</ConceptNote>
+
+      <ScreenIntro
+        kicker="Screen 05 · Library"
+        title={<>References as a <em style={{ fontStyle: 'italic' }}>knowledge graph.</em></>}
+        caption="47 papers, clustered by theme. Every citation traces to an excerpt you actually read. No BibTeX, no ghost citations."
+      />
+
+      <MockFrame title="claude-ra · library · 47 papers" height={740}>
+        <ProjectRail active="papers" />
+        <LibraryBody selected={selected} setSelected={setSelected} />
+      </MockFrame>
+
+      <div className="container" style={{ padding: '32px 24px 0' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, borderTop: `1px solid ${RA.line}`, paddingTop: 24 }}>
+          <LN num="A"><b>Clusters, not lists.</b> Papers group by theme automatically. You see where your lit review has gaps.</LN>
+          <LN num="B"><b>Excerpts are sources.</b> Every citation traces to a highlighted passage — the sentence you actually read.</LN>
+          <LN num="C"><b>Ghost-citation guard.</b> If Claude suggests a paper, it lives here first. You read it before it ever enters the manuscript.</LN>
+        </div>
+      </div>
+
+      <ScreenFooter prev="materials" next={null} />
+    </>
+  );
+}
+
+function LN({ num, children }) {
+  return (
+    <div style={{ display: 'flex', gap: 14 }}>
+      <span style={{ width: 26, height: 26, borderRadius: '50%', background: RA.paper2, border: `1px solid ${RA.line}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontFamily: RA.serif, fontSize: 15, color: RA.accent, flexShrink: 0 }}>{num}</span>
+      <div style={{ fontSize: 14, color: RA.ink2, lineHeight: 1.55 }}>{children}</div>
+    </div>
+  );
+}
+
+function LibraryBody({ selected, setSelected }) {
+  return (
+    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 380px', overflow: 'hidden' }}>
+      <GraphPane selected={selected} setSelected={setSelected} />
+      <PaperDetail selected={selected} />
+    </div>
+  );
+}
+
+function GraphPane({ selected, setSelected }) {
+  const clusters = [
+    { id: 'c1', label: 'calibration & metacognition', x: 180, y: 140, r: 90, color: RA.accent,  n: 12 },
+    { id: 'c2', label: 'AI usage in science',          x: 420, y: 190, r: 110, color: RA.quant, n: 18 },
+    { id: 'c3', label: 'hallucination & verification', x: 260, y: 340, r: 80, color: RA.qual,  n: 11 },
+    { id: 'c4', label: 'research workflow',            x: 500, y: 400, r: 60, color: '#6F746A', n: 6 },
+  ];
+  const papers = [
+    { id: 'shah2024',   x: 400, y: 170, c: 'c2', label: 'Shah 2024',   sel: true },
+    { id: 'okafor2025', x: 460, y: 210, c: 'c2', label: 'Okafor 2025' },
+    { id: 'chen2023',   x: 180, y: 120, c: 'c1', label: 'Chen 2023' },
+    { id: 'kim2022',    x: 230, y: 160, c: 'c1', label: 'Kim 2022' },
+    { id: 'rao2024',    x: 150, y: 170, c: 'c1', label: 'Rao 2024' },
+    { id: 'liu2025',    x: 260, y: 330, c: 'c3', label: 'Liu 2025' },
+    { id: 'park2024',   x: 290, y: 370, c: 'c3', label: 'Park 2024' },
+    { id: 'garcia2023', x: 520, y: 410, c: 'c4', label: 'Garcia 2023' },
+    { id: 'ng2024',     x: 380, y: 280, c: 'c2', label: 'Ng 2024' },
+    { id: 'weller2024', x: 470, y: 150, c: 'c2', label: 'Weller 2024' },
+  ];
+
+  return (
+    <div style={{ position: 'relative', overflow: 'hidden', background: RA.paper }}>
+      {/* toolbar */}
+      <div style={{ position: 'absolute', top: 14, left: 14, right: 14, display: 'flex', justifyContent: 'space-between', zIndex: 2 }}>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input placeholder="search 47 papers…" style={{
+            padding: '6px 10px', fontSize: 12, fontFamily: RA.sans,
+            border: `1px solid ${RA.line}`, borderRadius: 3, background: RA.paper, width: 240,
+          }} />
+          <select style={{ padding: '6px 10px', fontSize: 12, fontFamily: RA.sans, border: `1px solid ${RA.line}`, borderRadius: 3, background: RA.paper }}>
+            <option>view: clusters</option>
+            <option>view: chronological</option>
+            <option>view: list</option>
+          </select>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button style={miniBtn()}>+ import</button>
+          <button style={miniBtn()}>from Zotero</button>
+          <button style={miniBtn(true)}>export .bib</button>
+        </div>
+      </div>
+
+      <svg viewBox="0 0 700 520" width="100%" height="100%" style={{ display: 'block' }}>
+        {/* cluster blobs */}
+        {clusters.map(c => (
+          <g key={c.id}>
+            <circle cx={c.x} cy={c.y} r={c.r} fill={c.color} opacity="0.08" />
+            <circle cx={c.x} cy={c.y} r={c.r} fill="none" stroke={c.color} strokeOpacity="0.3" strokeDasharray="3 3" />
+            <text x={c.x} y={c.y - c.r - 6} fontSize="10.5" fill={c.color} textAnchor="middle" fontFamily={RA.mono} style={{ textTransform: 'uppercase', letterSpacing: 0.5 }} opacity="0.85">
+              {c.label} · {c.n}
+            </text>
+          </g>
+        ))}
+
+        {/* edges — a few illustrative connections */}
+        <g stroke={RA.ink3} strokeWidth="0.6" opacity="0.35">
+          <line x1="400" y1="170" x2="460" y2="210" />
+          <line x1="400" y1="170" x2="380" y2="280" />
+          <line x1="400" y1="170" x2="230" y2="160" />
+          <line x1="400" y1="170" x2="470" y2="150" />
+          <line x1="180" y1="120" x2="230" y2="160" />
+          <line x1="230" y1="160" x2="150" y2="170" />
+          <line x1="260" y1="330" x2="290" y2="370" />
+          <line x1="290" y1="370" x2="380" y2="280" />
+          <line x1="460" y1="210" x2="380" y2="280" />
+          <line x1="520" y1="410" x2="380" y2="280" />
+        </g>
+
+        {/* papers */}
+        {papers.map(p => {
+          const isSel = p.id === selected;
+          const cluster = clusters.find(c => c.id === p.c);
+          return (
+            <g key={p.id} style={{ cursor: 'pointer' }} onClick={() => setSelected(p.id)}>
+              <circle cx={p.x} cy={p.y} r={isSel ? 9 : 6} fill={isSel ? cluster.color : RA.paper} stroke={cluster.color} strokeWidth={isSel ? 2 : 1.2} />
+              <text x={p.x + 12} y={p.y + 4} fontSize={isSel ? 11.5 : 10.5} fill={isSel ? RA.ink : RA.ink2} fontFamily={RA.sans} fontWeight={isSel ? 600 : 400}>
+                {p.label}
+              </text>
+              {isSel && (
+                <text x={p.x + 12} y={p.y + 18} fontSize="10" fill={RA.accent} fontFamily={RA.mono}>
+                  cited 3× in manuscript
+                </text>
+              )}
+            </g>
+          );
+        })}
+
+        {/* annotation */}
+        <g>
+          <line x1="40" y1="470" x2="100" y2="430" stroke={RA.ink3} strokeWidth="0.8" />
+          <text x="40" y="490" fontSize="10" fill={RA.ink3} fontFamily={RA.mono} style={{ fontStyle: 'italic' }}>
+            gap: no papers bridging
+          </text>
+          <text x="40" y="502" fontSize="10" fill={RA.ink3} fontFamily={RA.mono} style={{ fontStyle: 'italic' }}>
+            calibration ↔ hallucination
+          </text>
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function PaperDetail({ selected }) {
+  const data = {
+    shah2024: {
+      title: 'AI use among researchers: a survey of 2,400 scientists',
+      authors: 'Shah, N., Li, M., & Patel, K.',
+      venue: 'Nature Human Behaviour',
+      year: 2024,
+      cluster: 'AI usage in science',
+      cited: 3,
+      excerpts: [
+        { page: 4, text: '72% of respondents reported using at least one AI tool weekly, but only 31% disclosed this in methods sections.' },
+        { page: 7, text: 'Trust varied widely by task: high for literature search (M=4.1), low for statistical analysis (M=2.3).' },
+        { page: 11, text: 'Researchers who verified AI outputs showed better calibration than those who did not, r=.42.' },
+      ],
+      citations: [
+        { section: '§ 1 Introduction', text: 'Prior work (Shah 2024) has documented usage; few studies examine calibration.' },
+        { section: '§ 2 Methods',      text: 'We adapted the trust-by-task instrument from Shah (2024).' },
+        { section: '§ 4 Discussion',   text: 'Our findings extend Shah (2024) by showing…' },
+      ],
+    },
+  };
+  const p = data[selected] || data.shah2024;
+
+  return (
+    <div style={{ borderLeft: `1px solid ${RA.line}`, overflow: 'auto', background: RA.paper2, padding: 22 }}>
+      <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, textTransform: 'uppercase', letterSpacing: 0.1, marginBottom: 10 }}>
+        Paper detail
+      </div>
+
+      <div style={{ fontFamily: RA.serif, fontSize: 17, lineHeight: 1.3, marginBottom: 8, color: RA.ink }}>
+        {p.title}
+      </div>
+      <div style={{ fontSize: 12, color: RA.ink2, marginBottom: 2 }}>{p.authors}</div>
+      <div style={{ fontFamily: RA.serif, fontStyle: 'italic', fontSize: 12.5, color: RA.ink2, marginBottom: 14 }}>
+        {p.venue}, {p.year}
+      </div>
+
+      <div style={{ display: 'flex', gap: 6, marginBottom: 18, flexWrap: 'wrap' }}>
+        <span style={chip(RA.quant)}>{p.cluster}</span>
+        <span style={chip(RA.accent)}>cited {p.cited}× in manuscript</span>
+        <span style={chip(RA.ink3)}>read · {p.excerpts.length} excerpts</span>
+      </div>
+
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontFamily: RA.mono, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.1, color: RA.ink3, marginBottom: 10 }}>
+          Your excerpts
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {p.excerpts.map((e, i) => (
+            <div key={i} style={{ padding: 12, background: RA.paper, border: `1px solid ${RA.line}`, borderLeft: `3px solid ${RA.accent}`, borderRadius: 3 }}>
+              <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, marginBottom: 5 }}>p. {e.page}</div>
+              <div style={{ fontFamily: RA.serif, fontSize: 13, color: RA.ink, lineHeight: 1.5 }}>
+                "{e.text}"
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <div style={{ fontFamily: RA.mono, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.1, color: RA.ink3, marginBottom: 10 }}>
+          Cited in your manuscript
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {p.citations.map((c, i) => (
+            <div key={i} style={{ padding: '10px 12px', background: RA.paper, border: `1px solid ${RA.line}`, borderRadius: 3, cursor: 'pointer' }}>
+              <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.accent, marginBottom: 4 }}>{c.section} ↗</div>
+              <div style={{ fontFamily: RA.serif, fontSize: 13, color: RA.ink2, lineHeight: 1.5 }}>{c.text}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ marginTop: 20, display: 'flex', gap: 8 }}>
+        <button style={miniBtn()}>open PDF</button>
+        <button style={miniBtn(true)}>cite in §…</button>
+      </div>
+    </div>
+  );
+}
+
+function chip(color) {
+  return {
+    fontSize: 10.5, padding: '3px 8px', borderRadius: 999,
+    background: color + '18', color: color, fontFamily: RA.mono,
+    letterSpacing: 0.02,
+  };
+}
+
+function miniBtn(accent) {
+  return {
+    padding: '6px 12px', fontFamily: RA.sans, fontSize: 12, fontWeight: 500,
+    background: accent ? RA.accent : 'transparent',
+    color: accent ? RA.paper : RA.ink2,
+    border: `1px solid ${accent ? RA.accent : RA.line}`,
+    borderRadius: 4, cursor: 'pointer',
+  };
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<LibraryScreen />);
+</script>
+</body>
+</html>

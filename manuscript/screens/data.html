@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Data — Manuscript</title>
+<link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="../shared/shared-components.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState } = React;
+
+function DataScreen() {
+  const [mode, setMode] = useState('clean');
+
+  return (
+    <>
+      <ScreenBar current="data" label="Data" />
+      <ConceptNote>Raw data stays private. Clean data travels — with a pipeline you can read.</ConceptNote>
+
+      <ScreenIntro
+        kicker="Screen 02 · Data"
+        title={<>Raw and Clean, <em style={{ fontStyle: 'italic' }}>side by side.</em></>}
+        caption="Two tabs, same file. Raw is encrypted, PII-flagged, never shared. Clean is anonymized and ready to deposit. Quant and qual in the same pane, because they live in the same project."
+      />
+
+      <div className="container" style={{ padding: '0 24px 24px' }}>
+        <div style={{ display: 'inline-flex', border: `1px solid ${RA.line}`, borderRadius: 999, overflow: 'hidden' }}>
+          <button onClick={() => setMode('raw')} style={tabBtn(mode === 'raw')}>🔒 Raw (private)</button>
+          <button onClick={() => setMode('clean')} style={tabBtn(mode === 'clean')}>🔗 Clean (shareable)</button>
+        </div>
+      </div>
+
+      <MockFrame title={`claude-ra · data · ${mode === 'raw' ? 'raw 🔒' : 'clean 🔗'}`} height={720}>
+        <ProjectRail active="data" />
+        <DataBody mode={mode} />
+        <ClaudeRail />
+      </MockFrame>
+
+      <div className="container" style={{ padding: '32px 24px 0' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, borderTop: `1px solid ${RA.line}`, paddingTop: 24 }}>
+          <FeatureNote num="A">
+            <b>One-click share.</b> Clean data gets an anonymized, versioned link to OSF. Raw never leaves the device.
+          </FeatureNote>
+          <FeatureNote num="B">
+            <b>The pipeline is the proof.</b> Dedupe → attention-check → reverse-code → scale. Each step is a commit. Each commit is reviewable.
+          </FeatureNote>
+          <FeatureNote num="C">
+            <b>Qual lives here too.</b> 24 transcripts, themed and excerpted, all addressable from the manuscript.
+          </FeatureNote>
+        </div>
+      </div>
+
+      <ScreenFooter prev="manuscript" next="figures" />
+    </>
+  );
+}
+
+function tabBtn(active) {
+  return {
+    padding: '8px 20px', fontFamily: RA.sans, fontSize: 13, fontWeight: 500,
+    background: active ? RA.ink : 'transparent',
+    color: active ? RA.paper : RA.ink2,
+    border: 'none', cursor: 'pointer',
+  };
+}
+
+function FeatureNote({ num, children }) {
+  return (
+    <div style={{ display: 'flex', gap: 14 }}>
+      <span style={{
+        width: 26, height: 26, borderRadius: '50%',
+        background: RA.paper2, border: `1px solid ${RA.line}`,
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        fontFamily: RA.serif, fontSize: 15, color: RA.accent, flexShrink: 0,
+      }}>{num}</span>
+      <div style={{ fontSize: 14, color: RA.ink2, lineHeight: 1.55 }}>{children}</div>
+    </div>
+  );
+}
+
+function DataBody({ mode }) {
+  const raw = mode === 'raw';
+  return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* Tab header */}
+      <div style={{
+        padding: '12px 20px 0', borderBottom: `1px solid ${RA.line}`,
+        display: 'flex', alignItems: 'flex-end',
+      }}>
+        <DataTab active={raw} icon="🔒" label="Raw" sub="private · IRB" />
+        <DataTab active={!raw} icon="🔗" label="Clean" sub="shareable · anonymized" />
+        <div style={{ flex: 1 }} />
+        <div style={{ display: 'flex', gap: 8, paddingBottom: 10 }}>
+          <button style={miniBtn()}>+ upload</button>
+          <button style={miniBtn(true)}>→ clean with claude</button>
+          {!raw && <button style={miniBtn()}>deposit to OSF ↗</button>}
+        </div>
+      </div>
+
+      {/* Body split */}
+      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', overflow: 'hidden' }}>
+        <div style={{ borderRight: `1px solid ${RA.line}`, padding: 18, overflow: 'auto' }}>
+          <SectionHead dot={RA.quant} label="Quantitative" file="survey.csv" n={raw ? '410 rows' : '312 rows'} />
+          {raw && (
+            <div style={{ marginBottom: 10, padding: 8, border: `1px dashed ${RA.accent}`, background: RA.accentSoft, color: RA.accentDeep, fontFamily: RA.mono, fontSize: 11 }}>
+              ⚠ contains PII (email, IP). Encrypted at rest. No sharing.
+            </div>
+          )}
+          <MockTable raw={raw} />
+          <div style={{ marginTop: 14, fontFamily: RA.mono, fontSize: 11, color: RA.ink3 }}>
+            {raw ? 'unchecked · no pipeline applied' : 'pipeline: dedupe → attention-check → reverse-code → scale'}
+          </div>
+          {!raw && <PipelineStrip />}
+        </div>
+
+        <div style={{ padding: 18, overflow: 'auto' }}>
+          <SectionHead dot={RA.qual} label="Qualitative" file="interviews/" n="24 transcripts" />
+          {raw ? <InterviewListRaw /> : <InterviewListClean />}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DataTab({ active, icon, label, sub }) {
+  return (
+    <div style={{
+      padding: '10px 16px 12px',
+      borderBottom: active ? `2px solid ${RA.accent}` : '2px solid transparent',
+      fontSize: 13, fontWeight: active ? 600 : 400,
+      color: active ? RA.ink : RA.ink3,
+      cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
+      marginBottom: -1,
+    }}>
+      <span>{icon}</span>
+      <span>{label}</span>
+      <span style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, fontWeight: 400, marginLeft: 4 }}>· {sub}</span>
+    </div>
+  );
+}
+
+function miniBtn(accent) {
+  return {
+    padding: '6px 12px', fontFamily: RA.sans, fontSize: 12, fontWeight: 500,
+    background: accent ? RA.accent : 'transparent',
+    color: accent ? RA.paper : RA.ink2,
+    border: `1px solid ${accent ? RA.accent : RA.line}`,
+    borderRadius: 4, cursor: 'pointer',
+  };
+}
+
+function SectionHead({ dot, label, file, n }) {
+  return (
+    <div style={{ marginBottom: 12, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+        <span style={{ width: 8, height: 8, borderRadius: '50%', background: dot, display: 'inline-block' }} />
+        <span style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3, textTransform: 'uppercase', letterSpacing: 0.1 }}>{label}</span>
+        <span style={{ fontFamily: RA.mono, fontSize: 13, color: RA.ink }}>{file}</span>
+      </div>
+      <span style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3 }}>{n}</span>
+    </div>
+  );
+}
+
+function MockTable({ raw }) {
+  const headers = raw
+    ? ['pid','email','ip_addr','age','trust_ai','trust_h','acc','dur']
+    : ['pid','age_bin','trust_ai','trust_h','acc','dur_z'];
+  const rows = raw
+    ? [
+        ['p001','a.c@…','10.0.1.4','34','4.2','3.8','0.71','412'],
+        ['p002','mok@…','10.0.1.5','27','3.5','4.1','0.84','301'],
+        ['p003','sr@…','10.0.1.6','42','4.8','4.0','0.65','498'],
+        ['p004','—','10.0.1.7','28','2.9','3.6','0.90','198'],
+        ['p005','—','10.0.1.8','35','4.0','3.9','0.78','355'],
+      ]
+    : [
+        ['p001','30–39','4.2','3.8','0.71','+0.2'],
+        ['p002','25–29','3.5','4.1','0.84','-0.1'],
+        ['p003','40–49','4.8','4.0','0.65','+1.1'],
+        ['p004','25–29','2.9','3.6','0.90','-0.8'],
+        ['p005','30–39','4.0','3.9','0.78','+0.3'],
+      ];
+  return (
+    <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: RA.mono, fontSize: 12 }}>
+      <thead>
+        <tr>{headers.map(h => <th key={h} style={{ padding: '6px 8px', textAlign: 'left', borderBottom: `1px solid ${RA.line}`, color: RA.ink3, fontWeight: 500, fontSize: 11, letterSpacing: 0.05 }}>{h}</th>)}</tr>
+      </thead>
+      <tbody>
+        {rows.map((r, i) => (
+          <tr key={i} style={{ borderBottom: `1px solid ${RA.lineSoft}` }}>
+            {r.map((v, j) => <td key={j} style={{ padding: '6px 8px', color: raw && (j === 1 || j === 2) ? RA.accent : RA.ink2 }}>{v}</td>)}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function PipelineStrip() {
+  const steps = [
+    { n: 1, k: 'dedupe', v: '410 → 398' },
+    { n: 2, k: 'attn-check', v: '398 → 341' },
+    { n: 3, k: 'reverse-code', v: 'q2, q4' },
+    { n: 4, k: 'trust scale', v: 'α = .87' },
+    { n: 5, k: 'anonymize', v: '312 → clean', done: true },
+  ];
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginTop: 10 }}>
+      {steps.map(s => (
+        <div key={s.n} style={{
+          padding: '8px 10px',
+          border: `1px solid ${s.done ? RA.accent : RA.line}`,
+          background: s.done ? RA.accentSoft : RA.paper2,
+          borderRadius: 3,
+        }}>
+          <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, marginBottom: 2 }}>{s.n} · {s.k}</div>
+          <div style={{ fontFamily: RA.mono, fontSize: 11, color: s.done ? RA.accentDeep : RA.ink2 }}>{s.v}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function InterviewListRaw() {
+  const files = [
+    { name: 'p001_transcript.txt', size: '42KB', sensitive: true },
+    { name: 'p002_transcript.txt', size: '38KB', sensitive: true },
+    { name: 'p003_transcript.txt', size: '51KB', sensitive: true },
+    { name: 'p004_transcript.txt', size: '47KB', sensitive: true },
+    { name: 'p005_audio.m4a', size: '12MB', sensitive: true },
+    { name: 'p006_transcript.txt', size: '44KB', sensitive: true },
+  ];
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <div style={{ padding: 8, background: RA.accentSoft, border: `1px dashed ${RA.accent}`, color: RA.accentDeep, fontFamily: RA.mono, fontSize: 11, marginBottom: 8 }}>
+        ⚠ names, timestamps, affiliations not yet redacted
+      </div>
+      {files.map(f => (
+        <div key={f.name} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 8px', fontFamily: RA.mono, fontSize: 12, color: RA.ink2, borderBottom: `1px solid ${RA.lineSoft}` }}>
+          <span>{f.sensitive && <span style={{ color: RA.accent, marginRight: 6 }}>🔒</span>}{f.name}</span>
+          <span style={{ color: RA.ink3 }}>{f.size}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function InterviewListClean() {
+  const themes = [
+    { name: 'verification rituals', n: 18, w: 0.86 },
+    { name: 'epistemic humility', n: 14, w: 0.72 },
+    { name: 'workflow delegation', n: 22, w: 0.98 },
+    { name: 'disclosure to reviewers', n: 9, w: 0.46 },
+    { name: 'calibration over time', n: 11, w: 0.58 },
+    { name: 'tool stickiness', n: 7, w: 0.38 },
+  ];
+  return (
+    <div>
+      <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3, marginBottom: 10 }}>
+        coded · κ=.78 · 5 themes · 74 excerpts
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {themes.map(t => (
+          <div key={t.name}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}>
+              <span style={{ color: RA.ink }}>{t.name}</span>
+              <span style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3 }}>{t.n} excerpts</span>
+            </div>
+            <div style={{ height: 6, background: RA.paper2, borderRadius: 3, overflow: 'hidden' }}>
+              <div style={{ width: `${t.w * 100}%`, height: '100%', background: RA.qual, opacity: 0.75 }} />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+        <button style={miniBtn()}>view excerpts</button>
+        <button style={miniBtn()}>export codebook</button>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<DataScreen />);
+</script>
+</body>
+</html>

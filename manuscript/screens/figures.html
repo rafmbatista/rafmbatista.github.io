@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Figures — Manuscript</title>
+<link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="../shared/shared-components.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState } = React;
+
+function FiguresScreen() {
+  const [selected, setSelected] = useState('fig2');
+  const [palette, setPalette] = useState('warm');
+  const [smoothing, setSmoothing] = useState(0.5);
+  const [showCI, setShowCI] = useState(true);
+
+  return (
+    <>
+      <ScreenBar current="figures" label="Figures" />
+      <ConceptNote>Figures are not PNGs. They are R scripts. Editing them regenerates the code.</ConceptNote>
+
+      <ScreenIntro
+        kicker="Screen 03 · Figures"
+        title={<>Tweak the figure. <em style={{ fontStyle: 'italic' }}>Regenerate the code.</em></>}
+        caption="Every figure is a committed R script bound to clean data. Change the palette or smoothing and the code updates. Insert into the manuscript at a specific heading. No screenshots. No Illustrator."
+      />
+
+      <MockFrame title={`claude-ra · figures · fig2_main.R`} height={740}>
+        <ProjectRail active="figures" />
+        <FiguresBody selected={selected} setSelected={setSelected}
+          palette={palette} setPalette={setPalette}
+          smoothing={smoothing} setSmoothing={setSmoothing}
+          showCI={showCI} setShowCI={setShowCI} />
+      </MockFrame>
+
+      <div className="container" style={{ padding: '32px 24px 0' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, borderTop: `1px solid ${RA.line}`, paddingTop: 24 }}>
+          <FNote num="A">
+            <b>Tweaks write code.</b> Change a palette in the panel, the R script updates. Every version is a commit.
+          </FNote>
+          <FNote num="B">
+            <b>Bound to data.</b> Figures reference <code style={{ fontFamily: RA.mono, fontSize: 11.5, background: RA.paper2, padding: '1px 4px' }}>survey_clean.csv</code> by path. Update the data, the figure redraws.
+          </FNote>
+          <FNote num="C">
+            <b>Insert at heading.</b> "Insert into manuscript § 3.2 Results" — the figure is placed, captioned, cross-referenced.
+          </FNote>
+        </div>
+      </div>
+
+      <ScreenFooter prev="data" next="materials" />
+    </>
+  );
+}
+
+function FNote({ num, children }) {
+  return (
+    <div style={{ display: 'flex', gap: 14 }}>
+      <span style={{ width: 26, height: 26, borderRadius: '50%', background: RA.paper2, border: `1px solid ${RA.line}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontFamily: RA.serif, fontSize: 15, color: RA.accent, flexShrink: 0 }}>{num}</span>
+      <div style={{ fontSize: 14, color: RA.ink2, lineHeight: 1.55 }}>{children}</div>
+    </div>
+  );
+}
+
+function FiguresBody(p) {
+  const figs = [
+    { id: 'fig1', num: 1, name: 'participant flow', kind: 'diagram' },
+    { id: 'fig2', num: 2, name: 'trust by task type', kind: 'bar+ci' },
+    { id: 'fig3', num: 3, name: 'coded themes',     kind: 'bar' },
+    { id: 'fig4', num: 4, name: 'calibration over time', kind: 'line' },
+  ];
+  return (
+    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '220px 1fr 320px', overflow: 'hidden' }}>
+
+      {/* figure list */}
+      <div style={{ borderRight: `1px solid ${RA.line}`, padding: '16px 0', overflow: 'auto', background: RA.paper2 }}>
+        <div style={{ padding: '0 16px 10px', fontFamily: RA.mono, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.1, color: RA.ink3 }}>
+          Figures · 4
+        </div>
+        {figs.map(f => (
+          <button key={f.id} onClick={() => p.setSelected(f.id)} style={{
+            display: 'block', width: '100%', textAlign: 'left',
+            padding: '10px 16px', border: 'none', background: p.selected === f.id ? RA.paper : 'transparent',
+            borderLeft: p.selected === f.id ? `2px solid ${RA.accent}` : '2px solid transparent',
+            cursor: 'pointer', fontFamily: RA.sans,
+          }}>
+            <div style={{ fontSize: 11, color: RA.ink3, fontFamily: RA.mono, marginBottom: 2 }}>Fig {f.num}</div>
+            <div style={{ fontSize: 13, color: p.selected === f.id ? RA.ink : RA.ink2 }}>{f.name}</div>
+          </button>
+        ))}
+        <div style={{ padding: '16px', marginTop: 8, borderTop: `1px solid ${RA.line}` }}>
+          <button style={addBtn()}>+ new figure</button>
+        </div>
+      </div>
+
+      {/* canvas */}
+      <div style={{ padding: 24, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
+          <div>
+            <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3 }}>fig2_main.R · last run 4m ago</div>
+            <div style={{ fontFamily: RA.serif, fontSize: 20, marginTop: 4 }}>Trust by task type</div>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button style={miniBtn()}>↻ re-run</button>
+            <button style={miniBtn()}>export PDF</button>
+            <button style={miniBtn(true)}>insert → §3.2</button>
+          </div>
+        </div>
+
+        <FigureCanvas palette={p.palette} smoothing={p.smoothing} showCI={p.showCI} />
+
+        <div style={{ marginTop: 14, padding: 14, background: RA.code, borderRadius: 4, fontFamily: RA.mono, fontSize: 11.5, color: '#d4d4d4', lineHeight: 1.65 }}>
+          <div style={{ color: RA.accentDeep, marginBottom: 4, fontSize: 10, letterSpacing: 0.1, textTransform: 'uppercase' }}>fig2_main.R · generated</div>
+          <div><span style={{ color: '#8ec07c' }}>library</span>(tidyverse)</div>
+          <div>df &lt;- <span style={{ color: '#8ec07c' }}>read_csv</span>(<span style={{ color: '#d79921' }}>"survey_clean.csv"</span>)</div>
+          <div>df |&gt; </div>
+          <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>ggplot</span>(<span style={{ color: '#8ec07c' }}>aes</span>(task, trust_ai, fill=task)) +</div>
+          <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_bar</span>(stat=<span style={{ color: '#d79921' }}>"summary"</span>, fun=mean) +</div>
+          {p.showCI && <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>geom_errorbar</span>(stat=<span style={{ color: '#d79921' }}>"summary"</span>, fun.data=mean_cl_normal) +</div>}
+          <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>scale_fill_manual</span>(values=c(<span style={{ color: '#d79921' }}>"{paletteHex(p.palette)[0]}"</span>, <span style={{ color: '#d79921' }}>"{paletteHex(p.palette)[1]}"</span>, <span style={{ color: '#d79921' }}>"{paletteHex(p.palette)[2]}"</span>)) +</div>
+          <div>&nbsp;&nbsp;<span style={{ color: '#8ec07c' }}>theme_minimal</span>()</div>
+        </div>
+      </div>
+
+      {/* tweaks */}
+      <div style={{ borderLeft: `1px solid ${RA.line}`, padding: 18, background: RA.paper2, overflow: 'auto' }}>
+        <div style={{ fontFamily: RA.mono, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.1, color: RA.ink3, marginBottom: 16 }}>
+          Tweaks · fig2
+        </div>
+
+        <Tweak label="Palette">
+          <div style={{ display: 'flex', gap: 6 }}>
+            {['warm','cool','mono','jewel'].map(k => (
+              <button key={k} onClick={() => p.setPalette(k)} style={{
+                padding: '6px 10px', fontSize: 11, fontFamily: RA.sans, cursor: 'pointer',
+                border: `1px solid ${p.palette === k ? RA.accent : RA.line}`,
+                background: p.palette === k ? RA.accentSoft : RA.paper,
+                color: p.palette === k ? RA.accentDeep : RA.ink2, borderRadius: 3,
+              }}>{k}</button>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 4, marginTop: 8 }}>
+            {paletteHex(p.palette).map((c, i) => (
+              <div key={i} style={{ width: 32, height: 18, background: c, borderRadius: 2 }} />
+            ))}
+          </div>
+        </Tweak>
+
+        <Tweak label="Smoothing" value={p.smoothing.toFixed(2)}>
+          <input type="range" min={0} max={1} step={0.05} value={p.smoothing}
+            onChange={e => p.setSmoothing(parseFloat(e.target.value))}
+            style={{ width: '100%', accentColor: RA.accent }} />
+        </Tweak>
+
+        <Tweak label="Confidence intervals">
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: RA.ink2, cursor: 'pointer' }}>
+            <input type="checkbox" checked={p.showCI} onChange={e => p.setShowCI(e.target.checked)} />
+            <span>Show 95% CI error bars</span>
+          </label>
+        </Tweak>
+
+        <Tweak label="Theme">
+          <select style={selectSty}>
+            <option>minimal</option><option>classic</option><option>bw</option>
+          </select>
+        </Tweak>
+
+        <Tweak label="Insert location">
+          <select style={selectSty}>
+            <option>§ 3.2 Results — Calibration</option>
+            <option>§ 3.1 Descriptives</option>
+            <option>§ 4 Discussion</option>
+            <option>Appendix A</option>
+          </select>
+        </Tweak>
+
+        <div style={{ marginTop: 20, padding: 10, background: RA.paper, border: `1px solid ${RA.line}`, borderRadius: 3 }}>
+          <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, marginBottom: 4 }}>VERSION HISTORY</div>
+          <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink2, lineHeight: 1.7 }}>
+            <div>v4 · now · <span style={{ color: RA.accent }}>current</span></div>
+            <div>v3 · 2h ago · CI added</div>
+            <div>v2 · yesterday · palette</div>
+            <div>v1 · 3d ago · first draft</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const selectSty = {
+  width: '100%', padding: '6px 8px', fontSize: 13, fontFamily: RA.sans,
+  border: `1px solid ${RA.line}`, background: RA.paper, color: RA.ink, borderRadius: 3,
+};
+
+function Tweak({ label, value, children }) {
+  return (
+    <div style={{ marginBottom: 18 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+        <span style={{ fontSize: 12, color: RA.ink2, fontWeight: 500 }}>{label}</span>
+        {value && <span style={{ fontFamily: RA.mono, fontSize: 11, color: RA.accent }}>{value}</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function paletteHex(k) {
+  const p = {
+    warm: ['#c86a4f', '#d89b6a', '#e8c080'],
+    cool: ['#4a6b8a', '#7a96b0', '#a8bcc8'],
+    mono: ['#2b2826', '#6a655f', '#b8b0a4'],
+    jewel: ['#7a3a52', '#4a6b3e', '#6a5a7a'],
+  };
+  return p[k] || p.warm;
+}
+
+function FigureCanvas({ palette, smoothing, showCI }) {
+  const colors = paletteHex(palette);
+  const data = [
+    { label: 'lit search', mean: 4.2, ci: 0.3 },
+    { label: 'data cleaning', mean: 3.7, ci: 0.35 },
+    { label: 'causal inference', mean: 2.1, ci: 0.4 },
+  ];
+  return (
+    <div style={{
+      background: RA.paper, border: `1px solid ${RA.line}`, borderRadius: 4,
+      padding: 28, display: 'flex', flexDirection: 'column', minHeight: 340,
+    }}>
+      <div style={{ fontSize: 13, fontFamily: RA.serif, marginBottom: 4 }}>Figure 2.</div>
+      <div style={{ fontSize: 12, color: RA.ink2, marginBottom: 20, fontFamily: RA.serif, fontStyle: 'italic' }}>
+        Researcher trust in AI outputs by task type (mean, 95% CI), N=312.
+      </div>
+      <svg viewBox="0 0 500 240" width="100%" style={{ maxHeight: 240 }}>
+        {/* axes */}
+        <line x1="60" y1="200" x2="480" y2="200" stroke={RA.ink} strokeWidth="1" />
+        <line x1="60" y1="30" x2="60" y2="200" stroke={RA.ink} strokeWidth="1" />
+        {/* y ticks */}
+        {[1,2,3,4,5].map(t => (
+          <g key={t}>
+            <line x1="57" y1={200 - (t-1)*34} x2="60" y2={200 - (t-1)*34} stroke={RA.ink} />
+            <text x="50" y={200 - (t-1)*34 + 4} fontSize="10" fill={RA.ink2} textAnchor="end" fontFamily={RA.mono}>{t}</text>
+          </g>
+        ))}
+        <text x="30" y="115" fontSize="11" fill={RA.ink2} textAnchor="middle" transform="rotate(-90, 30, 115)" fontFamily={RA.sans}>trust (1-5)</text>
+        {/* bars */}
+        {data.map((d, i) => {
+          const x = 110 + i * 130;
+          const h = (d.mean - 1) * 34;
+          const y = 200 - h;
+          const w = 60 - smoothing * 20; // "smoothing" modulates bar width as visual feedback
+          return (
+            <g key={d.label}>
+              <rect x={x - w/2} y={y} width={w} height={h} fill={colors[i]} opacity="0.85" />
+              {showCI && (
+                <g stroke={RA.ink} strokeWidth="1.2">
+                  <line x1={x} y1={y - d.ci * 34} x2={x} y2={y + d.ci * 34} />
+                  <line x1={x - 8} y1={y - d.ci * 34} x2={x + 8} y2={y - d.ci * 34} />
+                  <line x1={x - 8} y1={y + d.ci * 34} x2={x + 8} y2={y + d.ci * 34} />
+                </g>
+              )}
+              <text x={x} y="218" fontSize="11" fill={RA.ink2} textAnchor="middle" fontFamily={RA.sans}>{d.label}</text>
+              <text x={x} y={y - (showCI ? d.ci * 34 + 6 : 6)} fontSize="10" fill={RA.ink3} textAnchor="middle" fontFamily={RA.mono}>M={d.mean}</text>
+            </g>
+          );
+        })}
+      </svg>
+      <div style={{ marginTop: 12, fontSize: 11, color: RA.ink3, fontFamily: RA.mono, textAlign: 'center' }}>
+        source: survey_clean.csv · regenerated {new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}
+      </div>
+    </div>
+  );
+}
+
+function miniBtn(accent) {
+  return {
+    padding: '6px 12px', fontFamily: RA.sans, fontSize: 12, fontWeight: 500,
+    background: accent ? RA.accent : 'transparent',
+    color: accent ? RA.paper : RA.ink2,
+    border: `1px solid ${accent ? RA.accent : RA.line}`,
+    borderRadius: 4, cursor: 'pointer',
+  };
+}
+
+function addBtn() {
+  return {
+    width: '100%', padding: '6px 10px', fontFamily: RA.sans, fontSize: 12,
+    background: 'transparent', color: RA.ink2, border: `1px dashed ${RA.line}`, cursor: 'pointer', borderRadius: 3,
+  };
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<FiguresScreen />);
+</script>
+</body>
+</html>
