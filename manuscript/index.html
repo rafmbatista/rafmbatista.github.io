@@ -1,0 +1,357 @@
+<!DOCTYPE html><html lang="en"><head>
+
+
+
+
+
+
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Manuscript — an imagined editor for research writing</title>
+<meta name="description" content="A walk through an imagined product for academic writing, mocked up by Claude Design.">
+<link rel="stylesheet" href="shared/tokens.css">
+<style>
+  html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+  body { padding-bottom: 40px; }
+  .container { max-width: 900px; }
+  .announce { font-size: var(--fs-sm); }
+
+  /* Welcome ------------------------------------------------------- */
+  .welcome { padding: 80px 24px 16px; }
+  .welcome h1 {
+    font-family: var(--font-serif); font-weight: 400;
+    font-size: clamp(44px, 6.5vw, 80px);
+    line-height: 1.02; letter-spacing: -0.02em;
+    margin: 0 0 24px;
+  }
+  .welcome h1 em { font-style: italic; color: var(--accent); }
+  .welcome p {
+    font-family: var(--font-serif);
+    font-size: clamp(19px, 1.7vw, 22px);
+    line-height: 1.55; color: var(--ink-2);
+    max-width: 680px; margin: 0;
+  }
+
+  /* Tour sections ------------------------------------------------- */
+  .tour { padding: 72px 24px 24px; }
+  .tour-kicker {
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 14px;
+  }
+
+  /* Bridge ------------------------------------------------------- */
+  .bridge {
+    padding: 36px 24px 16px;
+    max-width: 820px;
+  }
+  .bridge p {
+    font-family: var(--font-serif);
+    font-size: clamp(19px, 1.7vw, 23px);
+    line-height: 1.55; color: var(--ink);
+    margin: 0 0 18px; max-width: 720px;
+  }
+  .bridge a {
+    color: var(--accent); text-decoration: none;
+    border-bottom: 1px solid var(--accent-soft);
+    padding-bottom: 1px;
+    transition: border-color 120ms ease, color 120ms ease;
+  }
+  .bridge a:hover { color: var(--accent-deep); border-bottom-color: var(--accent); }
+  .bridge-aside {
+    font-family: var(--font-sans) !important;
+    font-size: 15px !important;
+    color: var(--ink-3) !important;
+    font-style: italic;
+  }
+
+  /* Mocks block — deep-dive links ------------------------------ */
+  .mocks {
+    padding: 80px 24px 40px;
+    border-top: 1px solid var(--line);
+    margin-top: 40px;
+  }
+  .mocks-kicker {
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-3); margin-bottom: 14px;
+  }
+  .mocks p {
+    font-family: var(--font-sans); font-size: 16px; line-height: 1.65;
+    color: var(--ink-2); max-width: 640px; margin: 0 0 24px;
+  }
+  .mocks-list {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 4px;
+    border-top: 1px solid var(--line);
+  }
+  .mocks-list li {
+    border-bottom: 1px solid var(--line);
+  }
+  .mocks-list a {
+    display: block; padding: 14px 4px;
+    font-family: var(--font-mono); font-size: 13px;
+    color: var(--ink); text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: color 120ms ease, padding-left 180ms ease;
+  }
+  .mocks-list a:hover { color: var(--accent); padding-left: 10px; }
+  .tour h2 {
+    font-family: var(--font-serif); font-weight: 400;
+    font-size: clamp(30px, 4vw, 44px);
+    line-height: 1.12; letter-spacing: -0.015em;
+    margin: 0 0 20px; color: var(--ink);
+    max-width: 800px;
+  }
+  .tour h2 em { font-style: italic; }
+  .tour p {
+    font-family: var(--font-sans); font-size: 17px;
+    line-height: 1.72; color: var(--ink-2);
+    max-width: 720px; margin: 0 0 18px;
+  }
+  .tour p em { font-style: italic; }
+  .tour .explore {
+    display: inline-block; margin-top: 12px; margin-bottom: 18px;
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); text-decoration: none;
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .tour .explore:hover { color: var(--accent-deep); border-bottom-color: var(--accent-deep); }
+
+  /* Screenshot frame ------------------------------------------- */
+  .shot {
+    margin: 32px 0 14px;
+    border: 1px solid var(--line); border-radius: 4px;
+    background: var(--paper); overflow: hidden;
+    box-shadow: 0 2px 6px rgba(22,24,26,0.05), 0 16px 32px rgba(22,24,26,0.08);
+  }
+  .shot img { display: block; width: 100%; height: auto; }
+
+  /* Closing ----------------------------------------------------- */
+  .closing {
+    padding: 96px 24px 48px;
+    border-top: 1px solid var(--line);
+    margin-top: 72px;
+  }
+  .closing h2 {
+    font-family: var(--font-serif); font-weight: 400;
+    font-size: clamp(32px, 4.5vw, 54px);
+    line-height: 1.05; letter-spacing: -0.015em;
+    margin: 0 0 22px;
+  }
+  .closing p {
+    font-family: var(--font-serif);
+    font-size: clamp(18px, 1.6vw, 21px);
+    line-height: 1.55; color: var(--ink-2);
+    max-width: 680px; margin: 0 0 18px;
+  }
+  .closing .back {
+    display: inline-block; margin-top: 20px;
+    font-family: var(--font-mono); font-size: var(--fs-sm);
+    color: var(--ink); text-decoration: underline;
+    text-decoration-color: var(--line); text-underline-offset: 4px;
+  }
+  .closing .back:hover { text-decoration-color: var(--ink); }
+  .closing p a {
+    color: var(--ink); text-decoration: none;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 1px;
+    transition: border-color 120ms ease;
+  }
+  .closing p a:hover { border-bottom-color: var(--ink); }
+
+  /* Wireframes appendix --------------------------------------- */
+  .wireframes-link {
+    padding: 40px 24px 56px;
+    border-top: 1px solid var(--line);
+    margin-top: 40px;
+  }
+  .wireframes-link .kicker {
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-3); margin-bottom: 12px;
+  }
+  .wireframes-link p {
+    font-family: var(--font-serif);
+    font-size: 16px; line-height: 1.6;
+    color: var(--ink-2);
+    max-width: 680px; margin: 0 0 14px;
+  }
+  .wireframes-link a {
+    font-family: var(--font-mono); font-size: var(--fs-sm);
+    color: var(--ink); text-decoration: none;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 1px;
+    transition: border-color 120ms ease;
+  }
+  .wireframes-link a:hover { border-bottom-color: var(--ink); }
+
+  @media (max-width: 720px) {
+    .welcome { padding: 56px 24px 12px; }
+    .tour { padding: 56px 24px 16px; }
+    .closing { padding: 72px 24px 40px; }
+    .wireframes-link { padding: 32px 24px 40px; }
+  }
+</style>
+</head>
+<body style="cursor: crosshair;" data-cc-id="cc-1">
+
+<!-- Announcement bar -->
+<div class="announce" data-cc-id="cc-1">
+  <span class="pill">Concept</span>
+  An imagined product, mocked up by <a href="https://www.anthropic.com/news/claude-design-anthropic-labs">Claude Design</a>.
+</div>
+
+<!-- Nav -->
+<header class="container">
+  <nav class="navbar">
+    <a class="wordmark" href="index.html">
+      <span class="dot"></span>
+      <span style="font-family: var(--font-serif); font-size: 20px;">Manuscript</span>
+    </a>
+    <div class="nav-links">
+      <a href="#materials">Materials</a>
+      <a href="#library">Library</a>
+      <a href="#data">Data</a>
+      <a href="#figures">Figures</a>
+      <a href="#paper">Paper</a>
+    </div>
+  </nav>
+</header>
+
+<!-- Welcome ------------------------------------------------------ -->
+<section class="container welcome">
+  <h1>Welcome to <em>Manuscript</em>.</h1>
+  <p>
+    An imagined product. Inspired by and mocked up by Claude Design for academic research.</p>
+</section>
+
+<!-- Bridge ---------------------------------------------------- -->
+<section class="container bridge">
+  <p>
+    If Manuscript existed, I could open it and find every part of a study in one place.
+    The <a href="#materials">instruments</a> I built — surveys, protocols, consent forms.
+    The <a href="#library">papers</a> I read in the run-up.
+    The <a href="#data">data</a> those instruments collected.
+    The <a href="#figures">figures</a> I drew from it.
+    And at the center of it all, the <a href="#paper">paper</a> itself.
+  </p>
+  <p class="bridge-aside">
+    What follows is a walk through what that might look like. None of it works.
+  </p>
+</section>
+
+<!-- 01 · Materials ---------------------------------------------- -->
+<section class="container tour" id="materials">
+  <div class="tour-kicker">01 — Materials</div>
+  <h2>Where a study begins.</h2>
+  <p>
+    Every empirical paper stands on its instruments–––the survey, the
+    interview protocol, the consent form, the pre-analysis plan. Most of us today save these in folders on our computer, if they are even saved at all.&nbsp;Some of us (or most of us at least some of the time), will download the survey from Qualtrics or the pre-registration from AsPredicted each and every time. In Manuscript they would sit together, versioned, so nothing is forgotten or overlooked.
+  </p>
+  <p>
+    For example, the pre-registration is a commit, not a PDF. Every deviation from the
+    plan is a row in an audit log that is visible, named, and quietly drafted into the
+    limitations paragraph for me to tighten later.
+  </p>
+
+  <a class="explore" href="screens/materials.html">Explore the full Materials screen →</a>
+
+  <figure class="shot">
+    <img src="shots/materials_frame.png" alt="Materials screen — preregistration audit">
+  </figure>
+</section>
+
+<!-- 02 · Library ------------------------------------------------ -->
+<section class="container tour" id="library" data-cc-id="cc-2">
+  <div class="tour-kicker" data-cc-id="cc-5">02 — Library</div>
+  <h2 data-cc-id="cc-4" style="">Knowledge is connected.</h2>
+  <p data-cc-id="cc-3">Manuscript could ingest a reading list, files, photos, or entire books, stored in a project library. It would borrow tools we see today in Google's NotebookLM or Obsidian, where your library is easily turned to a graph, where papers cluster by theme. For the papers you've read, you can collect excerpts. For those you haven't but cite because reviewers asked you to, the relevant sections are highlighted for you. Citations now serve as a nudge, when you include a source you'll be prompted to tie it back to an excerpt. No hallucinations---from the machine or the human---when you have to cite your sources this way.</p>
+
+  <a class="explore" href="screens/papers.html">Explore the full Library screen →</a>
+
+  <figure class="shot">
+    <img src="shots/papers_frame.png" alt="Library screen — paper cluster graph">
+  </figure>
+</section>
+
+<!-- 03 · Data --------------------------------------------------- -->
+<section class="container tour" id="data">
+  <div class="tour-kicker">03 — Data</div>
+  <h2 style="" data-cc-id="cc-6">Raw data is protected. Cleaned data is made accessible.</h2>
+  <p>
+    Raw and Clean live side by side. Raw is encrypted, PII-flagged, never leaves
+    the device. Clean is anonymized, pipeline-traced so viewers can see how it was cleaned, ready to deposit at OSF.
+    Manuscript would handle all types of data, helping you parse qualitative and quantitative insights alike. It could check for errors automatically and summarize descriptives easily.</p>
+  
+
+  <a class="explore" href="screens/data.html">Explore the full Data screen →</a>
+
+  <figure class="shot">
+    <img src="shots/data_frame.png" alt="Data screen — clean quantitative with refresh banner and pipeline">
+  </figure>
+</section>
+
+<!-- 04 · Figures ------------------------------------------------ -->
+<section class="container tour" id="figures">
+  <div class="tour-kicker">04 — Figures</div>
+  <h2>Figures are tuned instantly and visually.</h2>
+  <p>
+    In Manuscript a figure is a live R
+    script bound to clean data. Like Claude Design's "Tweaks" in Manuscript you could easily Tweak a palette, toggle error bars, swap the type of figure you want at the click of a button — the
+    figure redraws, the script regenerates, and the new version is easily saved into your manuscript. When the
+    data refreshes, the figure refreshes too. No more <em>re-export, re-paste, and hope
+    it's the right version</em>.
+  </p>
+
+  <a class="explore" href="screens/figures.html">Explore the full Figures screen →</a>
+
+  <figure class="shot">
+    <img src="shots/figures_frame.png" alt="Figures screen — editable figure with tweaks panel">
+  </figure>
+</section>
+
+<!-- 05 · Paper — live 3-tab ------------------------------------- -->
+<section class="container tour" id="paper" data-cc-id="cc-6">
+  <div class="tour-kicker">05 — Paper</div>
+  <h2 style="" data-cc-id="cc-7">And finally, the paper renders for any audience.</h2>
+  <p style="" data-cc-id="cc-8">
+    One file, three views. Draft is the work in progress with links back to specific analyses, datasets, and highlighted excerpts. Publication is what the journal
+    sees — typeset and polished.
+    Interactive renders what a reader sees on the web, where the numbers are live and
+    they can filter the data themselves. The text doesn't change between views;
+    the template does. Switching journals is switching a template, not
+    re-formatting.
+  </p>
+
+  <a class="explore" href="screens/manuscript.html">Explore the full Paper screen →</a>
+
+  <figure class="shot">
+    <img src="shots/manuscript_frame.png" alt="Paper screen — draft view with mode switcher" data-cc-id="cc-1">
+  </figure>
+</section>
+
+<!-- Closing ---------------------------------------------------- -->
+<section class="container closing" data-cc-id="cc-3">
+  <h2 data-cc-id="cc-2">None of this exists.</h2>
+  <p style="" data-cc-id="cc-2">But it could. The Library draws on features that can be found in Google's <a href="https://notebooklm.google.com/" target="_blank" rel="noopener">NotebookLM</a>, <a href="https://obsidian.md/" target="_blank" rel="noopener">Obsidian</a>, and <a href="https://devontechnologies.com/" target="_blank" rel="noopener" data-cc-id="cc-4">DEVONThink</a>4. <a href="https://claude.com/product/claude-code" target="_blank" rel="noopener">Claude Code</a> and OpenAI's <a href="https://openai.com/codex/" target="_blank" rel="noopener">Codex</a> have made cleaning, wrangling, analyzing, and visualizing data efficient and accessible. What's more, DEVONThink has shown us this can live on our personal machines, Manuscript would then serve as a wrapper, organizing the system most of us already use. Claude Design showed us that a system like this is not in the distant future, it both served as inspiration and assistant in mocking up the frontend.&nbsp;</p>
+  <p data-cc-id="cc-3" style="">
+    For an afternoon's worth of work, it was fun to imagine what the future holds for research. I think a tool like this would be disruptive for academia but not for academics. Academia relies on publications to judge new hires and decide who to promote, journals in turn profit immensely from a system of publish-or-perish. Academics dedicate countless hours to the publication process that goes far beyond the invention of new ideas and the actual research. I believe a tool like this, should its designers will it, could free up time for thinking.&nbsp;</p>
+  <a class="back" href="/notes.html#3" data-cc-id="cc-5">← back to the note</a>
+</section>
+
+<!-- Appendix: wireframes ---------------------------------------- -->
+<section class="container wireframes-link">
+  <div class="kicker">Appendix</div>
+  <p>
+    Before the polished mocks above, Claude Design produced a set of rough wireframes — notes, arrows, IA experiments. They're preserved as-is.
+  </p>
+  <a href="wireframes.html" target="_blank" rel="noopener">Explore the original wireframes →</a>
+</section>
+
+</body></html>
