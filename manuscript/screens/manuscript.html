@@ -392,7 +392,118 @@ function PubPane() {
 }
 
 // ── INTERACTIVE ─────────────────────────────────────────────────
+// Simulated per-cell data: mean trust (on 1–5) for every
+// (discipline × experience × task) combination. Calibrated so the
+// full-sample aggregates match the paper's headline claim:
+// search ≈ 4.2, causal ≈ 2.1, overall gap ≈ 2.1.
+const DISCIPLINES = [
+  { id: 'all',   label: 'All',        n: 312 },
+  { id: 'psy',   label: 'Psychology', n: 94 },
+  { id: 'eco',   label: 'Economics',  n: 72 },
+  { id: 'soc',   label: 'Sociology',  n: 58 },
+  { id: 'pol',   label: 'Pol. Sci.',  n: 48 },
+  { id: 'com',   label: 'Comm.',      n: 40 },
+];
+const EXPERIENCE = [
+  { id: 'all',     label: 'All levels',     n: 312 },
+  { id: 'novice',  label: 'Novices',        n: 148 },
+  { id: 'expert',  label: 'Experts',        n: 164 },
+];
+const TASKS = [
+  { id: 'search',    label: 'Literature search' },
+  { id: 'summarize', label: 'Summarization' },
+  { id: 'code',      label: 'Code generation' },
+  { id: 'stats',     label: 'Statistics' },
+  { id: 'causal',    label: 'Causal inference' },
+];
+
+// Means calibrated to the headline: search ≈ 4.2, causal ≈ 2.1 overall.
+// Within-discipline variation; experts slightly more cautious on causal,
+// slightly higher trust on search (calibration closes gap with experience).
+const MEANS = {
+  // discipline × experience × task → mean trust
+  psy:  { novice:  { search: 4.35, summarize: 4.05, code: 3.50, stats: 2.70, causal: 2.25 },
+          expert:  { search: 4.15, summarize: 3.85, code: 3.30, stats: 2.50, causal: 1.95 } },
+  eco:  { novice:  { search: 4.20, summarize: 3.90, code: 3.75, stats: 3.10, causal: 2.55 },
+          expert:  { search: 4.05, summarize: 3.65, code: 3.55, stats: 2.70, causal: 1.75 } },
+  soc:  { novice:  { search: 4.25, summarize: 3.95, code: 3.35, stats: 2.55, causal: 2.15 },
+          expert:  { search: 4.10, summarize: 3.75, code: 3.20, stats: 2.35, causal: 1.85 } },
+  pol:  { novice:  { search: 4.30, summarize: 4.00, code: 3.45, stats: 2.60, causal: 2.30 },
+          expert:  { search: 4.20, summarize: 3.80, code: 3.25, stats: 2.40, causal: 2.00 } },
+  com:  { novice:  { search: 4.40, summarize: 4.10, code: 3.20, stats: 2.45, causal: 2.40 },
+          expert:  { search: 4.25, summarize: 3.95, code: 3.05, stats: 2.20, causal: 2.10 } },
+};
+
+// Counts per (discipline × experience) — used for weighted aggregation.
+const COUNTS = {
+  psy: { novice: 44, expert: 50 },
+  eco: { novice: 32, expert: 40 },
+  soc: { novice: 28, expert: 30 },
+  pol: { novice: 24, expert: 24 },
+  com: { novice: 20, expert: 20 },
+};
+
+function weightedMean(disciplineId, experienceId, taskId) {
+  const disciplines = disciplineId === 'all' ? ['psy','eco','soc','pol','com'] : [disciplineId];
+  const experiences = experienceId === 'all' ? ['novice','expert'] : [experienceId];
+  let sum = 0, n = 0;
+  for (const d of disciplines) {
+    for (const e of experiences) {
+      const w = COUNTS[d][e];
+      sum += MEANS[d][e][taskId] * w;
+      n += w;
+    }
+  }
+  return { mean: sum / n, n };
+}
+
+function filteredMeans(disciplineId, experienceId) {
+  return TASKS.map(t => ({ ...t, ...weightedMean(disciplineId, experienceId, t.id) }));
+}
+
 function InteractivePane() {
+  const [discipline, setDiscipline] = useState('all');
+  const [experience, setExperience] = useState('all');
+  const [taskA, setTaskA] = useState('search');
+  const [taskB, setTaskB] = useState('causal');
+  const [pulseKey, setPulseKey] = useState(0);
+
+  // Recompute on any change
+  const data = React.useMemo(() => filteredMeans(discipline, experience), [discipline, experience]);
+  const mA = data.find(d => d.id === taskA);
+  const mB = data.find(d => d.id === taskB);
+  const delta = Math.abs(mA.mean - mB.mean);
+  const subsampleN = mA.n; // same n across tasks in this design
+
+  // Full-sample reference (what the paper itself reports)
+  const fullData = React.useMemo(() => filteredMeans('all', 'all'), []);
+  const fullDelta = Math.abs(
+    fullData.find(d => d.id === taskA).mean - fullData.find(d => d.id === taskB).mean
+  );
+
+  React.useEffect(() => {
+    setPulseKey(k => k + 1);
+  }, [discipline, experience, taskA, taskB]);
+
+  const disciplineLabel = DISCIPLINES.find(d => d.id === discipline).label.toLowerCase();
+  const expLabel = experience === 'all' ? '' : ` (${EXPERIENCE.find(e => e.id === experience).label.toLowerCase()} only)`;
+
+  // Sensitivity sentence
+  const diffFromFull = delta - fullDelta;
+  const sensitivity = (() => {
+    const abs = Math.abs(diffFromFull);
+    if (discipline === 'all' && experience === 'all') {
+      return `This is the full-sample result reported in the paper.`;
+    }
+    if (abs < 0.15) {
+      return `With this subsample (n=${subsampleN}, ${disciplineLabel}${expLabel}), the calibration gap is Δ=${delta.toFixed(2)} — ~the same as the full-sample Δ=${fullDelta.toFixed(2)}. The claim holds.`;
+    }
+    if (diffFromFull < 0) {
+      return `With this subsample (n=${subsampleN}, ${disciplineLabel}${expLabel}), the calibration gap shrinks to Δ=${delta.toFixed(2)} — smaller than the full-sample Δ=${fullDelta.toFixed(2)}. The claim weakens.`;
+    }
+    return `With this subsample (n=${subsampleN}, ${disciplineLabel}${expLabel}), the calibration gap widens to Δ=${delta.toFixed(2)} — larger than the full-sample Δ=${fullDelta.toFixed(2)}. The claim strengthens.`;
+  })();
+
   return (
     <div style={{ flex: 1, overflow: 'auto', padding: '36px 56px', background: RA.paper, position: 'relative' }}>
       <div style={{ maxWidth: 700, margin: '0 auto' }}>
@@ -401,7 +512,7 @@ function InteractivePane() {
           color: RA.pencil, borderRadius: 3, fontSize: 12, marginBottom: 24,
           fontFamily: RA.mono, letterSpacing: 0.05,
         }}>
-          ↺ Interactive mode &mdash; numbers are live. Move the sliders; the paper recomputes.
+          ↺ Interactive mode — numbers are live. Filter the sample or change the task comparison; the paper recomputes.
         </div>
 
         <h1 style={{ fontFamily: RA.serif, fontSize: 32, fontWeight: 400, lineHeight: 1.1, margin: '0 0 24px' }}>
@@ -409,67 +520,72 @@ function InteractivePane() {
         </h1>
 
         <H2>Results</H2>
-        <P>
-          Across all participants, mean trust was <LivePill>M=3.4</LivePill>. Filter by discipline:
-        </P>
 
+        {/* Discipline filter */}
+        <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase', marginBottom: 6 }}>
+          Filter by discipline
+        </div>
+        <div style={{ display: 'flex', gap: 6, margin: '0 0 14px', flexWrap: 'wrap' }}>
+          {DISCIPLINES.map(d => (
+            <FilterChip key={d.id} active={d.id === discipline} onClick={() => setDiscipline(d.id)}>
+              {d.label} ({d.n})
+            </FilterChip>
+          ))}
+        </div>
+
+        <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase', marginBottom: 6 }}>
+          Experience level
+        </div>
         <div style={{ display: 'flex', gap: 6, margin: '0 0 20px', flexWrap: 'wrap' }}>
-          <FilterChip active>All (312)</FilterChip>
-          <FilterChip>Psychology (94)</FilterChip>
-          <FilterChip>Economics (72)</FilterChip>
-          <FilterChip>Sociology (58)</FilterChip>
-          <FilterChip>Pol. Sci. (48)</FilterChip>
-          <FilterChip>Comm. (40)</FilterChip>
+          {EXPERIENCE.map(e => (
+            <FilterChip key={e.id} active={e.id === experience} onClick={() => setExperience(e.id)}>
+              {e.label} ({e.n})
+            </FilterChip>
+          ))}
         </div>
 
         <P>
-          Trust varied by task type. For <b>literature search</b>, mean trust was <LivePill>M=4.2</LivePill>{' '}
-          (95% CI: 4.07–4.33). For <b>causal inference</b>, <LivePill>M=2.1</LivePill> (1.95–2.25).
-          The gap between these is <LivePill>Δ=2.1</LivePill>.
+          In this subsample (n=<LivePill key={'n'+pulseKey}>{subsampleN}</LivePill>),
+          mean trust for <b>{mA.label.toLowerCase()}</b> was{' '}
+          <LivePill key={'ma'+pulseKey}>M={mA.mean.toFixed(2)}</LivePill>.
+          For <b>{mB.label.toLowerCase()}</b>, <LivePill key={'mb'+pulseKey}>M={mB.mean.toFixed(2)}</LivePill>.
+          The calibration gap is <LivePill key={'d'+pulseKey}>Δ={delta.toFixed(2)}</LivePill>.
         </P>
 
         {/* Interactive chart */}
         <div style={{ border: `1px solid ${RA.line}`, background: RA.paper, padding: 18, margin: '12px 0 20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
-            <div style={{ fontFamily: RA.serif, fontSize: 15 }}>Fig. 2 · Calibration by task</div>
-            <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3 }}>↺ recomputed 2s ago</div>
+            <div style={{ fontFamily: RA.serif, fontSize: 15 }}>
+              Fig. 2 · Trust by task — {disciplineLabel}{expLabel || ', all levels'}
+            </div>
+            <div key={'ts'+pulseKey} style={{ fontFamily: RA.mono, fontSize: 11, color: RA.accent }}>
+              ↺ recomputed just now
+            </div>
           </div>
-          <svg viewBox="0 0 500 200" width="100%" height="200">
-            <path d="M 30 170 Q 130 60 260 90 T 470 60" stroke={RA.accent} strokeWidth="2.5" fill="none"/>
-            <path d="M 30 175 Q 130 130 260 140 T 470 120" stroke={RA.pencil} strokeWidth="2" fill="none" strokeDasharray="4 3"/>
-            <path d="M 30 160 Q 130 50 260 80 T 470 50" stroke={RA.accent} strokeWidth="8" fill="none" opacity="0.15"/>
-            <line x1="30" y1="180" x2="470" y2="180" stroke={RA.ink3} strokeWidth="0.5"/>
-            <line x1="30" y1="20" x2="30" y2="180" stroke={RA.ink3} strokeWidth="0.5"/>
-            {[1,2,3,4,5].map((n,i) => <text key={n} x="22" y={180 - i*35} textAnchor="end" fontSize="9" fill={RA.ink3}>{n}</text>)}
-            {['search','summarize','code','stats','causal'].map((t,i) => (
-              <text key={t} x={30 + i*110} y="195" fontSize="10" fill={RA.ink3}>{t}</text>
-            ))}
-            <g transform="translate(360, 30)" fontSize="10" fill={RA.ink2} fontFamily={RA.sans}>
-              <rect x="0" y="0" width="110" height="36" fill="white" stroke={RA.line}/>
-              <line x1="6" y1="10" x2="18" y2="10" stroke={RA.accent} strokeWidth="2.5"/>
-              <text x="22" y="13">novice (n=148)</text>
-              <line x1="6" y1="24" x2="18" y2="24" stroke={RA.pencil} strokeWidth="2" strokeDasharray="3 2"/>
-              <text x="22" y="27">expert (n=164)</text>
-            </g>
-          </svg>
+          <LiveChart data={data} taskA={taskA} taskB={taskB} pulseKey={pulseKey} />
 
-          {/* Interactive controls */}
+          {/* Task-pair controls */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 14, paddingTop: 14, borderTop: `1px solid ${RA.lineSoft}` }}>
             <div>
-              <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase', marginBottom: 4 }}>Smoothing</div>
-              <div style={{ position: 'relative', height: 6, background: RA.paper2, borderRadius: 3 }}>
-                <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '55%', background: RA.accent, borderRadius: 3 }} />
-                <div style={{ position: 'absolute', left: '55%', top: -4, width: 14, height: 14, background: RA.ink, borderRadius: '50%', transform: 'translateX(-50%)' }} />
-              </div>
+              <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase', marginBottom: 4 }}>Compare task A</div>
+              <TaskSelect value={taskA} onChange={setTaskA} exclude={taskB} />
             </div>
             <div>
-              <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase', marginBottom: 4 }}>Bootstraps · 5000</div>
-              <div style={{ position: 'relative', height: 6, background: RA.paper2, borderRadius: 3 }}>
-                <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '80%', background: RA.accent, borderRadius: 3 }} />
-                <div style={{ position: 'absolute', left: '80%', top: -4, width: 14, height: 14, background: RA.ink, borderRadius: '50%', transform: 'translateX(-50%)' }} />
-              </div>
+              <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase', marginBottom: 4 }}>…against task B</div>
+              <TaskSelect value={taskB} onChange={setTaskB} exclude={taskA} />
             </div>
           </div>
+        </div>
+
+        {/* Sensitivity note — autorewrites */}
+        <div style={{
+          padding: '12px 14px', background: RA.paper2, borderLeft: `3px solid ${RA.accent}`,
+          borderRadius: 3, marginBottom: 20, fontSize: 13, lineHeight: 1.55, color: RA.ink2,
+        }}>
+          <span style={{ fontFamily: RA.mono, fontSize: 10, color: RA.accent, letterSpacing: 0.1, textTransform: 'uppercase', marginRight: 8 }}>
+            sensitivity note
+          </span>
+          <span key={'s'+pulseKey} style={{ fontFamily: RA.serif, fontSize: 14 }}>{sensitivity}</span>
         </div>
 
         <P>
@@ -481,19 +597,104 @@ function InteractivePane() {
   );
 }
 
-function LivePill({ children }) {
-  return <span style={{ fontFamily: RA.mono, fontSize: 13, color: RA.accent, background: RA.accentSoft, padding: '1px 6px', borderRadius: 2, border: `1px solid ${RA.accent}` }}>{children}</span>;
-}
-function FilterChip({ active, children }) {
+function TaskSelect({ value, onChange, exclude }) {
   return (
-    <span style={{
-      padding: '4px 10px', borderRadius: 999,
-      fontFamily: RA.mono, fontSize: 11,
-      border: `1px solid ${active ? RA.ink : RA.line}`,
-      background: active ? RA.ink : 'transparent',
-      color: active ? RA.paper : RA.ink2,
-      cursor: 'pointer',
-    }}>{children}</span>
+    <select
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      style={{
+        width: '100%', padding: '6px 10px', fontSize: 12, fontFamily: RA.sans,
+        border: `1px solid ${RA.line}`, borderRadius: 3, background: RA.paper, color: RA.ink,
+      }}
+    >
+      {TASKS.map(t => (
+        <option key={t.id} value={t.id} disabled={t.id === exclude}>{t.label}</option>
+      ))}
+    </select>
+  );
+}
+
+// Chart — bars for each task; A & B highlighted in accent; others muted.
+function LiveChart({ data, taskA, taskB, pulseKey }) {
+  const W = 500, H = 220, padL = 40, padR = 20, padT = 20, padB = 40;
+  const innerW = W - padL - padR, innerH = H - padT - padB;
+  const yScale = v => padT + (5 - v) / 4 * innerH;
+  const barW = innerW / data.length * 0.55;
+  const slot = innerW / data.length;
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H}>
+      {/* Y gridlines */}
+      {[1,2,3,4,5].map(n => (
+        <g key={n}>
+          <line x1={padL} y1={yScale(n)} x2={W - padR} y2={yScale(n)} stroke={RA.lineSoft} strokeWidth="0.8" />
+          <text x={padL - 8} y={yScale(n) + 3} textAnchor="end" fontSize="9.5" fill={RA.ink3} fontFamily={RA.mono}>{n}</text>
+        </g>
+      ))}
+      {/* Axis */}
+      <line x1={padL} y1={padT} x2={padL} y2={H - padB} stroke={RA.ink3} strokeWidth="0.6" />
+      <line x1={padL} y1={H - padB} x2={W - padR} y2={H - padB} stroke={RA.ink3} strokeWidth="0.6" />
+
+      {/* Bars */}
+      {data.map((d, i) => {
+        const x = padL + i * slot + (slot - barW) / 2;
+        const y = yScale(d.mean);
+        const h = (H - padB) - y;
+        const isHighlight = d.id === taskA || d.id === taskB;
+        const color = isHighlight ? RA.accent : RA.ink3;
+        const op = isHighlight ? 1 : 0.35;
+        return (
+          <g key={d.id + pulseKey} style={{ transition: 'opacity 200ms' }}>
+            <rect
+              x={x} y={y} width={barW} height={h}
+              fill={color} opacity={op}
+              style={{ transition: 'y 360ms cubic-bezier(.4,.2,.2,1), height 360ms cubic-bezier(.4,.2,.2,1), fill 200ms, opacity 200ms' }}
+            />
+            <text x={x + barW / 2} y={y - 5} textAnchor="middle" fontSize="10" fill={color} fontFamily={RA.mono} fontWeight={isHighlight ? 600 : 400} opacity={op}>
+              {d.mean.toFixed(2)}
+            </text>
+            <text x={x + barW / 2} y={H - padB + 14} textAnchor="middle" fontSize="10" fill={isHighlight ? RA.ink : RA.ink3} fontFamily={RA.sans} fontWeight={isHighlight ? 600 : 400}>
+              {d.label.split(' ')[0].toLowerCase()}
+            </text>
+          </g>
+        );
+      })}
+
+      {/* Y axis label */}
+      <text x={10} y={padT - 6} fontSize="9.5" fill={RA.ink3} fontFamily={RA.mono}>Trust (1–5)</text>
+    </svg>
+  );
+}
+
+function LivePill({ children }) {
+  return (
+    <span
+      style={{
+        fontFamily: RA.mono, fontSize: 13, color: RA.accent,
+        background: RA.accentSoft, padding: '1px 6px', borderRadius: 2,
+        border: `1px solid ${RA.accent}`,
+        animation: 'livePulse 500ms ease-out',
+        display: 'inline-block',
+      }}
+    >
+      <style>{`@keyframes livePulse { 0% { background: ${RA.accent}; color: white; } 100% { background: ${RA.accentSoft}; color: ${RA.accent}; } }`}</style>
+      {children}
+    </span>
+  );
+}
+function FilterChip({ active, onClick, children }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        padding: '4px 10px', borderRadius: 999,
+        fontFamily: RA.mono, fontSize: 11,
+        border: `1px solid ${active ? RA.ink : RA.line}`,
+        background: active ? RA.ink : 'transparent',
+        color: active ? RA.paper : RA.ink2,
+        cursor: 'pointer',
+      }}
+    >{children}</button>
   );
 }
 

@@ -209,43 +209,254 @@ function ConsentPreview() {
 }
 
 function StimuliPreview() {
+  const [tab, setTab] = useState('cards');
+  const [selectedStim, setSelectedStim] = useState(0);
+
   const stim = [
-    { name: '01_lit_search_accurate.md',   task: 'literature search', condition: 'accurate' },
-    { name: '02_lit_search_hallucinated.md', task: 'literature search', condition: 'hallucinated' },
-    { name: '03_data_clean_correct.md',    task: 'data cleaning',    condition: 'correct' },
-    { name: '04_data_clean_wrong_dedup.md',task: 'data cleaning',    condition: 'subtle error' },
-    { name: '05_causal_correct.md',        task: 'causal inference', condition: 'correct' },
-    { name: '06_causal_confounded.md',     task: 'causal inference', condition: 'confounded' },
-    { name: '07_writing_clear.md',         task: 'writing',          condition: 'clear' },
-    { name: '08_writing_vague.md',         task: 'writing',          condition: 'vague' },
+    {
+      file: '01_lit_search_accurate.md', task: 'Literature search', condition: 'accurate',
+      prompt: 'Summarize recent findings on calibration of expert judgement under uncertainty.',
+      output: 'Chen & Alvarez (2023, Psychological Science) found that experts over-estimated their accuracy by 14 percentage points on novel tasks. Calibration improved with immediate feedback but not with delayed feedback. These findings align with earlier work by Kim et al. (2022) on metacognitive accuracy.',
+      note: 'All three citations exist and claims match the cited papers.',
+    },
+    {
+      file: '02_lit_search_hallucinated.md', task: 'Literature search', condition: 'hallucinated',
+      prompt: 'Summarize recent findings on calibration of expert judgement under uncertainty.',
+      output: 'Thompson et al. (2024, Journal of Behavioral Decision Making) showed that calibration training reduced overconfidence by 38%. This replicates Barker and Ostrowski (2021), who used the same protocol in a sample of physicians.',
+      note: 'Both citations are fabricated. Thompson et al. (2024) does not exist; Barker and Ostrowski (2021) is a nonexistent paper in a real journal.',
+    },
+    {
+      file: '03_data_clean_correct.md', task: 'Data cleaning', condition: 'correct',
+      prompt: 'Here is a CSV with 3,400 survey rows. Remove duplicates and attention-check failures.',
+      output: 'Dropped 47 rows where `response_id` was duplicated (keeping the most-complete response). Dropped 122 rows that failed the attention check (`q7 != "agree"`). Final N = 3,231. No rows removed on duration; sensitivity analysis recommended.',
+      note: 'Decisions match pre-registered cleaning rules exactly.',
+    },
+    {
+      file: '04_data_clean_wrong_dedup.md', task: 'Data cleaning', condition: 'subtle error',
+      prompt: 'Here is a CSV with 3,400 survey rows. Remove duplicates and attention-check failures.',
+      output: 'Dropped 104 rows where `email` was duplicated (keeping the first response). Dropped 122 rows that failed the attention check. Final N = 3,174.',
+      note: 'Subtle error: deduplicates on `email` rather than `response_id`, dropping legitimate re-consented participants. Easy to miss in review.',
+    },
+    {
+      file: '05_causal_correct.md', task: 'Causal inference', condition: 'correct',
+      prompt: 'Does AI-tool usage predict publication count? Analyze the attached panel data.',
+      output: 'Observational. A naive OLS shows β = 0.41 (p < .001), but this is confounded by career stage and field. Caution against causal interpretation without an IV or staggered adoption design. Correlation, not causation.',
+      note: 'Appropriately flags confounding and refuses a causal claim.',
+    },
+    {
+      file: '06_causal_confounded.md', task: 'Causal inference', condition: 'confounded',
+      prompt: 'Does AI-tool usage predict publication count? Analyze the attached panel data.',
+      output: 'Regressing publications on AI usage, β = 0.41 (p < .001, 95% CI [0.28, 0.54]). Researchers who use AI tools publish significantly more — a one-unit increase in usage predicts 0.4 additional publications per year.',
+      note: 'States a causal relationship from observational data. No mention of confounding, selection, or field differences.',
+    },
+    {
+      file: '07_writing_clear.md', task: 'Writing', condition: 'clear',
+      prompt: 'Rewrite this paragraph for a general-audience abstract.',
+      output: 'We asked 312 researchers how much they trust AI tools for different tasks. Trust was highest for looking up papers and lowest for drawing causal conclusions. This gap narrows with training, but it does not close.',
+      note: 'Concrete, ordered, plain language. Preserves the study\'s central finding.',
+    },
+    {
+      file: '08_writing_vague.md', task: 'Writing', condition: 'vague',
+      prompt: 'Rewrite this paragraph for a general-audience abstract.',
+      output: 'This study explores perceptions of AI in scientific contexts, leveraging a mixed-methods approach to illuminate multifaceted dimensions of trust and calibration across diverse research tasks.',
+      note: 'Uses abstract nouns ("perceptions", "dimensions"), zero numbers, zero findings. The content of the paper has disappeared.',
+    },
   ];
+
   return (
     <div>
       <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3, marginBottom: 12 }}>
         8 vignettes · 4 tasks × 2 conditions · randomized within-subject
       </div>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-        <thead>
-          <tr style={{ borderBottom: `1px solid ${RA.line}` }}>
-            {['file','task','condition'].map(h => (
-              <th key={h} style={{ padding: '8px 10px', textAlign: 'left', fontFamily: RA.mono, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.1, color: RA.ink3, fontWeight: 400 }}>{h}</th>
+
+      {/* Tab switcher */}
+      <div style={{ display: 'flex', gap: 2, marginBottom: 16, borderBottom: `1px solid ${RA.line}` }}>
+        {[
+          { id: 'cards',   label: 'Vignettes' },
+          { id: 'preview', label: 'Participant view' },
+          { id: 'matrix',  label: 'Design matrix' },
+        ].map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)} style={{
+            padding: '8px 14px', fontSize: 12, fontFamily: RA.mono,
+            background: 'transparent', border: 'none', cursor: 'pointer',
+            color: tab === t.id ? RA.ink : RA.ink3,
+            borderBottom: tab === t.id ? `2px solid ${RA.accent}` : '2px solid transparent',
+            marginBottom: -1, letterSpacing: 0.1, textTransform: 'uppercase',
+          }}>{t.label}</button>
+        ))}
+      </div>
+
+      {tab === 'cards'   && <StimCards stim={stim} />}
+      {tab === 'preview' && <StimParticipant stim={stim} idx={selectedStim} setIdx={setSelectedStim} />}
+      {tab === 'matrix'  && <StimMatrix stim={stim} />}
+    </div>
+  );
+}
+
+function StimCards({ stim }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {stim.map((s, i) => {
+        const good = ['accurate', 'correct', 'clear'].includes(s.condition);
+        const color = good ? '#4a5a42' : RA.accentDeep;
+        const bg = good ? '#e8ebe5' : RA.accentSoft;
+        return (
+          <div key={i} style={{
+            border: `1px solid ${RA.line}`, borderLeft: `3px solid ${good ? '#8aa378' : RA.accent}`,
+            borderRadius: 3, padding: '12px 14px', background: RA.paper,
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10, gap: 8 }}>
+              <div style={{ fontFamily: RA.mono, fontSize: 10.5, color: RA.ink3, textTransform: 'uppercase', letterSpacing: 0.1 }}>
+                {String(i + 1).padStart(2, '0')} · {s.task}
+              </div>
+              <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 999, background: bg, color, fontFamily: RA.mono, whiteSpace: 'nowrap' }}>
+                {s.condition}
+              </span>
+            </div>
+
+            <div style={{ fontFamily: RA.mono, fontSize: 9.5, color: RA.ink3, textTransform: 'uppercase', letterSpacing: 0.1, marginBottom: 4 }}>
+              prompt
+            </div>
+            <div style={{ fontFamily: RA.serif, fontSize: 12.5, color: RA.ink2, fontStyle: 'italic', lineHeight: 1.5, marginBottom: 10 }}>
+              {s.prompt}
+            </div>
+
+            <div style={{ fontFamily: RA.mono, fontSize: 9.5, color: RA.ink3, textTransform: 'uppercase', letterSpacing: 0.1, marginBottom: 4 }}>
+              AI output
+            </div>
+            <div style={{ fontFamily: RA.serif, fontSize: 13, color: RA.ink, lineHeight: 1.55, marginBottom: 10 }}>
+              {s.output}
+            </div>
+
+            <div style={{ paddingTop: 8, borderTop: `1px dashed ${RA.line}`, fontFamily: RA.serif, fontSize: 12, color: RA.ink3, fontStyle: 'italic', lineHeight: 1.5 }}>
+              <span style={{ fontFamily: RA.mono, fontStyle: 'normal', color: RA.accent, textTransform: 'uppercase', letterSpacing: 0.1, fontSize: 9.5, marginRight: 6 }}>
+                design
+              </span>
+              {s.note}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function StimParticipant({ stim, idx, setIdx }) {
+  const s = stim[idx];
+  return (
+    <div>
+      {/* Navigation */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+        <button onClick={() => setIdx((idx - 1 + stim.length) % stim.length)} style={miniBtn()}>← prev</button>
+        <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3 }}>
+          Vignette {idx + 1} of {stim.length} · <span style={{ color: RA.accent }}>{s.task} · {s.condition}</span>
+        </div>
+        <button onClick={() => setIdx((idx + 1) % stim.length)} style={miniBtn()}>next →</button>
+      </div>
+
+      {/* Qualtrics-style frame */}
+      <div style={{
+        border: `1px solid ${RA.line}`, background: '#fff', borderRadius: 3,
+        boxShadow: '0 1px 0 rgba(0,0,0,0.03)', overflow: 'hidden',
+      }}>
+        <div style={{ padding: '10px 18px', background: '#f8f7f2', borderBottom: `1px solid ${RA.line}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, letterSpacing: 0.1, textTransform: 'uppercase' }}>
+            Qualtrics · page {idx + 3} of 12 · progress: {Math.round(((idx + 3) / 12) * 100)}%
+          </span>
+          <span style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3 }}>trust-ai-study · v1.4</span>
+        </div>
+
+        <div style={{ padding: '28px 36px' }}>
+          <div style={{ fontFamily: RA.sans, fontSize: 14, color: RA.ink, marginBottom: 18, lineHeight: 1.55 }}>
+            Imagine you are a researcher. You asked an AI assistant the following:
+          </div>
+
+          <div style={{ padding: 14, background: '#f8f7f2', borderLeft: `3px solid ${RA.ink3}`, marginBottom: 20 }}>
+            <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.1 }}>Your prompt</div>
+            <div style={{ fontFamily: RA.serif, fontSize: 14, fontStyle: 'italic', color: RA.ink2, lineHeight: 1.5 }}>"{s.prompt}"</div>
+          </div>
+
+          <div style={{ padding: 16, background: '#fdfcf8', border: `1px solid ${RA.line}`, marginBottom: 24 }}>
+            <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.1 }}>AI response</div>
+            <div style={{ fontFamily: RA.serif, fontSize: 14, color: RA.ink, lineHeight: 1.6 }}>{s.output}</div>
+          </div>
+
+          <div style={{ fontFamily: RA.sans, fontSize: 14, color: RA.ink, marginBottom: 12 }}>
+            <b>Q{idx + 1}.</b> How much would you trust this response?
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, maxWidth: 480 }}>
+            <span style={{ fontSize: 11, color: RA.ink3, fontFamily: RA.sans }}>Not at all</span>
+            {[1,2,3,4,5].map(n => (
+              <label key={n} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                <span style={{ width: 22, height: 22, borderRadius: '50%', border: `1.5px solid ${RA.ink3}`, background: 'white' }} />
+                <span style={{ fontSize: 11, color: RA.ink3, fontFamily: RA.mono }}>{n}</span>
+              </label>
             ))}
-          </tr>
-        </thead>
-        <tbody>
-          {stim.map(s => (
-            <tr key={s.name} style={{ borderBottom: `1px solid ${RA.lineSoft}` }}>
-              <td style={{ padding: '8px 10px', fontFamily: RA.mono, fontSize: 12, color: RA.ink }}>{s.name}</td>
-              <td style={{ padding: '8px 10px', color: RA.ink2 }}>{s.task}</td>
-              <td style={{ padding: '8px 10px' }}>
-                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, background: s.condition.includes('correct') || s.condition === 'accurate' || s.condition === 'clear' ? '#e8ebe5' : RA.accentSoft, color: s.condition.includes('correct') || s.condition === 'accurate' || s.condition === 'clear' ? '#4a5a42' : RA.accentDeep, fontFamily: RA.mono }}>
-                  {s.condition}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+            <span style={{ fontSize: 11, color: RA.ink3, fontFamily: RA.sans }}>Completely</span>
+          </div>
+
+          <div style={{ marginTop: 20, fontFamily: RA.sans, fontSize: 14, color: RA.ink, marginBottom: 8 }}>
+            <b>Q{idx + 1}b.</b> What, if anything, would you verify before using this?
+          </div>
+          <div style={{ height: 56, border: `1px solid ${RA.line}`, background: 'white', borderRadius: 2 }} />
+        </div>
+      </div>
+
+      <div style={{ marginTop: 14, padding: 12, background: RA.paper2, fontSize: 12, color: RA.ink3, fontStyle: 'italic', fontFamily: RA.serif, lineHeight: 1.5, borderRadius: 3 }}>
+        <span style={{ fontFamily: RA.mono, fontStyle: 'normal', color: RA.accent, marginRight: 6 }}>note to reviewer:</span>
+        {s.note}
+      </div>
+    </div>
+  );
+}
+
+function StimMatrix({ stim }) {
+  const tasks = ['Literature search', 'Data cleaning', 'Causal inference', 'Writing'];
+  const cond = ['good', 'bad'];
+  const goodLabels = { 'Literature search': 'accurate', 'Data cleaning': 'correct', 'Causal inference': 'correct', 'Writing': 'clear' };
+
+  const cellFor = (task, kind) => {
+    const target = kind === 'good' ? goodLabels[task] : null;
+    return stim.find(s => s.task === task && (kind === 'good' ? s.condition === target : s.condition !== goodLabels[task]));
+  };
+
+  return (
+    <div>
+      <div style={{ fontFamily: RA.mono, fontSize: 11, color: RA.ink3, marginBottom: 14, fontStyle: 'italic' }}>
+        Fully crossed 4 × 2 design. Within-subject; order randomized.
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr 1fr', gap: 1, background: RA.line, border: `1px solid ${RA.line}` }}>
+        <div style={{ background: RA.paper2, padding: '12px 14px', fontFamily: RA.mono, fontSize: 10, color: RA.ink3, textTransform: 'uppercase', letterSpacing: 0.1 }}>
+          task \ condition
+        </div>
+        <div style={{ background: '#e8ebe5', padding: '12px 14px', fontFamily: RA.mono, fontSize: 10, color: '#4a5a42', textTransform: 'uppercase', letterSpacing: 0.1, textAlign: 'center' }}>
+          well-formed
+        </div>
+        <div style={{ background: RA.accentSoft, padding: '12px 14px', fontFamily: RA.mono, fontSize: 10, color: RA.accentDeep, textTransform: 'uppercase', letterSpacing: 0.1, textAlign: 'center' }}>
+          seeded flaw
+        </div>
+
+        {tasks.map(task => (
+          <React.Fragment key={task}>
+            <div style={{ background: RA.paper, padding: '14px', fontFamily: RA.serif, fontSize: 14, color: RA.ink }}>
+              {task}
+            </div>
+            {cond.map(k => {
+              const cell = cellFor(task, k);
+              return (
+                <div key={k} style={{ background: RA.paper, padding: 14, minHeight: 100 }}>
+                  <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.accent, marginBottom: 6 }}>
+                    {cell.condition}
+                  </div>
+                  <div style={{ fontFamily: RA.serif, fontSize: 12.5, color: RA.ink2, lineHeight: 1.5 }}>
+                    {cell.output.length > 180 ? cell.output.slice(0, 175) + '…' : cell.output}
+                  </div>
+                </div>
+              );
+            })}
+          </React.Fragment>
+        ))}
+      </div>
     </div>
   );
 }
