@@ -169,7 +169,7 @@ const SECTION_ORDER = ['§ 1 Introduction', '§ 2 Methods', '§ 3 Results', '§ 
 function LibraryScreen() {
   const [selected, setSelected] = useState('shah2024');
   const [view, setView] = useState('clusters');
-  const [trace, setTrace] = useState(true);
+  const [rightTab, setRightTab] = useState('detail');
 
   return (
     <>
@@ -184,7 +184,7 @@ function LibraryScreen() {
 
       <MockFrame title="claude-ra · library · 47 papers" height={740}>
         <ProjectRail active="papers" />
-        <LibraryBody selected={selected} setSelected={setSelected} view={view} setView={setView} trace={trace} setTrace={setTrace} />
+        <LibraryBody selected={selected} setSelected={setSelected} view={view} setView={setView} rightTab={rightTab} setRightTab={setRightTab} />
       </MockFrame>
 
       <div className="container" style={{ padding: '32px 24px 0' }}>
@@ -209,17 +209,18 @@ function LN({ num, children }) {
   );
 }
 
-function LibraryBody({ selected, setSelected, view, setView, trace, setTrace }) {
+function LibraryBody({ selected, setSelected, view, setView, rightTab, setRightTab }) {
+  const trace = rightTab === 'trace';
   return (
     <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 380px', overflow: 'hidden' }}>
-      <LeftPane selected={selected} setSelected={setSelected} view={view} setView={setView} trace={trace} setTrace={setTrace} />
-      <PaperDetail selected={selected} />
+      <LeftPane selected={selected} setSelected={setSelected} view={view} setView={setView} trace={trace} />
+      <RightPanel selected={selected} rightTab={rightTab} setRightTab={setRightTab} />
     </div>
   );
 }
 
 // ── LEFT PANE (switches by view) ─────────────────────────────────────
-function LeftPane({ selected, setSelected, view, setView, trace, setTrace }) {
+function LeftPane({ selected, setSelected, view, setView, trace }) {
   return (
     <div style={{ position: 'relative', overflow: 'hidden', background: RA.paper, display: 'flex', flexDirection: 'column' }}>
       {/* toolbar */}
@@ -242,26 +243,6 @@ function LeftPane({ selected, setSelected, view, setView, trace, setTrace }) {
           </select>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          {view === 'clusters' && (
-            <label style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              padding: '4px 10px',
-              border: `1px solid ${trace ? RA.accent : RA.line}`,
-              borderRadius: 999, cursor: 'pointer',
-              background: trace ? RA.accentSoft : RA.paper,
-              fontFamily: RA.mono, fontSize: 10.5,
-              color: trace ? RA.accentDeep : RA.ink3,
-              letterSpacing: 0.1, textTransform: 'uppercase', userSelect: 'none',
-            }}>
-              <input
-                type="checkbox"
-                checked={trace}
-                onChange={e => setTrace(e.target.checked)}
-                style={{ margin: 0, accentColor: RA.accent, width: 12, height: 12 }}
-              />
-              trace
-            </label>
-          )}
           <button style={miniBtn()}>+ import</button>
           <button style={miniBtn()}>from Zotero</button>
           <button style={miniBtn(true)}>export .bib</button>
@@ -279,13 +260,14 @@ function LeftPane({ selected, setSelected, view, setView, trace, setTrace }) {
 
 // ── VIEWS ────────────────────────────────────────────────────────────
 // Manuscript sections rendered as anchors along the right edge of the SVG.
+// Full section names live in the right panel (TraceView); in-SVG labels are compact.
 const SECTION_ANCHORS = [
-  { label: '§1 Intro',       y: 100, id: '§ 1 Introduction' },
-  { label: '§2 Methods',     y: 210, id: '§ 2 Methods' },
-  { label: '§3 Results',     y: 320, id: '§ 3 Results' },
-  { label: '§4 Discussion',  y: 430, id: '§ 4 Discussion' },
+  { label: '§1', y: 100, id: '§ 1 Introduction' },
+  { label: '§2', y: 210, id: '§ 2 Methods' },
+  { label: '§3', y: 320, id: '§ 3 Results' },
+  { label: '§4', y: 430, id: '§ 4 Discussion' },
 ];
-const ANCHOR_X = 650;
+const ANCHOR_X = 692;
 
 function ClustersView({ selected, setSelected, trace }) {
   const selPaper = PAPERS.find(p => p.id === selected);
@@ -367,16 +349,16 @@ function ClustersView({ selected, setSelected, trace }) {
       {/* section anchors on right edge — only visible in trace mode */}
       {trace && (
         <g>
-          <line x1={ANCHOR_X - 4} y1={70} x2={ANCHOR_X - 4} y2={460} stroke={RA.line} strokeWidth="1" />
-          <text x={ANCHOR_X + 4} y={54} fontSize="9.5" fill={RA.ink3} fontFamily={RA.mono} style={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>
-            manuscript →
+          <line x1={ANCHOR_X} y1={70} x2={ANCHOR_X} y2={460} stroke={RA.line} strokeWidth="1" />
+          <text x={ANCHOR_X - 6} y={54} fontSize="9.5" fill={RA.ink3} fontFamily={RA.mono} textAnchor="end" style={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            ← manuscript →
           </text>
           {SECTION_ANCHORS.map(a => {
             const isCitedHere = selPaper && selPaper.sections.includes(a.id);
             return (
               <g key={a.id}>
                 <circle cx={ANCHOR_X} cy={a.y} r={isCitedHere ? 5 : 3.5} fill={isCitedHere ? RA.accent : RA.paper} stroke={isCitedHere ? RA.accent : RA.ink3} strokeWidth="1.2" />
-                <text x={ANCHOR_X + 12} y={a.y + 4} fontSize="11" fill={isCitedHere ? RA.ink : RA.ink3} fontFamily={RA.mono} fontWeight={isCitedHere ? 600 : 400}>
+                <text x={ANCHOR_X - 8} y={a.y + 4} fontSize="11" fill={isCitedHere ? RA.ink : RA.ink3} fontFamily={RA.mono} fontWeight={isCitedHere ? 600 : 400} textAnchor="end">
                   {a.label}
                 </text>
               </g>
@@ -429,7 +411,7 @@ function ClustersView({ selected, setSelected, trace }) {
             // Curved path using a mid control point for visual separation
             const mx = (selPaper.x + ANCHOR_X) / 2 + 20;
             const my = (selPaper.y + anchor.y) / 2;
-            const d = `M ${selPaper.x} ${selPaper.y} Q ${mx} ${my} ${ANCHOR_X - 2} ${anchor.y}`;
+            const d = `M ${selPaper.x} ${selPaper.y} Q ${mx} ${my} ${ANCHOR_X} ${anchor.y}`;
             return (
               <g key={sec} style={{ animationDelay: `${i * 90}ms` }}>
                 <path
@@ -443,7 +425,7 @@ function ClustersView({ selected, setSelected, trace }) {
                 />
                 <circle
                   className="trace-endcap"
-                  cx={ANCHOR_X - 2} cy={anchor.y}
+                  cx={ANCHOR_X} cy={anchor.y}
                   fill={RA.accent}
                   style={{ animationDelay: `${i * 90 + 500}ms` }}
                 />
@@ -602,13 +584,105 @@ function ListView({ selected, setSelected }) {
   );
 }
 
+// ── RIGHT PANEL (tabbed: Paper Detail | Trace) ───────────────────────
+function RightPanel({ selected, rightTab, setRightTab }) {
+  return (
+    <div style={{ borderLeft: `1px solid ${RA.line}`, overflow: 'hidden', background: RA.paper2, display: 'flex', flexDirection: 'column' }}>
+      {/* tabs */}
+      <div style={{ display: 'flex', borderBottom: `1px solid ${RA.line}`, background: RA.paper2, flexShrink: 0 }}>
+        {[
+          { id: 'detail', label: 'Paper detail' },
+          { id: 'trace',  label: 'Trace' },
+        ].map(t => {
+          const active = rightTab === t.id;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setRightTab(t.id)}
+              style={{
+                flex: 1,
+                padding: '12px 16px',
+                fontFamily: RA.mono, fontSize: 10.5,
+                letterSpacing: 0.1, textTransform: 'uppercase',
+                background: active ? RA.paper2 : 'transparent',
+                color: active ? RA.accentDeep : RA.ink3,
+                border: 'none',
+                borderBottom: `2px solid ${active ? RA.accent : 'transparent'}`,
+                cursor: 'pointer',
+              }}
+            >
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ flex: 1, overflow: 'auto' }}>
+        {rightTab === 'detail' && <PaperDetail selected={selected} />}
+        {rightTab === 'trace'  && <TraceView selected={selected} />}
+      </div>
+    </div>
+  );
+}
+
+// ── TRACE VIEW (manuscript outline in right panel) ───────────────────
+function TraceView({ selected }) {
+  const p = PAPERS.find(x => x.id === selected) || PAPERS[0];
+  const citedSet = new Set(p.sections);
+  const citationsBySection = {};
+  for (const c of p.citations) citationsBySection[c.section] = c.text;
+
+  return (
+    <div style={{ padding: 22 }}>
+      <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, textTransform: 'uppercase', letterSpacing: 0.1, marginBottom: 10 }}>
+        Manuscript outline
+      </div>
+      <div style={{ fontFamily: RA.serif, fontSize: 14, color: RA.ink2, lineHeight: 1.5, marginBottom: 18 }}>
+        <em>{p.label}</em> appears in <b>{p.sections.length}</b> of 4 sections.
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {SECTION_ORDER.map(sec => {
+          const isCited = citedSet.has(sec);
+          return (
+            <div key={sec} style={{
+              padding: 12,
+              background: isCited ? RA.paper : 'transparent',
+              border: `1px solid ${isCited ? RA.accent : RA.lineSoft}`,
+              borderLeft: `3px solid ${isCited ? RA.accent : RA.lineSoft}`,
+              borderRadius: 3,
+              opacity: isCited ? 1 : 0.55,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: isCited ? 8 : 0 }}>
+                <div style={{ fontFamily: RA.serif, fontSize: 14, color: RA.ink, fontWeight: isCited ? 600 : 400 }}>{sec}</div>
+                <div style={{ fontFamily: RA.mono, fontSize: 10, color: isCited ? RA.accent : RA.ink3 }}>
+                  {isCited ? 'cited' : 'not cited'}
+                </div>
+              </div>
+              {isCited && (
+                <div style={{ fontFamily: RA.serif, fontSize: 12.5, color: RA.ink2, lineHeight: 1.55, fontStyle: 'italic' }}>
+                  "{citationsBySection[sec]}"
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ marginTop: 18, fontFamily: RA.mono, fontSize: 10.5, color: RA.ink3, fontStyle: 'italic', lineHeight: 1.55 }}>
+        Co-cited papers (sharing at least one section) are highlighted in the graph.
+      </div>
+    </div>
+  );
+}
+
 // ── DETAIL PANEL ─────────────────────────────────────────────────────
 function PaperDetail({ selected }) {
   const p = PAPERS.find(x => x.id === selected) || PAPERS[0];
   const cluster = CLUSTERS.find(c => c.id === p.c);
 
   return (
-    <div style={{ borderLeft: `1px solid ${RA.line}`, overflow: 'auto', background: RA.paper2, padding: 22 }}>
+    <div style={{ padding: 22 }}>
       <div style={{ fontFamily: RA.mono, fontSize: 10, color: RA.ink3, textTransform: 'uppercase', letterSpacing: 0.1, marginBottom: 10 }}>
         Paper detail
       </div>
