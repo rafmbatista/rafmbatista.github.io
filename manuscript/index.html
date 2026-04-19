@@ -165,37 +165,44 @@
   }
   .closing p a:hover { border-bottom-color: var(--ink); }
 
-  /* Wireframes appendix --------------------------------------- */
-  .wireframes-link {
+  /* Footnotes --------------------------------------------------- */
+  .footnote {
     padding: 40px 24px 56px;
     border-top: 1px solid var(--line);
     margin-top: 40px;
   }
-  .wireframes-link .kicker {
+  .footnote .kicker {
     font-family: var(--font-mono); font-size: var(--fs-xs);
     letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--ink-3); margin-bottom: 12px;
   }
-  .wireframes-link p {
+  .footnote p {
     font-family: var(--font-serif);
     font-size: 16px; line-height: 1.6;
     color: var(--ink-2);
     max-width: 680px; margin: 0 0 14px;
   }
-  .wireframes-link a {
+  .footnote p a {
+    color: var(--ink); text-decoration: none;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 1px;
+    transition: border-color 120ms ease;
+  }
+  .footnote p a:hover { border-bottom-color: var(--ink); }
+  .footnote > a {
     font-family: var(--font-mono); font-size: var(--fs-sm);
     color: var(--ink); text-decoration: none;
     border-bottom: 1px solid var(--line);
     padding-bottom: 1px;
     transition: border-color 120ms ease;
   }
-  .wireframes-link a:hover { border-bottom-color: var(--ink); }
+  .footnote > a:hover { border-bottom-color: var(--ink); }
 
   @media (max-width: 720px) {
     .welcome { padding: 56px 24px 12px; }
     .tour { padding: 56px 24px 16px; }
     .closing { padding: 72px 24px 40px; }
-    .wireframes-link { padding: 32px 24px 40px; }
+    .footnote { padding: 32px 24px 40px; }
   }
 </style>
 </head>
@@ -332,8 +339,16 @@
   <a class="back" href="/notes.html#3" data-cc-id="cc-5">← back to the note</a>
 </section>
 
-<!-- Appendix: wireframes ---------------------------------------- -->
-<section class="container wireframes-link">
+<!-- Footnote: see also ----------------------------------------- -->
+<section class="container footnote">
+  <div class="kicker">See also</div>
+  <p>
+    In putting this together, I was reminded of James Somers's 2018 article in <a href="https://www.theatlantic.com/science/archive/2018/04/the-scientific-paper-is-obsolete/556676/" target="_blank" rel="noopener">The Atlantic</a>. In that piece, he argued that the scientific paper is (was?) obsolete and pointed us to Stephen Wolfram's <a href="https://www.wolfram.com/notebooks/" target="_blank" rel="noopener">computational notebooks</a> and <a href="https://writings.stephenwolfram.com/2017/11/what-is-a-computational-essay/" target="_blank" rel="noopener">computational essays</a> and Bret Victor's <a href="https://worrydream.com/ScientificCommunicationAsSequentialArt/" target="_blank" rel="noopener">redesign of the scientific paper as what might come in it's place. This was all before the world learned of LLMs. Now may actually be when scientific papers become obsolete.</a>. 
+  </p>
+</section>
+
+<!-- Footnote: wireframes ---------------------------------------- -->
+<section class="container footnote">
   <div class="kicker">Appendix</div>
   <p>
     Before the more polished mocks above, Claude Design produced a set of rough wireframes — notes, arrows, IA experiments. You can see them preserved here.
