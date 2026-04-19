@@ -45,7 +45,7 @@ function FiguresScreen() {
       <div className="container" style={{ padding: '32px 24px 0' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, borderTop: `1px solid ${RA.line}`, paddingTop: 24 }}>
           <FNote num="A">
-            <b>Tweaks write code.</b> Switch geoms or palettes in the panel, the R script updates. Every version is a commit.
+            <b>Tinker writes code.</b> Switch geoms or palettes in the panel, the R script updates. Every version is a commit.
           </FNote>
           <FNote num="B">
             <b>Bound to data.</b> Figures reference <code style={{ fontFamily: RA.mono, fontSize: 11.5, background: RA.paper2, padding: '1px 4px' }}>survey_clean.csv</code> by path. Update the data, the figure redraws.
@@ -148,10 +148,10 @@ function FiguresBody(p) {
         </div>
       </div>
 
-      {/* tweaks */}
+      {/* tinker */}
       <div style={{ borderLeft: `1px solid ${RA.line}`, padding: 18, background: RA.paper2, overflow: 'auto' }}>
         <div style={{ fontFamily: RA.mono, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.1, color: RA.ink3, marginBottom: 16 }}>
-          Tweaks · fig2
+          Tinker · fig2
         </div>
 
         <Tweak label="Chart type">
