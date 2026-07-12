@@ -146,6 +146,21 @@
 
       <p class="empty-state" id="no-results" style="display:none;">No notes match your search.</p>
 
+      <!-- Email subscribe (Buttondown) -->
+      <div class="subscribe">
+        <p class="subscribe-intro">Get new notes by email — occasional, only when I write one.</p>
+        <form
+          class="subscribe-form"
+          action="https://buttondown.com/api/emails/embed-subscribe/rafmbatista"
+          method="post"
+          target="popupwindow"
+          onsubmit="window.open('https://buttondown.com/rafmbatista', 'popupwindow')"
+        >
+          <input type="email" name="email" aria-label="Email address" placeholder="you@example.com" required>
+          <button type="submit">Subscribe</button>
+        </form>
+      </div>
+
     </div>
 
     <footer>
