@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Rafael M. Batista — Notes</title>
+    <link>https://rafaelmbatista.com/notes.html</link>
+    <atom:link href="https://rafaelmbatista.com/feed.xml" rel="self" type="application/rss+xml" />
+    <description>A commonplace notebook by Rafael M. Batista — passages, observations, and ideas I want to hold on to.</description>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 12 Jul 2026 00:00:00 +0000</lastBuildDate>
+
+    <!-- Newest note first. When you add a note, add a new <item> at the TOP.
+         guid is a STABLE id (isPermaLink="false") so email tools don't re-send
+         a note if its page URL later changes (e.g. notes.html#1 -> /notes/1.html). -->
+
+    <item>
+      <title>From: Claude Design; For: Researchers</title>
+      <link>https://rafaelmbatista.com/notes.html#3</link>
+      <guid isPermaLink="false">https://rafaelmbatista.com/notes/3</guid>
+      <pubDate>Wed, 29 Apr 2026 00:00:00 +0000</pubDate>
+      <description><![CDATA[On Friday, Anthropic Labs released a preview of Claude Design, an entirely new way to interact with Claude to create visual work like "designs, prototypes, slides, one-pagers, and more." The video blew me away — then I tried it, and imagined a different product built for researchers instead.]]></description>
+    </item>
+
+    <item>
+      <title>Trails and public spaces</title>
+      <link>https://rafaelmbatista.com/notes/2.html</link>
+      <guid isPermaLink="false">https://rafaelmbatista.com/notes/2</guid>
+      <pubDate>Sun, 19 Apr 2026 00:00:00 +0000</pubDate>
+      <description><![CDATA[Kenny Peng and colleagues propose a new design for social media: rather than feeds — where there's only one direction to move in — a better design would facilitate trails. A reply on why the campground or the piazza may be the better analogy.]]></description>
+    </item>
+
+    <item>
+      <title>The family we draw</title>
+      <link>https://rafaelmbatista.com/notes.html#1</link>
+      <guid isPermaLink="false">https://rafaelmbatista.com/notes/1</guid>
+      <pubDate>Sun, 15 Mar 2026 00:00:00 +0000</pubDate>
+      <description><![CDATA[I married my wife a few months ago, in December of 2025. Friends have since asked whether it feels any different — and there is one thing that feels fundamentally different, illustrated by a simple thought experiment: how would you draw your family?]]></description>
+    </item>
+
+  </channel>
+</rss>
