@@ -148,7 +148,7 @@
 
       <!-- Email subscribe (Buttondown) -->
       <div class="subscribe">
-        <p class="subscribe-intro">Get new notes by email — occasional, only when I write one.</p>
+        <p class="subscribe-intro">Get new Notes by email.</p>
         <form
           class="subscribe-form"
           action="https://buttondown.com/api/emails/embed-subscribe/rafmbatista"
@@ -175,38 +175,57 @@
       var search     = document.getElementById('search');
       var noResults  = document.getElementById('no-results');
 
-      // Default view: every note is shown, stacked as a preview list.
-      function showAll() {
-        notes.forEach(function (n) { n.style.display = ''; });
+      var current = null;
+
+      function resetIndexVisibility() {
         indexLinks.forEach(function (l) { l.style.display = ''; });
         indexSeps.forEach(function (s) { s.style.display = ''; });
+      }
+
+      // Show exactly one note; hide the rest.
+      function showOne(target) {
+        if (!target) target = notes[0];
+        current = target;
+        notes.forEach(function (n) {
+          n.style.display = (n === target) ? '' : 'none';
+        });
         noResults.style.display = 'none';
+        resetIndexVisibility();
       }
 
-      function scrollToHash() {
+      function randomNote() {
+        return notes[Math.floor(Math.random() * notes.length)];
+      }
+
+      // On load / back-forward: honor #n if present, else land on a random note.
+      function route() {
         var hash   = window.location.hash.replace('#', '');
-        if (!hash) return;
-        var target = document.getElementById(hash);
-        if (target) target.scrollIntoView();
+        var target = hash ? document.getElementById(hash) : randomNote();
+        search.value = '';
+        showOne(target);
       }
 
-      // Index numbers now scroll to a note instead of isolating it.
-      // Clear an active search first so the target is actually visible.
+      // Index numbers isolate a single note and deep-link it via the hash.
       indexLinks.forEach(function (link) {
-        link.addEventListener('click', function () {
-          if (search.value.trim()) {
-            search.value = '';
-            showAll();
-          }
-          // The default href="#n" jump proceeds after this handler.
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          var target = document.getElementById(this.getAttribute('data-n'));
+          if (!target) return;
+          history.pushState(null, '', '#' + this.getAttribute('data-n'));
+          search.value = '';
+          showOne(target);
+          window.scrollTo(0, 0);
         });
       });
+
+      window.addEventListener('popstate', route);
 
       search.addEventListener('input', function () {
         var query = this.value.toLowerCase().trim();
 
+        // Clearing the search returns to the note you were on (no reshuffle).
         if (!query) {
-          showAll();
+          showOne(current || randomNote());
           return;
         }
 
@@ -239,8 +258,7 @@
         noResults.style.display = (visible === 0) ? 'block' : 'none';
       });
 
-      showAll();
-      scrollToHash();
+      route();
     })();
     </script>
 
