@@ -31,10 +31,12 @@ body{margin:0;background:#C9CDDA;-webkit-text-size-adjust:100%;text-size-adjust:
 :root[data-theme="dark"] body{background:#15151f;}
 :root[data-theme="light"] body{background:#C9CDDA;}
 .stage{display:flex;justify-content:center;padding:min(4vw,44px) 0;}
+.poster-frame{position:relative;}
 
 .poster{
   container-type:inline-size;
-  width:min(95vw,1240px);
+  width:1240px;
+  transform-origin:top left;
   background:var(--paper);
   color:var(--ink);
   font-family:"Source Sans Pro",system-ui,-apple-system,sans-serif;font-weight:420;
@@ -202,7 +204,6 @@ body{margin:0;background:#C9CDDA;-webkit-text-size-adjust:100%;text-size-adjust:
 .prereg .pk{text-transform:uppercase;letter-spacing:.08em;font-size:var(--fs-label);color:var(--muted);font-weight:700;}
 .prereg .pv{font-weight:700;color:var(--ink);}
 .condtable{border-collapse:separate;border-spacing:0;width:100%;font-family:var(--sans);}
-@container (max-width:760px){.condtable{table-layout:fixed;}.condtable td.seq2{white-space:normal;}}
 .condtable caption{text-align:left;font-size:var(--fs-label);text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;padding-bottom:.5cqw;}
 .condtable th{font-size:var(--fs-label);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;text-align:left;padding:0 .5cqw .38cqw;}
 .condtable th.r,.condtable td.r{text-align:right;}
@@ -273,12 +274,14 @@ body{margin:0;background:#C9CDDA;-webkit-text-size-adjust:100%;text-size-adjust:
   /* poster is proportionally taller than A0, so scale to fill the A0 height and
      center it on the sheet (balanced margins, small white border on the sides). */
   .stage{padding:0;display:flex;align-items:center;justify-content:center;min-height:100vh;}
-  .poster{width:752mm;margin:0;box-shadow:none;}
+  .poster{width:752mm;margin:0;box-shadow:none;transform:none!important;}
+  .poster-frame{width:auto!important;height:auto!important;position:static;}
 }
 </style>
 </head>
 <body>
 <div class="stage">
+<div class="poster-frame">
 <div class="poster">
 
   <!-- ===================== MASTHEAD ===================== -->
@@ -460,6 +463,26 @@ body{margin:0;background:#C9CDDA;-webkit-text-size-adjust:100%;text-size-adjust:
 
 </div>
 </div>
+</div>
 <a class="poster-pdf" href="/files/Batista-Griffiths-CogSci2026-poster-letter.pdf" target="_blank" rel="noopener">Download PDF &darr;</a>
+<script>
+(function () {
+  var REF = 1240;
+  var poster = document.querySelector('.poster');
+  var frame  = document.querySelector('.poster-frame');
+  function fit() {
+    var avail = document.documentElement.clientWidth;
+    var s = Math.min(1, avail / REF);
+    poster.style.transform = s < 1 ? 'scale(' + s + ')' : 'none';
+    frame.style.width  = (REF * s) + 'px';
+    frame.style.height = (poster.offsetHeight * s) + 'px';
+  }
+  window.addEventListener('resize', fit);
+  window.addEventListener('orientationchange', fit);
+  window.addEventListener('load', fit);
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(fit); }
+  fit();
+})();
+</script>
 </body>
 </html>
