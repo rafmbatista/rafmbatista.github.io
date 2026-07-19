@@ -25,7 +25,8 @@
   --sans:"Source Sans Pro",system-ui,-apple-system,sans-serif;
 }
 *{box-sizing:border-box;}
-body{margin:0;background:#C9CDDA;}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+body{margin:0;background:#C9CDDA;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 @media (prefers-color-scheme:dark){ body{background:#15151f;} }
 :root[data-theme="dark"] body{background:#15151f;}
 :root[data-theme="light"] body{background:#C9CDDA;}
@@ -201,6 +202,7 @@ body{margin:0;background:#C9CDDA;}
 .prereg .pk{text-transform:uppercase;letter-spacing:.08em;font-size:var(--fs-label);color:var(--muted);font-weight:700;}
 .prereg .pv{font-weight:700;color:var(--ink);}
 .condtable{border-collapse:separate;border-spacing:0;width:100%;font-family:var(--sans);}
+@container (max-width:760px){.condtable{table-layout:fixed;}.condtable td.seq2{white-space:normal;}}
 .condtable caption{text-align:left;font-size:var(--fs-label);text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;padding-bottom:.5cqw;}
 .condtable th{font-size:var(--fs-label);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;text-align:left;padding:0 .5cqw .38cqw;}
 .condtable th.r,.condtable td.r{text-align:right;}
@@ -252,7 +254,20 @@ body{margin:0;background:#C9CDDA;}
 .foot .brand{color:#fff;font-weight:700;}
 .foot .sep{color:var(--syco);padding:0 .6cqw;}
 
+.poster-pdf{
+  position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:20;
+  font-family:"Source Sans Pro",system-ui,-apple-system,sans-serif;
+  font-size:14px;font-weight:600;letter-spacing:.02em;
+  color:#fff;background:#1B1C33;text-decoration:none;
+  padding:11px 20px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 6px 20px rgba(20,22,45,.30);
+  transition:background .15s;
+}
+.poster-pdf:hover{background:#2a2c47;}
+
 @media print{
+  .poster-pdf{display:none;}
   @page{size:841mm 1189mm;margin:0;}
   html,body{background:#fff;}
   /* poster is proportionally taller than A0, so scale to fill the A0 height and
@@ -445,5 +460,6 @@ body{margin:0;background:#C9CDDA;}
 
 </div>
 </div>
+<a class="poster-pdf" href="/files/Batista-Griffiths-CogSci2026-poster-letter.pdf" target="_blank" rel="noopener">Download PDF &darr;</a>
 </body>
 </html>
