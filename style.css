@@ -103,6 +103,49 @@ a:hover { color: var(--accent-hover); text-decoration: underline; text-underline
 .bio { margin-top: 2.5rem; }
 .bio p { color: #555; line-height: 1.8; }
 
+/* Citation tooltip on bio links */
+.cite { position: relative; }
+
+.cite-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: 250px;
+  max-width: 70vw;
+  padding: 0.65rem 0.8rem;
+  background: var(--text);
+  color: var(--bg);
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+  font-weight: 300;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  text-align: left;
+  border-radius: 5px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(-50%, -8px);
+  transition: opacity 0.15s, transform 0.15s;
+  z-index: 20;
+}
+
+.cite-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--text);
+}
+
+.cite:hover .cite-tooltip,
+.cite:focus-within .cite-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -14px);
+}
+
 /* Link list */
 .link-list { list-style: none; display: flex; flex-wrap: wrap; }
 .link-list li { font-size: 0.88rem; font-weight: 400; }
